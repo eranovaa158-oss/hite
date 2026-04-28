@@ -1610,6 +1610,9 @@ public class Account {
         if !supplementary {
             self.managedOperationsDisposable.add(managedNetworkTelemetryReports(postbox: postbox, network: network).start())
         }
+        if !supplementary {
+            self.managedOperationsDisposable.add(managedAutomaticProxyBootstrap(accountManager: accountManager, network: network))
+        }
 
         if !supplementary {
             let mediaBox = postbox.mediaBox

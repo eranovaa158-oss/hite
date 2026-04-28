@@ -164,7 +164,7 @@ public final class ResizableSheetComponent<ChildEnvironmentType: Sendable & Equa
         centeredSize: CGSize? = nil,
         defaultHeight: CGFloat? = nil,
         externalState: ExternalState? = nil,
-        animateOut: ActionSlot<Action<()>>,
+        animateOut: ActionSlot<Action<()>>
     ) {
         self.content = content
         self.titleItem = titleItem

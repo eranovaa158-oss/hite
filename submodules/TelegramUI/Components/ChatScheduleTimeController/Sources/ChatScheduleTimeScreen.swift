@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import UIKit
 import Display
 import ComponentFlow
@@ -568,7 +568,7 @@ private final class ChatScheduleTimeSheetContentComponent: Component {
                         style: .glass,
                         color: environment.theme.list.itemCheckColors.fillColor,
                         foreground: environment.theme.list.itemCheckColors.foregroundColor,
-                        pressedColor: environment.theme.list.itemCheckColors.fillColor.withMultipliedAlpha(0.8),
+                        pressedColor: environment.theme.list.itemCheckColors.fillColor.withMultipliedAlpha(0.8)
                     ),
                     content: AnyComponentWithIdentity(id: AnyHashable(0 as Int), component: AnyComponent(
                         Text(text: buttonTitle, font: Font.semibold(17.0), color: environment.theme.list.itemCheckColors.foregroundColor)
@@ -659,7 +659,7 @@ private final class ChatScheduleTimeSheetContentComponent: Component {
                             style: .glass,
                             color: environment.theme.list.itemCheckColors.fillColor.withMultipliedAlpha(0.1),
                             foreground: environment.theme.list.itemCheckColors.fillColor,
-                            pressedColor: environment.theme.list.itemCheckColors.fillColor.withMultipliedAlpha(0.8),
+                            pressedColor: environment.theme.list.itemCheckColors.fillColor.withMultipliedAlpha(0.8)
                         ),
                         content: AnyComponentWithIdentity(id: AnyHashable(0 as Int), component: AnyComponent(
                             Text(text: strings.Conversation_ScheduleMessage_SendWhenOnline, font: Font.semibold(17.0), color: environment.theme.list.itemCheckColors.fillColor)

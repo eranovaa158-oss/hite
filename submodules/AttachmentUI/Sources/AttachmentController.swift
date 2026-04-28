@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import UIKit
 import Display
 import AsyncDisplayKit
@@ -794,7 +794,7 @@ public class AttachmentController: ViewController, MinimizableController {
                     guard let caption = await mediaPickerContext.caption.get() else {
                         return
                     }
-                    if caption.length == 0 {
+                    if captionText.isEmpty {
                         return
                     }
 
@@ -1846,7 +1846,7 @@ private func findParentGlassBackgroundView(_ view: UIView) -> GlassBackgroundVie
 }
 
 /// The attach-button morph's clip, with four independent corner radii: one layer's `cornerRadii` where
-/// the OS has them, else two nested clips (one top radius, one bottom radius — the larger of each pair).
+/// the OS has them, else two nested clips (one top radius, one bottom radius вЂ” the larger of each pair).
 private final class ClipContainerView: UIView {
     private let clipView = UIView()
     let contentView = UIView()

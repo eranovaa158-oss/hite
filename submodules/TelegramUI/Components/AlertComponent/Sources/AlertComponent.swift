@@ -722,7 +722,7 @@ open class AlertScreen: ViewControllerComponentContainer, KeyShortcutResponder {
             sharedContext: context.sharedContext,
             configuration: configuration,
             content: content,
-            actions: actions,
+            actions: actions
         )
     }
     

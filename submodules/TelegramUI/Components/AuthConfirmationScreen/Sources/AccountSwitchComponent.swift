@@ -97,7 +97,7 @@ public final class AccountSwitchComponent: Component {
                     AvatarComponent(
                         context: component.context,
                         theme: component.theme,
-                        peer: component.peer,
+                        peer: component.peer
                     )
                 ),
                 environment: {},

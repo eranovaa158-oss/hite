@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import UIKit
 import Display
 import ComponentFlow
@@ -569,6 +569,7 @@ public class GlassBackgroundView: UIView {
     public static var useCustomGlassImpl: Bool = false
     
     public override init(frame: CGRect) {
+        #if compiler(>=6.2)
         if #available(iOS 26.0, *), !GlassBackgroundView.useCustomGlassImpl {
             self.legacyView = nil
             self.legacyHighlightContainerView = nil
@@ -601,6 +602,19 @@ public class GlassBackgroundView: UIView {
             
             self.shadowView = UIImageView()
         }
+        #else
+        self.legacyView = LegacyGlassView(frame: CGRect())
+        let legacyHighlightContainerView = UIView()
+        legacyHighlightContainerView.isUserInteractionEnabled = false
+        legacyHighlightContainerView.clipsToBounds = true
+        self.legacyHighlightContainerView = legacyHighlightContainerView
+        self.nativeView = nil
+        self.nativeViewClippingContext = nil
+        self.nativeParamsView = nil
+        self.foregroundView = UIImageView()
+        
+        self.shadowView = UIImageView()
+        #endif
         
         self.maskContainerView = UIView()
         self.maskContainerView.backgroundColor = .white
@@ -865,6 +879,7 @@ public class GlassBackgroundView: UIView {
                         }
                     }
                 }
+                #endif
             }
         }
         
@@ -956,6 +971,11 @@ public final class GlassBackgroundContainerView: UIView {
             self.nativeParamsView = nil
             self.legacyView = ContentView()
         }
+        #else
+        self.nativeView = nil
+        self.nativeParamsView = nil
+        self.legacyView = ContentView()
+        #endif
         
         super.init(frame: CGRect())
         
@@ -1867,7 +1887,7 @@ public final class GlassContextExtractableContainer: UIView, ContextExtractableC
                 tintColor: normalParams.tintColor,
                 isInteractive: normalParams.isInteractive,
                 isVisible: normalParams.isVisible,
-                transition: mappedTransition,
+                transition: mappedTransition
             )
         case let .extracted(size, cornerRadius, extractionState):
             switch extractionState {
@@ -1980,7 +2000,7 @@ extension GlassBackgroundView {
     /// Changes the glass's size along `width`/`height` (animation time from `timing`'s origin; corner radius half the
     /// shorter side) on the render server. The model takes the final size, and every view the glass lays out by its size
     /// gets keyframes: Core Animation keyframes on the effect view resize native glass correctly (measured on iOS 27,
-    /// docs/superpowers/specs/2026-10-14-navbar-keyframed-transitions-design.md §6 results).
+    /// docs/superpowers/specs/2026-10-14-navbar-keyframed-transitions-design.md В§6 results).
     public func animateShape(width: NavigationSpringCurve, height: NavigationSpringCurve, timing: NavigationKeyframeTiming, isDark: Bool, tintColor: TintColor) {
         self.animateShape(sizes: timing.sampleTimes.map { CGSize(width: max(0.0, width.value(at: $0)), height: max(0.0, height.value(at: $0))) }, timing: timing, isDark: isDark, tintColor: tintColor)
     }

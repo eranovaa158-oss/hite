@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import UIKit
 import TelegramPresentationData
 import ChatInputAccessoryPanel
@@ -56,7 +56,7 @@ private func textStringForForwardedMessage(_ message: EngineMessage, strings: Pr
                         return (NSAttributedString(string: strings.Message_Audio), [], true)
                     } else {
                         if let title = title, let performer = performer, !title.isEmpty, !performer.isEmpty {
-                            return (NSAttributedString(string: title + " — " + performer), [], true)
+                            return (NSAttributedString(string: title + " вЂ” " + performer), [], true)
                         } else if let title = title, !title.isEmpty {
                             return (NSAttributedString(string: title), [], true)
                         } else if let performer = performer, !performer.isEmpty {
@@ -803,7 +803,7 @@ public final class ChatInputMessageAccessoryPanel: Component {
                                 return PresentationStrings.FormattedString(string: environment.strings.SuggestPost_SetTimeFormat_TodayAt(value).string, ranges: [])
                             }
                         )).string
-                        textString = NSAttributedString(string: "\(currencySymbol)\(amountString)  📅 \(timeString)", font: textFont, textColor: environment.theme.chat.inputPanel.primaryTextColor)
+                        textString = NSAttributedString(string: "\(currencySymbol)\(amountString)  рџ“… \(timeString)", font: textFont, textColor: environment.theme.chat.inputPanel.primaryTextColor)
                     } else {
                         textString = NSAttributedString(string: environment.strings.Chat_PostSuggestion_Suggest_InputSubtitleAnytime("\(currencySymbol)\(amountString)").string, font: textFont, textColor: environment.theme.chat.inputPanel.primaryTextColor)
                     }

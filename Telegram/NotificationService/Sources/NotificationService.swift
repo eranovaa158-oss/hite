@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import PasscodeCore
 import UserNotifications
 import SwiftSignalKit
@@ -1037,7 +1037,7 @@ private final class NotificationServiceHandler {
                     var messageId: MessageId.Id?
                     var storyId: Int32?
                     var mediaAttachment: Media?
-                    // Commits the notification → message link Siri's announce flow looks up;
+                    // Commits the notification в†’ message link Siri's announce flow looks up;
                     // the poll path runs it ahead of the fetch so the content is handed to the
                     // system only after the link is stored.
                     var recordNotificationLink: Signal<Never, NoError> = .complete()
@@ -2770,10 +2770,10 @@ typealias CMJImage = UIImage
 
 // MARK: - Public Namespace
 
-/// A lightweight utility for turning ordinary bitmap images into ``NSAdaptiveImageGlyph`` (Apple “Genmoji”) objects.
+/// A lightweight utility for turning ordinary bitmap images into ``NSAdaptiveImageGlyph`` (Apple вЂњGenmojiвЂќ) objects.
 ///
 /// ## Overview
-/// The public API is minimal — a single call to generate a glyph and helper utilities for
+/// The public API is minimal вЂ” a single call to generate a glyph and helper utilities for
 /// de/serialising attributed strings.
 ///
 /// ```swift
@@ -2814,11 +2814,11 @@ public struct Customoji {
         case cgImageUnavailable
         /// The `tileSizes` parameter was empty, not strictly ascending, contained duplicates, or exceeded the source size.
         case invalidTileSizes
-        /// No tiles were generated — normally unreachable unless all requested sizes were invalid.
+        /// No tiles were generated вЂ” normally unreachable unless all requested sizes were invalid.
         case noTilesGenerated
         /// The current platform is neither UIKit- nor AppKit-based (unlikely in practice).
         case unsupportedPlatform
-        /// The `heicQuality` parameter was outside the 0.0 … 1.0 range.
+        /// The `heicQuality` parameter was outside the 0.0 вЂ¦ 1.0 range.
         case invalidHeicQuality
         /// Cropping or scaling to a square failed.
         case squareCropFailed
@@ -2909,7 +2909,7 @@ public struct Customoji {
         /// - Returns: A tuple where:
         ///   - plain: UTF-16 plain text.
         ///   - ranges: An array mapping text ranges to glyph identifiers.
-        ///   - blobs: A dictionary mapping identifier → raw HEIC data.
+        ///   - blobs: A dictionary mapping identifier в†’ raw HEIC data.
         @inlinable
         public static func decompose(_ attr: NSAttributedString) -> (
             plain: String, ranges: [(NSRange, String)], blobs: [String: Data]
@@ -2936,7 +2936,7 @@ public struct Customoji {
         /// - Parameters:
         ///   - plain: The plain UTF-16 text.
         ///   - ranges: An array of `(NSRange, identifier)` pairs.
-        ///   - blobs: A dictionary of identifier → HEIC data. *Must* contain every identifier referenced by `ranges`.
+        ///   - blobs: A dictionary of identifier в†’ HEIC data. *Must* contain every identifier referenced by `ranges`.
         /// - Returns: A fully restored `NSAttributedString` with adaptive-image glyphs reinstated.
         public static func recompose(
             plain: String,
@@ -2963,7 +2963,7 @@ public struct Customoji {
     #endif
 
     // MARK: - Helper: Pixel-Side Validation
-    /// Ensures that the image’s **longer edge** does not exceed ``maxSide`` pixels, guarding against
+    /// Ensures that the imageвЂ™s **longer edge** does not exceed ``maxSide`` pixels, guarding against
     /// excessive memory usage during HEIC encoding.
     private static func validatePixelSide(of image: CMJImage) throws {
         #if canImport(UIKit)

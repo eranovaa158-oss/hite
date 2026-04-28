@@ -1,4 +1,4 @@
-#!/bin/sh
+﻿#!/bin/sh
 
 set -e
 set -x
@@ -52,6 +52,7 @@ touch toolchain.cmake
 echo "set(CMAKE_SYSTEM_NAME Darwin)" >> toolchain.cmake
 echo "set(CMAKE_SYSTEM_PROCESSOR aarch64)" >> toolchain.cmake
 echo "set(CMAKE_C_COMPILER $(xcode-select -p)/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang)" >> toolchain.cmake
+echo "set(CMAKE_CXX_COMPILER $(xcode-select -p)/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++)" >> toolchain.cmake
 
 cmake -G"Unix Makefiles" -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake -DCMAKE_OSX_SYSROOT=${IOS_SYSROOT[0]} ../td $options
 make tde2e -j$(sysctl -n hw.ncpu)
