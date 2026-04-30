@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import UIKit
 import Display
 import AccountContext
@@ -189,15 +189,23 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
             } else {
                 proxyType = presentationData.strings.Settings_ProxyDisabled
             }
-            items[.proxy]!.append(PeerInfoScreenDisclosureItem(id: 0, label: .text(proxyType), text: presentationData.strings.Settings_Proxy, icon: PresentationResourcesSettings.proxy, action: {
-                interaction.openSettings(.proxy)
-            }))
+        } else {
+            proxyType = presentationData.strings.Settings_ProxyDisabled
         }
+        items[.proxy]!.append(PeerInfoScreenDisclosureItem(id: 0, label: .text(proxyType), text: presentationData.strings.Settings_Proxy, icon: PresentationResourcesSettings.proxy, action: {
+            interaction.openSettings(.proxy)
+        }))
+        items[.proxy]!.append(PeerInfoScreenDisclosureItem(id: 1, text: "WhiteGram", icon: PresentationResourcesSettings.whiteGram, action: {
+            interaction.openSettings(.whiteGram)
+        }))
     }
     
     var appIndex = 1000
     if let settings = data.globalSettings {
         for bot in settings.bots {
+            if bot.shortName.lowercased() == "wallet" {
+                continue
+            }
             let iconSignal: Signal<UIImage?, NoError>
             if let peer = PeerReference(bot.peer), let icon = bot.icons[.iOSSettingsStatic] {
                 let fileReference: FileMediaReference = .attachBot(peer: peer, media: icon)

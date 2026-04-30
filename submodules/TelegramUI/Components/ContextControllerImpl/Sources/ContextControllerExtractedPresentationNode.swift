@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import UIKit
 import AsyncDisplayKit
 import Display
@@ -199,7 +199,7 @@ private final class PortalTransitionStaging {
     /// Tears down staging. Reparents contentNode into the requested destination,
     /// removes clone from its overlay host, removes wrapper from surface.
     /// All operations are explicit; we rely on Telegram's manual-animation policy
-    /// (no implicit CALayer actions) — no CATransaction wrapping needed.
+    /// (no implicit CALayer actions) вЂ” no CATransaction wrapping needed.
     ///
     /// `presentationScale` re-application is intentionally not handled here: the
     /// portal path is gated on `contentNode.presentationScale == 1.0` in CCEPN's
@@ -223,7 +223,7 @@ private final class PortalTransitionStaging {
             // ContentContainingNode/View added contentNode at init). Capturing
             // contentNode.supernode at staging-enter time was overengineered: during
             // animateOut staging that's offsetContainerNode (CCEPN's transient host),
-            // which gets torn down with CCEPN — leaving the bubble parentless.
+            // which gets torn down with CCEPN вЂ” leaving the bubble parentless.
             switch containingItem {
             case let .node(containingNode):
                 containingNode.addSubnode(containingNode.contentNode)
@@ -468,6 +468,9 @@ final class ContextControllerExtractedPresentationNode: ASDisplayNode, ContextCo
         
         self.scrollNode = ASDisplayNode()
         self.scrollNode.view.addGestureRecognizer(self.scroller.panGestureRecognizer)
+        if case let .location(source) = source, source.keepInPlace {
+            self.scroller.panGestureRecognizer.isEnabled = false
+        }
         
         self.contentRectDebugNode = ASDisplayNode()
         self.contentRectDebugNode.isUserInteractionEnabled = false
@@ -552,6 +555,23 @@ final class ContextControllerExtractedPresentationNode: ASDisplayNode, ContextCo
                 let contentPoint = self.view.convert(point, to: contentNode.view)
                 let _ = contentPoint
                 //TODO:
+            }
+
+            if case let .location(source) = self.source, source.keepInPlace, !self.actionsContainerNode.frame.contains(self.view.convert(point, to: self.scrollNode.view)) {
+                if let controller = self.getController() as? ContextControllerImpl, let passthroughTouchEvent = controller.passthroughTouchEvent {
+                    switch passthroughTouchEvent(self.view, point) {
+                    case .ignore:
+                        break
+                    case let .dismiss(consume, result):
+                        self.requestDismiss(.default)
+                        if let result {
+                            return result
+                        }
+                        if !consume {
+                            return nil
+                        }
+                    }
+                }
             }
             
             if let result = self.scrollNode.hitTest(self.view.convert(point, to: self.scrollNode.view), with: event) {
@@ -785,7 +805,7 @@ final class ContextControllerExtractedPresentationNode: ASDisplayNode, ContextCo
                 contentNodeValue.sourceTransitionSurface = takeInfo.sourceTransitionSurface
 
                 // Mirror any ancestor scale on the source (e.g. a sheet's container transform) onto the offset
-                // container so the extracted contents render at the same visual size as in-place — without this
+                // container so the extracted contents render at the same visual size as in-place вЂ” without this
                 // they pop to 1:1 when reparented into the unscaled overlay window.
                 let sourceView = takeInfo.containingItem.view
                 let modeledWidth = sourceView.bounds.width
@@ -1422,7 +1442,7 @@ final class ContextControllerExtractedPresentationNode: ASDisplayNode, ContextCo
                 contentTransition.updateFrame(node: contentNode, frame: contentFrame, beginWithCurrentState: true)
 
                 // Keep the staging wrapper's frame in sync with ItemContentNode's frame so
-                // chat-side relayouts that fire mid-animation (e.g. via layoutUpdated →
+                // chat-side relayouts that fire mid-animation (e.g. via layoutUpdated в†’
                 // requestUpdate after isExtractedToContextPreview = true) shift the portal
                 // source the same way ItemContentNode shifts. The additive position springs
                 // on wrapper.layer ("position.x" / "position.y") and this layout-pass
@@ -1516,7 +1536,7 @@ final class ContextControllerExtractedPresentationNode: ASDisplayNode, ContextCo
                     // Use ItemContentNode.frame (already includes contentVerticalOffset and
                     // additionalVisibleOffsetY from the layout pass) plus
                     // containingItem.contentRect.origin to derive the bubble's actual rest
-                    // window rect. Using bare `contentRect` skips those offsets — when reactions
+                    // window rect. Using bare `contentRect` skips those offsets вЂ” when reactions
                     // are visible (additionalVisibleOffsetY = reactionContextNode.visibleExtensionDistance)
                     // the wrapper would sit ~10pt above the bubble's true rest, visibly offsetting
                     // the portal mirror until staging.settle reparents into offsetContainerNode.
@@ -1542,7 +1562,7 @@ final class ContextControllerExtractedPresentationNode: ASDisplayNode, ContextCo
                         // is visible at the chat-bubble slot; final (overlay clone, above
                         // chrome) is visible at the menu position. Final fade-in begins
                         // `crossfadeOverlap` seconds before source fade-out, so the final
-                        // is already on screen before the source starts dropping out — no
+                        // is already on screen before the source starts dropping out вЂ” no
                         // single-frame seam at the handoff. Each fade runs for a fixed 0.1s.
                         if let wrapper = staging.wrapper, let clone = staging.clone {
                             let sourceFadeDelay = 0.12 * duration
@@ -1857,7 +1877,7 @@ final class ContextControllerExtractedPresentationNode: ASDisplayNode, ContextCo
                         // Mid-dismiss crossfade: clone (overlay portal target, above chrome)
                         // is visible at the menu position; final (chat-tree wrapper, behind
                         // chrome) is visible once the bubble settles at the chat-bubble
-                        // slot. Late handoff — clone carries the bubble through most of the
+                        // slot. Late handoff вЂ” clone carries the bubble through most of the
                         // dismiss; final picks up only as the bubble lands. Source fade-out
                         // is anchored at 80% of the spring duration; final fade-in starts
                         // `crossfadeOverlap` seconds earlier. Each fade runs for 0.1s.
@@ -1933,7 +1953,7 @@ final class ContextControllerExtractedPresentationNode: ASDisplayNode, ContextCo
                 // update, and the dismissal then runs in the same runloop. At that moment the model
                 // already holds that animation's destination while the content is still rendered at its
                 // start, so the dismissal would begin from where the bubble is GOING rather than where it
-                // IS — an instant jump of the full relayout delta (the reaction row's height), then a
+                // IS вЂ” an instant jump of the full relayout delta (the reaction row's height), then a
                 // correct animation to the chat. Fold the outstanding model-vs-presentation delta back in
                 // so the travel starts from the rendered position. Zero whenever nothing is in flight.
                 if let contentNode = itemContentNode, let presentation = contentNode.layer.presentation() {
@@ -2232,12 +2252,12 @@ final class ContextControllerExtractedPresentationNode: ASDisplayNode, ContextCo
     
     /// Re-aims an in-flight dismiss at the source item's current rest position.
     ///
-    /// `animateOut` samples its landing geometry exactly once — into the staging wrapper's frame,
-    /// or into `offsetContainerNode.position` on the non-portal path — and `layoutUpdated` is
+    /// `animateOut` samples its landing geometry exactly once вЂ” into the staging wrapper's frame,
+    /// or into `offsetContainerNode.position` on the non-portal path вЂ” and `layoutUpdated` is
     /// otherwise suppressed for the rest of the animation. A source item that resizes mid-flight
     /// therefore leaves the travel aiming at a stale target: the bubble lands short and the
     /// reparent in the travel's completion snaps it the remaining distance. That distance is the
-    /// item's own screen displacement, which for a chat bubble is the full height delta — the list
+    /// item's own screen displacement, which for a chat bubble is the full height delta вЂ” the list
     /// is bottom-anchored, so growth lifts the item's top, while the frozen wrapper keeps the
     /// bubble's top where it was.
     ///
@@ -2252,14 +2272,14 @@ final class ContextControllerExtractedPresentationNode: ASDisplayNode, ContextCo
     /// from the primary travel animation, which shares this layer but owns `position.y`; and that
     /// primary animation carries the completion that reparents the content, so it must not be
     /// re-issued. Replacement rather than stacking, under a stable key, with `from` set to the full
-    /// remaining displacement (residual read off the presentation layer plus this pass's delta) —
+    /// remaining displacement (residual read off the presentation layer plus this pass's delta) вЂ”
     /// the same shape as `CoreListNodeHostView`'s height compensation, and for the same reason: a
     /// keyless additive re-issue stacks phase-shifted copies instead of superseding them.
     private func retargetAnimatingOutContent() {
         guard let animatingOutState = self.animatingOutState, let contentNode = self.itemContentNode else {
             return
         }
-        // `animatingOutState` is never cleared — the node is torn down with its controller — so this
+        // `animatingOutState` is never cleared вЂ” the node is torn down with its controller вЂ” so this
         // can still be reached after the travel's completion has reparented the content back into
         // the chat and handed ownership of its geometry over. That completion clears the flag
         // immediately after settling.

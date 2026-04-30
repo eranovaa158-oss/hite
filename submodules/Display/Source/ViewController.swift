@@ -772,6 +772,10 @@ public protocol CustomViewControllerNavigationDataSummary: AnyObject {
     open func tabBarActivateSearch() {
     }
 
+    open func tabBarActivateSearchFromCompactMenu() {
+        self.tabBarActivateSearch()
+    }
+
     open func tabBarDeactivateSearch() {
     }
     

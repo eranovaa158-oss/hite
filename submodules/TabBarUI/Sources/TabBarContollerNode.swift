@@ -1,8 +1,11 @@
-import Foundation
+﻿import Foundation
 import UIKit
 import AsyncDisplayKit
 import Display
+import AppBundle
 import TelegramPresentationData
+import TelegramUIPreferences
+import ContextUI
 import ComponentFlow
 import ComponentDisplayAdapters
 import TabBarComponent
@@ -32,7 +35,7 @@ final class TabBarControllerNode: ASDisplayNode {
             self.itemCount = itemCount
         }
     }
-    
+
     private struct LayoutResult {
         let params: Params
         let bottomInset: CGFloat?
@@ -42,49 +45,58 @@ final class TabBarControllerNode: ASDisplayNode {
             self.bottomInset = bottomInset
         }
     }
-    
+
     private final class View: UIView {
         var onLayout: (() -> Void)?
-        
+
         override func layoutSubviews() {
             super.layoutSubviews()
-            
+
             self.onLayout?()
         }
     }
-    
+
+    private var presentationData: PresentationData
     private var theme: PresentationTheme
     private var strings: PresentationStrings
+    var whiteGramTabSettings: WhiteGramTabSettings {
+        didSet {
+            if self.whiteGramTabSettings != oldValue {
+                self.requestUpdate()
+            }
+        }
+    }
     private let itemSelected: (Int, Bool, [ASDisplayNode]) -> Void
     private let itemHasDoubleTapAction: (Int) -> Bool
     private let itemDoubleTapped: (Int) -> Void
     private let contextAction: (Int, ContextExtractedContentContainingView, ContextGesture) -> Void
-    
+
     private let tabBarView = ComponentView<Empty>()
-    
+
     private let disabledOverlayNode: ASDisplayNode
     private var toolbar: ComponentView<Empty>?
     private let toolbarActionSelected: (ToolbarActionOption) -> Void
     private let disabledPressed: () -> Void
     private let activateSearch: () -> Void
     private let deactivateSearch: () -> Void
-    
+    private let compactSearchAction: () -> Void
+
     private(set) var tabBarItems: [TabBarNodeItem] = []
     private(set) var selectedIndex: Int = 0
 
     private weak var currentController: ViewController?
-    
+
     private var layoutResult: LayoutResult?
     /// What the last layout pass applied to the bar; its placement is nil while the bar is horizontal.
     private var appliedPlacement: TabBarAppliedPlacement?
     private var isUpdateRequested: Bool = false
     private var isChangingSelectedIndex: Bool = false
-    
+
     func setCurrentController(_ controller: ViewController?) -> () -> Void {
         guard controller !== self.currentController else {
             return {}
         }
-        
+
         let previousNode = self.currentController?.displayNode
         self.currentController = controller
         if let currentControllerNode = self.currentController?.displayNode {
@@ -97,7 +109,7 @@ final class TabBarControllerNode: ASDisplayNode {
                 self.view.bringSubviewToFront(tabBarView)
             }
         }
-        
+
         return { [weak self, weak previousNode] in
             if previousNode !== self?.currentController?.displayNode {
                 previousNode?.removeFromSupernode()
@@ -111,10 +123,12 @@ final class TabBarControllerNode: ASDisplayNode {
         }
         return nil
     }
-    
-    init(theme: PresentationTheme, strings: PresentationStrings, itemSelected: @escaping (Int, Bool, [ASDisplayNode]) -> Void, itemHasDoubleTapAction: @escaping (Int) -> Bool, itemDoubleTapped: @escaping (Int) -> Void, contextAction: @escaping (Int, ContextExtractedContentContainingView, ContextGesture) -> Void, swipeAction: @escaping (Int, TabBarItemSwipeDirection) -> Void, toolbarActionSelected: @escaping (ToolbarActionOption) -> Void, disabledPressed: @escaping () -> Void, activateSearch: @escaping () -> Void, deactivateSearch: @escaping () -> Void) {
-        self.theme = theme
-        self.strings = strings
+
+    init(presentationData: PresentationData, whiteGramTabSettings: WhiteGramTabSettings, itemSelected: @escaping (Int, Bool, [ASDisplayNode]) -> Void, itemHasDoubleTapAction: @escaping (Int) -> Bool, itemDoubleTapped: @escaping (Int) -> Void, contextAction: @escaping (Int, ContextExtractedContentContainingView, ContextGesture) -> Void, swipeAction: @escaping (Int, TabBarItemSwipeDirection) -> Void, toolbarActionSelected: @escaping (ToolbarActionOption) -> Void, disabledPressed: @escaping () -> Void, activateSearch: @escaping () -> Void, deactivateSearch: @escaping () -> Void, compactSearchAction: @escaping () -> Void) {
+        self.presentationData = presentationData
+        self.theme = presentationData.theme
+        self.strings = presentationData.strings
+        self.whiteGramTabSettings = whiteGramTabSettings
         self.itemSelected = itemSelected
         self.itemHasDoubleTapAction = itemHasDoubleTapAction
         self.itemDoubleTapped = itemDoubleTapped
@@ -126,13 +140,14 @@ final class TabBarControllerNode: ASDisplayNode {
         self.disabledPressed = disabledPressed
         self.activateSearch = activateSearch
         self.deactivateSearch = deactivateSearch
+        self.compactSearchAction = compactSearchAction
 
         super.init()
-        
+
         self.setViewBlock({
             return View(frame: CGRect())
         })
-        
+
         (self.view as? View)?.onLayout = { [weak self] in
             guard let self else {
                 return
@@ -144,37 +159,93 @@ final class TabBarControllerNode: ASDisplayNode {
                 }
             }
         }
-        
+
         self.backgroundColor = theme.list.plainBackgroundColor
-        
+
         //self.addSubnode(self.tabBarNode)
         //self.addSubnode(self.disabledOverlayNode)
     }
-    
+
     override func didLoad() {
         super.didLoad()
-        
+
         self.disabledOverlayNode.view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.disabledTapGesture(_:))))
     }
-    
+
     @objc private func disabledTapGesture(_ recognizer: UITapGestureRecognizer) {
         if case .ended = recognizer.state {
             self.disabledPressed()
         }
     }
-    
+
     func updateTheme(_ theme: PresentationTheme) {
         self.theme = theme
         self.backgroundColor = theme.list.plainBackgroundColor
-        
+
         self.disabledOverlayNode.backgroundColor = theme.rootController.tabBar.backgroundColor.withAlphaComponent(0.5)
         self.requestUpdate()
     }
-    
+
+    func updatePresentationData(_ presentationData: PresentationData) {
+        self.presentationData = presentationData
+        self.strings = presentationData.strings
+        self.updateTheme(presentationData.theme)
+        self.requestUpdate()
+    }
+
+    private func openCompactTabMenu(sourceView: UIView) {
+        guard let currentController = self.currentController else {
+            return
+        }
+
+        var items: [ContextMenuItem] = []
+        for index in 0 ..< self.tabBarItems.count {
+            let item = self.tabBarItems[index].item
+            let title = item.title ?? ""
+            if title.isEmpty {
+                continue
+            }
+            items.append(.action(ContextMenuActionItem(text: title, icon: { theme in
+                if let image = item.image {
+                    return generateTintedImage(image: image, color: theme.contextMenu.primaryColor)
+                }
+                return nil
+            }, action: { [weak self] _, f in
+                f(.default)
+                self?.itemSelected(index, false, [])
+            })))
+        }
+
+        items.append(.separator)
+        items.append(.action(ContextMenuActionItem(text: self.strings.Common_Search, icon: { theme in
+            return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Search"), color: theme.contextMenu.primaryColor)
+        }, action: { [weak self] _, f in
+            f(.default)
+            self?.compactSearchAction()
+        })))
+
+        let contextController = makeContextController(
+            presentationData: self.presentationData,
+            source: .location(CompactTabBarContextLocationContentSource(sourceView: sourceView)),
+            items: .single(ContextController.Items(content: .list(items))),
+            gesture: nil
+        )
+        contextController.passthroughTouchEvent = { [weak sourceView] contextView, point in
+            if let sourceView {
+                let sourceFrame = sourceView.convert(sourceView.bounds, to: contextView)
+                if sourceFrame.contains(point) {
+                    return .dismiss(consume: true, result: nil)
+                }
+            }
+            return .dismiss(consume: false, result: nil)
+        }
+        currentController.present(contextController, in: .window(.root))
+    }
+
     func updateIsTabBarEnabled(_ value: Bool, transition: ContainedViewLayoutTransition) {
         transition.updateAlpha(node: self.disabledOverlayNode, alpha: value ? 0.0 : 1.0)
     }
-    
+
     var tabBarHidden = false {
         didSet {
             if self.tabBarHidden != oldValue {
@@ -200,7 +271,7 @@ final class TabBarControllerNode: ASDisplayNode {
             return bottomInset
         }
     }
-    
+
     private func requestUpdate() {
         self.isUpdateRequested = true
         self.view.setNeedsLayout()
@@ -224,6 +295,12 @@ final class TabBarControllerNode: ASDisplayNode {
             }
         }
 
+        let whiteGramTabSettings = self.whiteGramTabSettings
+        let isCompactSearchActive = whiteGramTabSettings.compactPanel && params.currentControllerSearchState?.isActive == true
+        let whiteGramFolderSettings = WhiteGramChatFolderSettings.current
+        if whiteGramTabSettings.compactPanel && !whiteGramFolderSettings.disableFolders && whiteGramFolderSettings.foldersAtBottom && !whiteGramFolderSettings.compactPanel {
+            tabBarBottomInset = max(70.0, panelsBottomInset + 40.0)
+        }
         var sideInset: CGFloat = 12.0
         if tabBarBottomInset <= 28.0 {
             sideInset = 20.0
@@ -270,9 +347,9 @@ final class TabBarControllerNode: ASDisplayNode {
                 strings: self.strings,
                 items: self.tabBarItems.map { item in
                     let itemId = AnyHashable(ObjectIdentifier(item.item))
-                    
+
                     let index = self.tabBarItems.firstIndex(where: { AnyHashable(ObjectIdentifier($0.item)) == itemId }) ?? 0
-                    
+
                     return TabBarComponent.Item(
                         content: .tabBarItem(item.item),
                         action: { [weak self] isLongTap in
@@ -374,7 +451,7 @@ final class TabBarControllerNode: ASDisplayNode {
                 self.toolbar = toolbar
                 toolbarTransition = .immediate
             }
-            
+
             let _ = toolbar.update(
                 transition: toolbarTransition,
                 component: AnyComponent(GlassControlPanelComponent(
@@ -429,7 +506,7 @@ final class TabBarControllerNode: ASDisplayNode {
                 environment: {},
                 containerSize: toolbarFrame.size
             )
-            
+
             if let toolbarView = toolbar.view {
                 if toolbarView.superview == nil {
                     self.view.addSubview(toolbarView)
@@ -454,7 +531,7 @@ final class TabBarControllerNode: ASDisplayNode {
         }
         return params.layout.size.height - tabBarFrame.minY
     }
-    
+
     func frameForControllerTab(at index: Int) -> CGRect? {
         guard let tabBarView = self.tabBarView.view as? TabBarComponent.View else {
             return nil
@@ -464,7 +541,7 @@ final class TabBarControllerNode: ASDisplayNode {
         }
         return self.view.convert(itemFrame, from: tabBarView)
     }
-    
+
     func isPointInsideContentArea(point: CGPoint) -> Bool {
         guard let tabBarView = self.tabBarView.view else {
             return false
@@ -482,15 +559,36 @@ final class TabBarControllerNode: ASDisplayNode {
         }
         return false
     }
-    
+
     func updateTabBarItems(items: [TabBarNodeItem]) {
         self.tabBarItems = items
         self.requestUpdate()
     }
-    
+
     func updateSelectedIndex(index: Int) {
         self.selectedIndex = index
         self.isChangingSelectedIndex = true
         self.requestUpdate()
+    }
+}
+
+private final class CompactTabBarContextLocationContentSource: ContextLocationContentSource {
+    private weak var sourceView: UIView?
+
+    let keepInPlace: Bool = true
+
+    init(sourceView: UIView) {
+        self.sourceView = sourceView
+    }
+
+    func transitionInfo() -> ContextControllerLocationViewInfo? {
+        guard let sourceView = self.sourceView else {
+            return nil
+        }
+        let sourceFrame = sourceView.convert(sourceView.bounds, to: nil)
+        return ContextControllerLocationViewInfo(
+            location: CGPoint(x: sourceFrame.midX, y: sourceFrame.minY),
+            contentAreaInScreenSpace: UIScreen.main.bounds
+        )
     }
 }

@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import Postbox
 import SwiftSignalKit
 import MtProtoKit
@@ -28,7 +28,7 @@ private func makeExclusiveKeychain(id: AccountRecordId, postbox: Postbox) -> Key
         if enabled, let postbox = postbox {
             return postbox.keychainEntryForKey(key)
         } else {
-            Logger.shared.log("Keychain", "couldn't get \(key) — not current")
+            Logger.shared.log("Keychain", "couldn't get \(key) вЂ” not current")
             return nil
         }
     }, set: { [weak postbox] key, data in
@@ -38,7 +38,7 @@ private func makeExclusiveKeychain(id: AccountRecordId, postbox: Postbox) -> Key
         if enabled, let postbox = postbox {
             postbox.setKeychainEntryForKey(key, value: data)
         } else {
-            Logger.shared.log("Keychain", "couldn't set \(key) — not current")
+            Logger.shared.log("Keychain", "couldn't set \(key) вЂ” not current")
         }
     }, remove: { [weak postbox] key in
         let enabled = accountRecordToActiveKeychainId.with { dict -> Bool in
@@ -47,7 +47,7 @@ private func makeExclusiveKeychain(id: AccountRecordId, postbox: Postbox) -> Key
         if enabled, let postbox = postbox {
             postbox.removeKeychainEntryForKey(key)
         } else {
-            Logger.shared.log("Keychain", "couldn't remove \(key) — not current")
+            Logger.shared.log("Keychain", "couldn't remove \(key) вЂ” not current")
         }
     })
 }
@@ -259,7 +259,12 @@ public class UnauthorizedAccount {
         self.proxySettingsDisposable.dispose()
         self.networkEngineStateDisposable.dispose()
     }
-    
+
+    deinit {
+        self.proxySettingsDisposable.dispose()
+        self.automaticProxyBootstrapDisposable.dispose()
+    }
+
     public func changedMasterDatacenterId(accountManager: AccountManager<TelegramAccountManagerTypes>, masterDatacenterId: Int32) -> Signal<UnauthorizedAccount, NoError> {
         if masterDatacenterId == Int32(self.network.datacenterId) {
             return .single(self)
