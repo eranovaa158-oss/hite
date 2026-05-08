@@ -1,10 +1,11 @@
-import Foundation
+﻿import Foundation
 import UIKit
 import AsyncDisplayKit
 import Display
 import SwiftSignalKit
 import TelegramCore
 import TelegramPresentationData
+import TelegramUIPreferences
 import ItemListUI
 import PresentationDataUtils
 import AvatarNode
@@ -2024,7 +2025,12 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                 }
             }
             
+            let whiteGramChatSettings = WhiteGramChatSettings.effectiveChatListSettings
             var avatarDiameter = min(60.0, floor(item.presentationData.fontSize.baseDisplaySize * 60.0 / 17.0))
+            let compactChatLayout = whiteGramChatSettings.compactChatList
+            if compactChatLayout {
+                avatarDiameter = min(38.0, floor(item.presentationData.fontSize.baseDisplaySize * 38.0 / 17.0))
+            }
             
             if case let .peer(peerData) = item.content, let customMessageListData = peerData.customMessageListData, customMessageListData.commandPrefix != nil {
                 avatarDiameter = 40.0
@@ -4028,6 +4034,13 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                 peerRevealOptions = []
                 peerLeftRevealOptions = []
             }
+            if !whiteGramChatSettings.chatSwipeOptions {
+                peerRevealOptions = []
+                peerLeftRevealOptions = []
+            } else if !whiteGramChatSettings.chatSwipeDelete {
+                peerRevealOptions.removeAll(where: { $0.key == RevealOptionKey.delete.rawValue })
+                peerLeftRevealOptions.removeAll(where: { $0.key == RevealOptionKey.delete.rawValue })
+            }
             
             let (onlineLayout, onlineApply) = onlineLayout(online, onlineIsVoiceChat)
             var animateContent = false
@@ -4039,6 +4052,7 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             
             let titleSpacing: CGFloat = -1.0
             let authorSpacing: CGFloat = -3.0
+            let rawContentTopInset = compactChatLayout ? floor(item.presentationData.fontSize.itemListBaseFontSize * 4.0 / 17.0) : floor(item.presentationData.fontSize.itemListBaseFontSize * 8.0 / 17.0)
             var itemHeight: CGFloat = 8.0 * 2.0 + 1.0
             itemHeight -= 21.0
             if case let .peer(peerData) = item.content, let customMessageListData = peerData.customMessageListData, customMessageListData.commandPrefix != nil {
@@ -4050,8 +4064,16 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                 itemHeight += titleSpacing
                 itemHeight += authorSpacing
             }
+            if forceSingleLinePreview && canUseTwoLinePreview {
+                itemHeight = max(58.0, itemHeight - measureLayout.size.height)
+            }
+            if whiteGramChatSettings.compactChatList {
+                let compactTextBlockHeight = titleLayout.size.height + textLayout.size.height
+                let compactTextHeight = rawContentTopInset + compactTextBlockHeight + 5.0
+                itemHeight = max(42.0, compactTextHeight, 38.0 + 4.0)
+            }
                         
-            let rawContentRect = CGRect(origin: CGPoint(x: 2.0, y: layoutOffset + floor(item.presentationData.fontSize.itemListBaseFontSize * 8.0 / 17.0)), size: CGSize(width: rawContentWidth, height: itemHeight - 12.0 - 9.0))
+            let rawContentRect = CGRect(origin: CGPoint(x: 2.0, y: layoutOffset + rawContentTopInset), size: CGSize(width: rawContentWidth, height: itemHeight - 12.0 - 9.0))
             
             let insets = ChatListItemNode.insets(first: first, last: last, firstWithHeader: firstWithHeader)
             var heightOffset: CGFloat = 0.0

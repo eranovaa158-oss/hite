@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import TelegramCore
 import TelegramPresentationData
 import TelegramUIPreferences
@@ -107,8 +107,9 @@ public func stringForMessageTimestampStatus(
         timestamp = orignalDate
     }
     
-    var dateText = stringForMessageTimestamp(timestamp: timestamp, dateTimeFormat: dateTimeFormat)
-    if timestamp == scheduleWhenOnlineTimestamp {
+    let whiteGramSettings = WhiteGramChatSettings.current
+    var dateText = whiteGramSettings.hideMessageTimestamp ? "" : stringForMessageTimestamp(timestamp: timestamp, dateTimeFormat: dateTimeFormat, withSeconds: whiteGramSettings.showSecondsInMessageTimestamp)
+    if !whiteGramSettings.hideMessageTimestamp && timestamp == scheduleWhenOnlineTimestamp {
         dateText = "         "
     }
     
@@ -179,7 +180,9 @@ public func stringForMessageTimestampStatus(
             dateText = strings.Message_FullDateFormat(dayText, stringForMessageTimestamp(timestamp: timestamp, dateTimeFormat: dateTimeFormat)).string
         }
     } else if let forwardInfo = message.forwardInfo, forwardInfo.flags.contains(.isImported) {
-        dateText = strings.Message_ImportedDateFormat(dateStringForDay(strings: strings, dateTimeFormat: dateTimeFormat, timestamp: forwardInfo.date), stringForMessageTimestamp(timestamp: forwardInfo.date, dateTimeFormat: dateTimeFormat), dateText).string
+        if !whiteGramSettings.hideMessageTimestamp {
+            dateText = strings.Message_ImportedDateFormat(dateStringForDay(strings: strings, dateTimeFormat: dateTimeFormat, timestamp: forwardInfo.date), stringForMessageTimestamp(timestamp: forwardInfo.date, dateTimeFormat: dateTimeFormat, withSeconds: whiteGramSettings.showSecondsInMessageTimestamp), dateText).string
+        }
     }
     
     var authorTitle: String?
@@ -247,7 +250,11 @@ public func stringForMessageTimestampStatus(
         
     } else {
         if let authorTitle = authorTitle, !authorTitle.isEmpty {
-            dateText = "\(authorTitle), \(dateText)"
+            if dateText.isEmpty {
+                dateText = authorTitle
+            } else {
+                dateText = "\(authorTitle), \(dateText)"
+            }
         }
     }
     

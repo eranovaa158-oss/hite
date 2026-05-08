@@ -1653,9 +1653,11 @@ class ChatControllerNode: ASDisplayNode, ASScrollViewDelegate {
         if let titleAccessoryPanelNode {
             self.currentTitleAccessoryPanelNode = titleAccessoryPanelNode
             let panelKey = "\(type(of: titleAccessoryPanelNode))"
+            let hidesPanelBackground = titleAccessoryPanelNode is ChatPinnedMessageTitlePanelNode && ChatPinnedMessageTitlePanelNode.shouldUseCompactPinnedMessagesPanel(interfaceState: self.chatPresentationInterfaceState, context: self.context)
             headerPanels.append(HeaderPanelContainerComponent.Panel(
                 key: panelKey,
                 orderIndex: 3,
+                hidesBackground: hidesPanelBackground,
                 component: AnyComponent(LegacyChatHeaderPanelComponent(
                     panelNode: titleAccessoryPanelNode,
                     interfaceState: self.chatPresentationInterfaceState
@@ -1744,6 +1746,7 @@ class ChatControllerNode: ASDisplayNode, ASScrollViewDelegate {
         }
         
         var floatingTopicsPanelInsets = UIEdgeInsets()
+        let headerPanelsAffectLayout = headerPanels.contains(where: { !$0.hidesBackground })
         
         var headerPanelsSize: CGSize?
         if !headerPanels.isEmpty {
@@ -1768,7 +1771,9 @@ class ChatControllerNode: ASDisplayNode, ASScrollViewDelegate {
                 containerSize: CGSize(width: layout.size.width - layout.safeInsets.left - layout.safeInsets.right, height: layout.size.height)
             )
             headerPanelsSize = headerPanelsSizeValue
-            floatingTopicsPanelInsets.top += headerPanelsSizeValue.height
+            if headerPanelsAffectLayout {
+                floatingTopicsPanelInsets.top += headerPanelsSizeValue.height
+            }
         } else if let headerPanelsView = self.headerPanelsView {
             self.headerPanelsView = nil
             if let headerPanelsComponentView = headerPanelsView.view {
@@ -2776,7 +2781,9 @@ class ChatControllerNode: ASDisplayNode, ASScrollViewDelegate {
                 self.floatingTopicsPanelContainer.view.addSubview(headerPanelsComponentView)
             }
             headerPanelsTransition.setFrame(view: headerPanelsComponentView, frame: headerPanelsFrame)
-            sidePanelTopInset += headerPanelsSize.height + 2.0
+            if headerPanelsAffectLayout {
+                sidePanelTopInset += headerPanelsSize.height + 2.0
+            }
         }
         
         if let footerPanelsComponentView = self.footerPanelsView?.view, let footerPanelsSize {

@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import UIKit
 import SwiftSignalKit
 import Display
@@ -786,11 +786,11 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
     // Returns whether navigation actually STARTED. The result is load-bearing: the caller freezes the
     // overscroll control before handing over, and nothing ever unfreezes it, so a handler that
     // declines (no navigation controller, or unset entirely) would strand the control over the bottom
-    // of a chat that is going nowhere — the same permanent dead band this whole subsystem was
+    // of a chat that is going nowhere вЂ” the same permanent dead band this whole subsystem was
     // debugged for.
     var openNextChannelToRead: ((EnginePeer, (id: Int64, data: MessageHistoryThreadData)?, TelegramEngine.NextUnreadChannelLocation) -> Bool)?
 
-    // The two stages of the "no next channel" landing — a 0.3s dwell, then a 0.2s ramp — held so a
+    // The two stages of the "no next channel" landing вЂ” a 0.3s dwell, then a 0.2s ramp вЂ” held so a
     // second qualifying release can tear the first one down before starting its own. Both stages are
     // needed: cancelling only the ramp leaves a pending dwell that later starts a ramp from a hold
     // distance nobody set.
@@ -1018,12 +1018,12 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
         nextClientId += 1
 
         self.rotated = rotated
-        // CoreList is the DEFAULT backend for the rotated history — the bottom-up chat proper, which is
+        // CoreList is the DEFAULT backend for the rotated history вЂ” the bottom-up chat proper, which is
         // the only surface it has been built and verified against. `rotated` is `false` by default on
         // this initializer, so every other list built from it (the overlay audio player's playlist, the
         // shared-context message list, an embedded chat preview) keeps `ListViewImpl` without naming it.
         var useCoreListBackend = rotated
-        // The Debug Settings switch keeps its original meaning — force CoreList on — which after the
+        // The Debug Settings switch keeps its original meaning вЂ” force CoreList on вЂ” which after the
         // default flip is only reachable for the non-rotated lists above.
         if context.sharedContext.immediateExperimentalUISettings.coreListChatBackend {
             useCoreListBackend = true
@@ -1332,8 +1332,8 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
             }
             // One-shot: the expansion belongs to the gesture that produced it, so consume it here
             // rather than leaving it for the next release to find. `maybeUpdateOverscrollAction`
-            // only ever WRITES this value in its create branch — the removal branch leaves it
-            // standing — so a swipe that reached full expansion and then stopped being reported as
+            // only ever WRITES this value in its create branch вЂ” the removal branch leaves it
+            // standing вЂ” so a swipe that reached full expansion and then stopped being reported as
             // overscrolled (the control is dismissed, the offset goes non-negative, the chat stops
             // offering the action) parks it at 1.0 permanently, and the next unrelated drag release
             // anywhere in the chat fires this action. Reading it into a local keeps the reset
@@ -1343,7 +1343,7 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
             strongSelf.currentOverscrollExpandProgress = 0.0
             if strongSelf.offerNextChannelToRead, expandProgress >= 0.99 {
                 if let nextChannelToRead = strongSelf.nextChannelToRead {
-                    // A landing may already be running from an earlier release — the control stays at
+                    // A landing may already be running from an earlier release вЂ” the control stays at
                     // full expansion for its whole duration, so a second qualifying release inside it
                     // is easy to make. Stop its stages before handing this node to the transition,
                     // but leave the hold where it stands: `prepareSnapshotState` runs synchronously
@@ -1357,7 +1357,7 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
                     //
                     // But undo it if navigation did not start. Nothing else ever clears this flag, so
                     // a declined hand-over used to leave `maybeUpdateOverscrollAction` returning early
-                    // forever with the control still installed — a permanent dead band at the bottom
+                    // forever with the control still installed вЂ” a permanent dead band at the bottom
                     // of the chat, which is precisely the defect class this subsystem was debugged
                     // for. Also release any hold the cancelled landing left standing; the snapshot
                     // that would have consumed it was never taken.
@@ -1370,7 +1370,7 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
                     // flight toward the resting edge one callback ago; moving the edge is a durable
                     // trajectory invalidation, so the flight rebakes and settles into the held
                     // position instead. Applying the hold and letting the flight finish is therefore
-                    // the mechanism — halting motion in place instead would strand the content
+                    // the mechanism вЂ” halting motion in place instead would strand the content
                     // wherever the finger happened to lift, which is neither the resting position nor
                     // the held one.
                     //
@@ -1416,7 +1416,7 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
         // defer to a two-touch pan by enumerating `pan.view.gestureRecognizers`
         // (`Display/Source/ListViewScroller.swift:22` and its port in `PhysicsScrollEngine`), so a
         // recognizer attached to an ancestor is invisible to that scan. It would still receive
-        // touches — UIKit collects recognizers up the whole chain — but the scroll pan would begin
+        // touches вЂ” UIKit collects recognizers up the whole chain вЂ” but the scroll pan would begin
         // with two fingers down and, granting no simultaneity, starve this recognizer: a two-finger
         // selection drag scrolls the chat instead of selecting.
         self.listView.scrollGestureHostView.addGestureRecognizer(selectionRecognizer)
@@ -2537,7 +2537,7 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
 
                 if let strongSelf = self, updatedScrollPosition == nil, case .InteractiveChanges = reason, let previous = previous {
                     // ONE sample feeds both gates below. They are compared against each other to decide a
-                    // scroll position, and this runs while a transaction is being PREPARED — so the
+                    // scroll position, and this runs while a transaction is being PREPARED вЂ” so the
                     // question is what state the list is in, not where a pass in flight happens to have
                     // the content at this instant. On ListViewImpl the settled and presented geometries
                     // are the same thing; under a hosting backend, two separate reads would let "am I
@@ -2846,8 +2846,8 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
     // the "you are all caught up" control stays legible for a beat, then ramp the hold away.
     //
     // Restart semantics, and they are the point of the method existing. The control sits at full
-    // expansion for the whole 0.5s — `maybeUpdateOverscrollAction` keeps recomputing progress from a
-    // reported offset that the hold itself pins at `-holdDistance` — so a second release inside the
+    // expansion for the whole 0.5s вЂ” `maybeUpdateOverscrollAction` keeps recomputing progress from a
+    // reported offset that the hold itself pins at `-holdDistance` вЂ” so a second release inside the
     // window arrives with `expandProgress` back at 1.0 and qualifies again. Previously each release
     // scheduled its own dwell and its own animator with nothing tying them together, and the
     // interleavings all ended somewhere wrong: an early ramp's completion clearing
@@ -2862,7 +2862,7 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
         self.listView.holdOverscrollAction(distance: ChatHistoryListNodeImpl.overscrollActionHoldDistance, movesContent: false)
 
         // A cancellable dwell rather than `Queue.mainQueue().after`, which hands back nothing to
-        // cancel — that is what let a superseded release still start a ramp 0.3s later.
+        // cancel вЂ” that is what let a superseded release still start a ramp 0.3s later.
         let dwell = SwiftSignalKit.Timer(timeout: 0.3, repeat: false, completion: { [weak self] in
             guard let self else {
                 return
@@ -2891,8 +2891,8 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
     }
 
     // Stops both stages and nothing else. It deliberately does NOT release the hold or clear
-    // `freezeOverscrollControlProgress`: both callers own what happens to the geometry next — one
-    // re-establishes them immediately, the other is freezing the current frame into a snapshot — and
+    // `freezeOverscrollControlProgress`: both callers own what happens to the geometry next вЂ” one
+    // re-establishes them immediately, the other is freezing the current frame into a snapshot вЂ” and
     // zeroing the hold in between would emit an at-rest content offset that dismisses the control for
     // a turn before it comes back.
     private func cancelOverscrollActionLanding() {
@@ -2906,7 +2906,7 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
         if self.freezeOverscrollControl {
             return
         }
-        if let offset = offset, offset < -0.1, self.offerNextChannelToRead, let chatControllerNode = self.controllerInteraction.chatControllerNode() as? ChatControllerNode, chatControllerNode.shouldAllowOverscrollActions {
+        if let offset = offset, offset < -0.1, WhiteGramChatSettings.current.channelSwipeToNext, self.offerNextChannelToRead, let chatControllerNode = self.controllerInteraction.chatControllerNode() as? ChatControllerNode, chatControllerNode.shouldAllowOverscrollActions {
             let overscrollView: ComponentHostView<Empty>
             if let current = self.overscrollView {
                 overscrollView = current
@@ -2936,9 +2936,9 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
             self.currentOverscrollExpandProgress = expandProgress
 
             // Move the edge WHILE THE FINGER IS DOWN, where the backend can do it without moving
-            // content. The physics reads the edge before we hear about the release —
+            // content. The physics reads the edge before we hear about the release вЂ”
             // `launchFlight` hands off and bakes the whole flight inside the pan's `.ended`, and only
-            // then fires `didEndDragging` — so a hold applied at release is one step late, and out of
+            // then fires `didEndDragging` вЂ” so a hold applied at release is one step late, and out of
             // bounds that step is spring-shaped and proportional to the overscroll. Held from here,
             // the gesture has ONE edge and the opening is sized for it.
             if self.isDraggingForOverscrollAction, self.listView.holdsOverscrollActionDuringDrag,
@@ -4330,7 +4330,7 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
             } else {
                 // The batch is not eligible for the dust effect (empty, or a found item is too tall to snapshot).
                 // The ids were tentatively marked applied above, which would give them the custom 0.8s delete
-                // duration (getCustomItemDeleteAnimationDuration) WITHOUT any dust — a slow, dust-less collapse
+                // duration (getCustomItemDeleteAnimationDuration) WITHOUT any dust вЂ” a slow, dust-less collapse
                 // with the item never hidden. Drop them so they fall back to the default list delete animation.
                 // They stay consumed from currentDeleteAnimationCorrelationIds, so they are not re-processed.
                 appliedDeleteAnimationCorrelationIds.removeAll()
@@ -4971,7 +4971,7 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
         }*/
         var scrollToItem: ListViewScrollToItem?
         // The unread-separator re-pin used to be computed here, from `itemNode.index` and
-        // `itemNode.frame` — both of which only mean anything on ListViewImpl, so the behavior was
+        // `itemNode.frame` вЂ” both of which only mean anything on ListViewImpl, so the behavior was
         // silently dead under any hosting backend. It is now a backend responsibility
         // (`maintainsUnreadItemAlignment`), because the measurement and the re-pin straddle this
         // pass's inset change and only the backend can keep them atomic.
@@ -5620,12 +5620,12 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
         return self.listView.contentHeight
     }
     // The view that owns the scroll pan gesture recognizer. Since the composition refactor,
-    // `self.view` is the rotated wrapper and the pan lives on a descendant — so ChatControllerNode's
+    // `self.view` is the rotated wrapper and the pan lives on a descendant вЂ” so ChatControllerNode's
     // previewing-mode hitTest fallback must return THIS view: returning an ancestor of the pan's view
     // binds the touch above the pan, which then never fires, and scrolling silently breaks.
     //
     // This is ASKED OF THE BACKEND rather than derived as `self.listView.view`, which is what it used
-    // to be. That spelling encoded "the backend's own view owns the pan" — true for `ListViewImpl`,
+    // to be. That spelling encoded "the backend's own view owns the pan" вЂ” true for `ListViewImpl`,
     // and false for `CoreListChatHistoryBackend`, where the pan sits two levels lower on the scroll
     // engine's content host. So the composition fix reproduced the very bug it fixed as soon as a
     // second backend existed, with no build error: previewing mode could not scroll under CoreList.
@@ -5707,7 +5707,7 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
         set { self.listView.verticalScrollIndicatorColor = newValue }
     }
     // True when the current/most-recent scroll gesture was a real interactive drag (the finger moved the
-    // content) that began pinned to the content origin — within 10pt of index 0, which is the
+    // content) that began pinned to the content origin вЂ” within 10pt of index 0, which is the
     // newest-message edge given the rotated list. Each backend owns the predicate now; this used to
     // recombine a raw `trackingOffset`/`beganTrackingAtTopOrigin` pair read off the backend.
     public var didInteractivelyDragFromTopOrigin: Bool {

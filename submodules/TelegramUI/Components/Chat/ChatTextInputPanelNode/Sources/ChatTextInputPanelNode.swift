@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import LottieSettings
 import UniformTypeIdentifiers
 import UIKit
@@ -7,6 +7,7 @@ import AsyncDisplayKit
 import SwiftSignalKit
 import TelegramCore
 import TelegramPresentationData
+import TelegramUIPreferences
 import TextFormat
 import AccountContext
 import TouchDownGesture
@@ -276,20 +277,20 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
     
     private var enableBounceAnimations: Bool = false
     // Rich-input configuration from the server flag `ios_rich_input_mode` (Double): 0 / absent (default) is the
-    // dual-field switch — the composer defaults to the legacy field and latches to native only when content
+    // dual-field switch вЂ” the composer defaults to the legacy field and latches to native only when content
     // becomes legacy-non-representable; 1 is always-native; 2 is legacy-only. The `useInputDecEngine` experimental
-    // flag (Debug Settings ▸ "Input V3") forces always-native regardless of `ios_rich_input_mode`.
+    // flag (Debug Settings в–ё "Input V3") forces always-native regardless of `ios_rich_input_mode`.
     // `enableRichTextInput` = native is permitted at all (false only in legacy-only mode);
     // `alwaysUseNativeInput` = native from the start (mode 1 or `useInputDecEngine`). See `desiredUseNative(for:)`.
     private var enableRichTextInput: Bool = false
     private var alwaysUseNativeInput: Bool = false
-    // Which input backend a NATIVE composer is built for — orthogonal to the two flags above, which
-    // decide WHETHER the native composer is used at all. Production stays `.legacy`; Debug Settings ▸
+    // Which input backend a NATIVE composer is built for вЂ” orthogonal to the two flags above, which
+    // decide WHETHER the native composer is used at all. Production stays `.legacy`; Debug Settings в–ё
     // "Text Field v2: InputDec backend" (`inputDecTextBackend`) selects `.inputDecIfSupported`, which
     // itself falls back to legacy on a runtime the InputDec backend cannot drive.
     private var richTextInputBackendPreference: RichTextEditorInputBackendPreference = .legacy
-    /// Debug Settings ▸ "Input V3". Selects the engine-backed editor
-    /// rather than a backend of the legacy one — a different type, read once at panel setup.
+    /// Debug Settings в–ё "Input V3". Selects the engine-backed editor
+    /// rather than a backend of the legacy one вЂ” a different type, read once at panel setup.
     private var useInputDecEngineEditor: Bool = false
     
     public var displayAttachmentMenu: () -> Void = { }
@@ -426,7 +427,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
 
         // The quote (`.block`) attribute used to be copied from the character at the range start onto the
         // replacement so inserted text inherited the quote. `replacingFlatRange` splices into the quote's
-        // own content, so that is now automatic — see
+        // own content, so that is now automatic вЂ” see
         // `ChatInputContentInsertIntoQuoteTests.test_insertingInsideAQuote_staysQuotedWithoutAnyAttributeCopying`.
         let updatedState = textInputState.replacingFlatRange(
             NSRange(location: range.lowerBound, length: range.count),
@@ -532,7 +533,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
             }
             if richTextInputNode.usesNativeRichTextEngine {
                 // Pass the model content DIRECTLY (not via `state.inputText`, which flattens structural blocks through
-                // `NSAttributedString`) — see `inputTextState`. Flat for the legacy node, lossless for native.
+                // `NSAttributedString`) вЂ” see `inputTextState`. Flat for the legacy node, lossless for native.
                 let content = state.content
                 richTextInputNode.setInputContent(
                     content,
@@ -541,9 +542,9 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
             } else {
                 richTextInputNode.applyRenderingConfig(context: context, baseFontSize: baseFontSize, textColor: textColor, primaryTextColor: primaryTextColor, accentTextColor: accentTextColor, spoilersRevealed: richTextInputNode.spoilersRevealed, availableEmojis: (self.context?.animatedEmojiStickersValue.keys).flatMap(Set.init) ?? Set(), emojiViewProvider: self.emojiViewProvider)
                 // The node runs the in-place fix-up (`refreshTextInputAttributes`) inside `setInputContent` now,
-                // using the config supplied by `applyRenderingConfig` above — so the panel no longer drives it.
+                // using the config supplied by `applyRenderingConfig` above вЂ” so the panel no longer drives it.
                 // Pass the model content DIRECTLY (not via `state.inputText`, which flattens structural blocks through
-                // `NSAttributedString`) — see `inputTextState`. Flat for the legacy node, lossless for native.
+                // `NSAttributedString`) вЂ” see `inputTextState`. Flat for the legacy node, lossless for native.
                 let content = state.content
                 richTextInputNode.setInputContent(
                     content,
@@ -582,7 +583,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
             }
             if richTextInputNode.usesNativeRichTextEngine {
                 // Pass the model content DIRECTLY (not via `state.inputText`, which flattens structural blocks through
-                // `NSAttributedString`) — see `inputTextState`. Flat for the legacy node, lossless for native.
+                // `NSAttributedString`) вЂ” see `inputTextState`. Flat for the legacy node, lossless for native.
                 let content = state.content
                 richTextInputNode.setInputContent(
                     content,
@@ -591,9 +592,9 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
             } else {
                 richTextInputNode.applyRenderingConfig(context: context, baseFontSize: baseFontSize, textColor: textColor, primaryTextColor: primaryTextColor, accentTextColor: accentTextColor, spoilersRevealed: richTextInputNode.spoilersRevealed, availableEmojis: (self.context?.animatedEmojiStickersValue.keys).flatMap(Set.init) ?? Set(), emojiViewProvider: self.emojiViewProvider)
                 // The node runs the in-place fix-up (`refreshTextInputAttributes`) inside `setInputContent` now,
-                // using the config supplied by `applyRenderingConfig` above — so the panel no longer drives it.
+                // using the config supplied by `applyRenderingConfig` above вЂ” so the panel no longer drives it.
                 // Pass the model content DIRECTLY (not via `state.inputText`, which flattens structural blocks through
-                // `NSAttributedString`) — see `inputTextState`. Flat for the legacy node, lossless for native.
+                // `NSAttributedString`) вЂ” see `inputTextState`. Flat for the legacy node, lossless for native.
                 let content = state.content
                 richTextInputNode.setInputContent(
                     content,
@@ -772,6 +773,13 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
         
         super.init()
         
+        self.whiteGramChatSettingsObserver = NotificationCenter.default.addObserver(forName: WhiteGramChatSettings.updatedNotification, object: nil, queue: .main) { [weak self] _ in
+            guard let self, let presentationInterfaceState = self.presentationInterfaceState, let (width, leftInset, rightInset, bottomInset, additionalSideInsets, maxHeight, maxOverlayHeight, metrics, isSecondary, isMediaInputExpanded) = self.validLayout else {
+                return
+            }
+            let _ = self.updateLayout(width: width, leftInset: leftInset, rightInset: rightInset, bottomInset: bottomInset, additionalSideInsets: additionalSideInsets, maxHeight: maxHeight, maxOverlayHeight: maxOverlayHeight, isSecondary: isSecondary, transition: .animated(duration: 0.25, curve: .easeInOut), interfaceState: presentationInterfaceState, metrics: metrics, isMediaInputExpanded: isMediaInputExpanded)
+        }
+
         self.view.addSubview(self.glassBackgroundContainer)
         
         self.slowModeButton.requestUpdate = { [weak self] in
@@ -825,7 +833,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
             self.richTextInputBackendPreference = .inputDecIfSupported
         }
         // Below iOS 18.4 the engine editor cannot be built (`RichTextEditorChatInputNode` checks the
-        // same availability), so the flag must change nothing there — not even force the composer
+        // same availability), so the flag must change nothing there вЂ” not even force the composer
         // native, which is what setting the two flags below without the check did.
         if context.sharedContext.immediateExperimentalUISettings.useInputDecEngine, #available(iOS 18.4, *) {
             // Rich input must be on for the composer to build a rich node at all; the engine editor
@@ -914,6 +922,9 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
         
         self.mediaActionButtons.micButton.beginRecording = { [weak self] in
             if let strongSelf = self, let presentationInterfaceState = strongSelf.presentationInterfaceState, let interfaceInteraction = strongSelf.interfaceInteraction {
+                guard WhiteGramChatSettings.current.voiceMessageButton else {
+                    return
+                }
                 let isVideo: Bool
                 switch presentationInterfaceState.interfaceState.mediaRecordingMode {
                     case .audio:
@@ -1096,6 +1107,9 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
         self.statusDisposable.dispose()
         self.tooltipController?.dismiss()
         self.currentEmojiSuggestion?.disposable.dispose()
+        if let whiteGramChatSettingsObserver = self.whiteGramChatSettingsObserver {
+            NotificationCenter.default.removeObserver(whiteGramChatSettingsObserver)
+        }
     }
     
     override public func didLoad() {
@@ -1246,12 +1260,12 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
             case .delete:
                 context.delete()
             case .toggleLayout:
-                break   // mosaic↔slideshow toggle is article-editor only; the composer is mosaic-only
+                break   // mosaicв†”slideshow toggle is article-editor only; the composer is mosaic-only
             }
         }
-        // Report "typing…" chat activity on a genuine text edit. The legacy backend gets this from
+        // Report "typingвЂ¦" chat activity on a genuine text edit. The legacy backend gets this from
         // `chatInputTextNode(shouldChangeTextIn:)`; the native editor never calls that delegate, so it fires
-        // this hook instead (and gates out caret moves / programmatic content sets — see the node).
+        // this hook instead (and gates out caret moves / programmatic content sets вЂ” see the node).
         richTextInputNode.onTypingActivity = { [weak self] in self?.updateActivity() }
         richTextInputNode.inputHitTestSlop = UIEdgeInsets(top: -5.0, left: -12.0, bottom: -5.0, right: -5.0)
         richTextInputNode.keyboardAppearance = keyboardAppearance
@@ -1368,8 +1382,8 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
                     // The engine editor focuses ITSELF from its own text tap, and that tap must find
                     // the field unfocused. Focusing here first (this fires from `touchesEnded`, before
                     // UIKit's text multi-tap action) made that action see a first responder whose
-                    // caret was already under the finger — a draft or seed leaves it at the end, where
-                    // one taps to continue typing — and it could read the focusing tap as a tap ON the
+                    // caret was already under the finger вЂ” a draft or seed leaves it at the end, where
+                    // one taps to continue typing вЂ” and it could read the focusing tap as a tap ON the
                     // caret and raise Paste / Select / Select All. Deferring one turn was not enough:
                     // the multi-tap action arrives in a later event. So this only catches a tap the
                     // editor did not take.
@@ -1388,7 +1402,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
         }
         // This focus-on-tap recognizer sits on the whole editor inputView. With the default
         // delaysTouchesEnded/cancelsTouchesInView it swallows the view's touchesEnded for the editor's OWN
-        // interactive sub-controls — notably the rich editor's collapse-quote UIButton, which then gets
+        // interactive sub-controls вЂ” notably the rich editor's collapse-quote UIButton, which then gets
         // touchDown (highlights) but never .touchUpInside, so collapsing a quote did nothing in the composer
         // (the article editor adds no such recognizer, so it worked there). It still fires its own touch
         // callbacks for focus, so dropping the delay/cancel is safe.
@@ -2020,9 +2034,9 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
                     
                     if let richTextInputNode = self.richTextInputNode, let context = self.context {
                         // Re-color through the node's decoration rather than a naive full-range `foregroundColor`
-                        // rewrite. The old rewrite colored EVERY glyph — including custom-emoji and unrevealed-
+                        // rewrite. The old rewrite colored EVERY glyph вЂ” including custom-emoji and unrevealed-
                         // spoiler placeholders (which must stay `.clear` under their overlays) and mentions/urls/
-                        // dates (which must stay the accent color) — so a theme change revealed the emoji/spoiler
+                        // dates (which must stay the accent color) вЂ” so a theme change revealed the emoji/spoiler
                         // base glyphs (and dropped mention accents) until the next keystroke healed them.
                         // `decorateAfterTextChange` re-applies the correct per-attribute colors, matching the
                         // per-keystroke path (and re-rebuilds the emoji/spoiler overlays).
@@ -2544,6 +2558,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
             sendActionButtonsSize = self.sendActionButtons.updateLayout(size: CGSize(width: 40.0, height: minimalHeight), isMediaInputExpanded: isMediaInputExpanded, showTitle: showTitle, currentMessageEffectId: presentationInterfaceState.interfaceState.sendMessageEffect, transition: transition, interfaceState: presentationInterfaceState)
             mediaActionButtonsSize = self.mediaActionButtons.updateLayout(size: CGSize(width: 40.0, height: 40.0), isMediaInputExpanded: isMediaInputExpanded, showTitle: false, currentMessageEffectId: presentationInterfaceState.interfaceState.sendMessageEffect, transition: transition, interfaceState: presentationInterfaceState)
         }
+        let voiceMessageButtonEnabled = WhiteGramChatSettings.current.voiceMessageButton
         
         var starReactionButtonSize: CGSize?
         if let customRightAction = self.customRightAction, case let .stars(count, isFilled, action, longPressAction) = customRightAction {
@@ -2609,7 +2624,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
             }
         }
         
-        var effectiveActionButtonsSize = starReactionButtonSize ?? mediaActionButtonsSize
+        var effectiveActionButtonsSize = starReactionButtonSize ?? (voiceMessageButtonEnabled ? mediaActionButtonsSize : CGSize())
         if let liveMicrophoneButtonSize {
             effectiveActionButtonsSize.width += 6.0 + liveMicrophoneButtonSize.width
         }
@@ -3221,7 +3236,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
             // THE pass that applies the field's new height, so it is the one the caret's visibility
             // depends on: the editor no longer scrolls on its own when the content grows, and the
             // reveal here is computed against the height being applied rather than the one on screen.
-            // `.immediate` because the panel is already animating that height — animating the offset
+            // `.immediate` because the panel is already animating that height вЂ” animating the offset
             // inside it would animate the text twice.
             richTextInputNode.updateLayout(size: textFieldFrame.size, caretReveal: .ifNeeded(.immediate))
             self.updateInputField(textInputFrame: textFieldFrame, transition: ComponentTransition(transition))
@@ -3707,7 +3722,9 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
         }
                 
         let mediaInputDisabled: Bool
-        if !interfaceState.voiceMessagesAvailable {
+        if !WhiteGramChatSettings.current.voiceMessageButton {
+            mediaInputDisabled = true
+        } else if !interfaceState.voiceMessagesAvailable {
             mediaInputDisabled = true
         } else if interfaceState.hasActiveGroupCall {
             mediaInputDisabled = true
@@ -3889,7 +3906,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
                 transition.updateFrame(view: expandButton.button, frame: expandButtonFrame)
                 transition.updateFrame(view: expandButton.icon, frame: image.size.centered(in: expandButtonFrame))
             }
-            // The expand button always sits in the top-right corner, above the send button — never inline with the
+            // The expand button always sits in the top-right corner, above the send button вЂ” never inline with the
             // text row. It appears whenever the field is tall enough (multi-line) to have room above the send
             // button, on all panel widths.
             let isTallPanel = actualTextFieldFrame.height >= 70.0
@@ -3950,7 +3967,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
         self.interfaceInteraction?.openAICompose()
     }
 
-    /// The field's glass-background height (text region, excluding any accessory panel) at exactly 3 lines —
+    /// The field's glass-background height (text region, excluding any accessory panel) at exactly 3 lines вЂ”
     /// the capsule height when the AI button is shown. Measured for real via the active input node
     /// (`measuredTextFieldHeight`) and cached per (width, fontSize); recomputed only when either changes.
     private func threeLineFieldHeight(forWidth width: CGFloat, node: ChatRichTextInputNode, metrics: LayoutMetrics, bottomInset: CGFloat, textFieldInsets: UIEdgeInsets) -> CGFloat {
@@ -4757,7 +4774,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
         }
         
         // The mic button's press handling begins on touch-*down* (micButtonInteractionBegan),
-        // so a touch that lands on it can arm a recording before the Stop tap resolves —
+        // so a touch that lands on it can arm a recording before the Stop tap resolves вЂ”
         // stacking stopButton on top is not enough on its own.
         self.mediaActionButtons.stopButton.isHidden = !displayStop
         self.mediaActionButtons.micButton.isUserInteractionEnabled = !displayStop
@@ -5226,8 +5243,8 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
                 richTextInputNode?.performFormatAction(.spoiler)
             })
         }
-        // Inline formats are disabled where they cannot apply — a selection wholly in code, whose
-        // model is plain text (a `Pre` entity holds no other entity) — rather than offered as no-ops.
+        // Inline formats are disabled where they cannot apply вЂ” a selection wholly in code, whose
+        // model is plain text (a `Pre` entity holds no other entity) вЂ” rather than offered as no-ops.
         children.append(contentsOf: [
             UIAction(title: self.strings?.TextFormat_Bold ?? "Bold", image: nil,
                      attributes: richTextInputNode.canPerformFormatAction(.bold) ? [] : .disabled) { [weak richTextInputNode] _ in
@@ -5322,7 +5339,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
                     return (current.replacingFlatRange(range, with: attributedString), .text)
                 } else {
                     // No selection: the whole composer is replaced by newly translated text. Building a
-                    // fresh state is correct here — there is no existing structure to preserve, and
+                    // fresh state is correct here вЂ” there is no existing structure to preserve, and
                     // mapping one blob of translation back onto blocks is not well defined.
                     return (ChatTextInputState(inputText: attributedString), inputMode)
                 }
@@ -5336,14 +5353,14 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
         }
     }
     
-    /// The chat's hardware-keyboard format shortcuts (⌘B, ⌘I, ⌘U, ⇧⌘M, ⇧⌘X, ⇧⌘P, and ⇧⌘N as
+    /// The chat's hardware-keyboard format shortcuts (вЊB, вЊI, вЊU, в‡§вЊM, в‡§вЊX, в‡§вЊP, and в‡§вЊN as
     /// `.clearFormatting`, `ChatControllerKeyShortcuts.swift`). On the native engine the shortcut runs
-    /// the editor's own command — the one the Format menu runs — and returns true; on the legacy
+    /// the editor's own command вЂ” the one the Format menu runs вЂ” and returns true; on the legacy
     /// backend it does nothing and returns false, and the caller keeps its input-state path.
     ///
     /// The engine must not take the input-state path: `chatTextInputAddFormattingAttribute` rebuilds the
     /// whole composer from `state.inputText`, whose `NSAttributedString` has no vocabulary for tables,
-    /// details, headings, lists or a pull quote's author, so ⌘B deleted or demoted them, and the result
+    /// details, headings, lists or a pull quote's author, so вЊB deleted or demoted them, and the result
     /// arrived as a host document set, not an undo step of its own (`HarnessChatFormatShortcutTests`).
     public func performNativeFormatShortcut(_ action: ChatRichTextFormatAction) -> Bool {
         guard let richTextInputNode = self.richTextInputNode, richTextInputNode.usesNativeRichTextEngine else {
@@ -5353,10 +5370,10 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
         return true
     }
 
-    /// The legacy text view's half of a hardware format shortcut (⌘B, ⌘I, ⌘U, ⇧⌘M, ⇧⌘X, ⇧⌘P,
-    /// ⇧⌘N): the chat's input-state transform, applied as ONE undoable step on the text view — the
+    /// The legacy text view's half of a hardware format shortcut (вЊB, вЊI, вЊU, в‡§вЊM, в‡§вЊX, в‡§вЊP,
+    /// в‡§вЊN): the chat's input-state transform, applied as ONE undoable step on the text view вЂ” the
     /// Format menu's `applyFormattingAttribute` rule. Run bare, the echo was an attribute-only
-    /// write, which keeps UIKit's typing steps and records nothing, so undo after ⌘B took back the
+    /// write, which keeps UIKit's typing steps and records nothing, so undo after вЊB took back the
     /// typing and left the bold on nothing (`HarnessLegacyFormatShortcutUndoTests`). Returns false
     /// when the input is not the legacy text view, and the caller keeps its own path.
     public func performLegacyFormatShortcut(_ transform: @escaping (ChatTextInputState) -> ChatTextInputState) -> Bool {
@@ -5598,7 +5615,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
         if self.richTextInputNode?.usesNativeRichTextEngine != true {
             self.replaceLegacyWithNative()
         }
-        // `replaceLegacyWithNative` above always yields a native node unless `richTextInputNode` is nil — which
+        // `replaceLegacyWithNative` above always yields a native node unless `richTextInputNode` is nil вЂ” which
         // cannot happen inside a paste callback (the legacy node is first responder to receive it). This guard is
         // a defensive invariant, not a live legacy fallback.
         guard let node = self.richTextInputNode, node.usesNativeRichTextEngine else {
@@ -5615,8 +5632,8 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
 
         // A rich structural fragment (e.g. a copied table/list) from the WYSIWYG editor carries the private
         // `RichTextEditorClipboard.fragmentUTI`, which the legacy NSAttributedString paste below cannot represent
-        // (a table would flatten through RTF). Route it to the native backend — which reads the fragment and
-        // splices it at the caret — latching the field to native so the structure survives. Gated on
+        // (a table would flatten through RTF). Route it to the native backend вЂ” which reads the fragment and
+        // splices it at the caret вЂ” latching the field to native so the structure survives. Gated on
         // `enableRichTextInput` so the legacy-only mode keeps the (lossy) default paste.
         if self.enableRichTextInput, pasteboard.data(forPasteboardType: RichTextEditorClipboard.fragmentUTI) != nil {
             self.pasteRichFragmentFromPasteboard()
@@ -5642,7 +5659,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
             // A list-bearing RTF: iOS's NSAttributedString RTF import flattens lists (no NSTextList), so render
             // the markers as literal text via the structure-preserving RTFImport path; otherwise keep the
             // inline-preserving legacy conversion. (When rich input is enabled, the native-routing branch above
-            // has already claimed a list paste — this serves the legacy-only configuration.)
+            // has already claimed a list paste вЂ” this serves the legacy-only configuration.)
             attributedString = legacyChatInputAttributedString(fromRTF: data) ?? chatInputStateStringFromRTF(data, type: NSAttributedString.DocumentType.rtf)
         } else if let data = pasteboard.data(forPasteboardType: "com.apple.flat-rtfd") {
             if let _ = pasteboard.data(forPasteboardType: "com.apple.notes.richtext"), DeviceModel.current.isIpad, let htmlData = pasteboard.data(forPasteboardType: "public.html") {
@@ -5655,7 +5672,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
         // Markdown-on-paste: plain clipboard text that parses as markdown with formatting/structure is
         // inserted as rich content. ANY markdown (inline or structural) latches the field to the native
         // editor, which re-reads the same pasteboard text through its own plainTextFragmentTransformer and
-        // performs a two-step paste (insert plain → replace with rich) so undo reverts rich→plain. Only
+        // performs a two-step paste (insert plain в†’ replace with rich) so undo reverts richв†’plain. Only
         // taken when the parser actually classifies the text as rich; plain text falls through.
         var pastedMarkdownContent: ChatInputContent?
         if attributedString == nil, let plainText = pasteboard.string, let context = self.context {
@@ -5664,12 +5681,12 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
 
         // STRUCTURAL markdown must be claimed BEFORE the emoji-marker reattach below. A text selection
         // copied out of a rich-message bubble is markdown that can carry BOTH structure (`# `, `> `, `- `)
-        // AND `[<alt>](tg://emoji?id=…)` emoji markers; with the reattach first it claimed every such
-        // paste, producing live emoji beside LITERAL `#`/`>` characters — the headings and quotes silently
+        // AND `[<alt>](tg://emoji?id=вЂ¦)` emoji markers; with the reattach first it claimed every such
+        // paste, producing live emoji beside LITERAL `#`/`>` characters вЂ” the headings and quotes silently
         // lost. The markdown parser decodes the emoji markers itself (`BrowserMarkdown` maps them to
         // `RichText.textCustomEmoji`), so it is strictly the more faithful reader for that text.
         //
-        // Gated on `!isEntityExpressible()` — i.e. only content the LEGACY field genuinely cannot hold — so
+        // Gated on `!isEntityExpressible()` вЂ” i.e. only content the LEGACY field genuinely cannot hold вЂ” so
         // an inline-only paste (bold, a link, a lone custom emoji) keeps its existing route and does not
         // trip the one-way native latch just for arriving via the clipboard. Anything that IS
         // entity-expressible still reaches the markdown branch further down, unchanged.
@@ -5713,7 +5730,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
         }
         
         if self.handlePastedMedia(perform: true) {
-            return false   // media consumed → suppress the default text paste
+            return false   // media consumed в†’ suppress the default text paste
         }
         return true
     }
@@ -5721,7 +5738,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
     private final func applyPastedAttributedString(_ attributedString: NSAttributedString) {
         self.interfaceInteraction?.updateTextInputStateAndMode { current, inputMode in
             // An empty selection is an insertion at the caret, which is what a paste with no
-            // selection means — so this needs no separate branch (the old `else` was unreachable
+            // selection means вЂ” so this needs no separate branch (the old `else` was unreachable
             // anyway: `mutableCopy()` of an `NSAttributedString` never fails).
             let range = NSRange(location: current.selectionRange.lowerBound, length: current.selectionRange.count)
             return (current.replacingFlatRange(range, with: attributedString), inputMode)
@@ -5734,10 +5751,10 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
     /// the state push, whose echo keeps the characters and is therefore written in place
     /// (`ChatInputTextView.attributedText`). Undo removes the pasted text, formatting and all.
     ///
-    /// `false` — nothing was changed — when the view's characters are not the state's (a collapsed
+    /// `false` вЂ” nothing was changed вЂ” when the view's characters are not the state's (a collapsed
     /// quote is drawn as an attachment), the selection disagrees, a composition is open, or the
     /// panel's own `shouldChangeTextIn` would rewrite the text (it strips direction marks and, when
-    /// consecutive newlines are not allowed, collapses them — through a full set that clears the
+    /// consecutive newlines are not allowed, collapses them вЂ” through a full set that clears the
     /// stack anyway). The caller then applies the paste as one `performUndoableTextChange` step,
     /// which is undoable but drops the typing steps before it.
     private final func pasteThroughTextInput(_ pasted: NSAttributedString, textView: ChatInputTextView) -> Bool {
@@ -5769,7 +5786,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
 
     /// Whether the clipboard MAY hold media `handlePastedMedia` would take, answered from the item
     /// types alone. This is what `canPerformAction(paste:)` asks, and UIKit asks that every time it
-    /// builds the edit menu or the keyboard's paste affordances — so it must not read the contents:
+    /// builds the edit menu or the keyboard's paste affordances вЂ” so it must not read the contents:
     /// reading another app's clipboard without a paste gesture raises the system "Allow Paste"
     /// prompt, which also takes the keyboard down. `hasImages` and `contains(pasteboardTypes:)` do
     /// not. A false positive only offers Paste; the paste itself still decides from the contents.
@@ -5823,7 +5840,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
             if isPNG && images.count == 1, let image = images.first {
                 let maxSide = max(image.size.width, image.size.height)
                 // Degenerate zero-size image: treat as handled (consume the paste, route nothing) so the
-                // host still suppresses the default text paste — matching the legacy behavior where
+                // host still suppresses the default text paste вЂ” matching the legacy behavior where
                 // chatInputTextNodeShouldPaste returned false here.
                 if maxSide.isZero { return true }
                 let aspectRatio = min(image.size.width, image.size.height) / maxSide

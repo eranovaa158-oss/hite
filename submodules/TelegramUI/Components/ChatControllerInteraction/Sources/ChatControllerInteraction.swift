@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import UIKit
 import SwiftSignalKit
 import AsyncDisplayKit
@@ -566,6 +566,7 @@ public final class ChatControllerInteraction: ChatControllerInteractionProtocol 
         self.updateInputMode = updateInputMode
         self.updatePresentationState = updatePresentationState
         self.openMessageShareMenu = openMessageShareMenu
+        self.performPersonalChatDoubleTapAction = performPersonalChatDoubleTapAction
         self.presentController = presentController
         self.presentControllerInCurrent = presentControllerInCurrent
         self.navigationController = navigationController

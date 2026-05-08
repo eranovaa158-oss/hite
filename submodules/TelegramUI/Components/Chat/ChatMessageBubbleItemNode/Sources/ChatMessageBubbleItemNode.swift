@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import LottieSettings
 import UIKit
 import AsyncDisplayKit
@@ -471,6 +471,13 @@ private func contentNodeMessagesAndClassesForItem(_ item: ChatMessageItem) -> ([
     }
     
     let firstMessage = item.content.firstMessage
+    let hideChannelPostReactions: Bool
+    if let channel = firstMessage.peers[firstMessage.id.peerId] as? TelegramChannel, case .broadcast = channel.info, !WhiteGramChatSettings.current.channelPostReactions {
+        hideChannelPostReactions = true
+        needReactions = false
+    } else {
+        hideChannelPostReactions = false
+    }
     
     let reactionsAreInline: Bool
     reactionsAreInline = shouldDisplayInlineDateReactions(message: EngineMessage(firstMessage), isPremium: item.associatedData.isPremium, forceInline: item.associatedData.forceInlineReactions)
@@ -484,7 +491,7 @@ private func contentNodeMessagesAndClassesForItem(_ item: ChatMessageItem) -> ([
         }
     }
     
-    if !reactionsAreInline && !hideAllAdditionalInfo, let reactionsAttribute = mergedMessageReactions(attributes: firstMessage.attributes, isTags: firstMessage.areReactionsTags(accountPeerId: item.context.account.peerId)), !reactionsAttribute.reactions.isEmpty {
+    if !hideChannelPostReactions && !reactionsAreInline && !hideAllAdditionalInfo, let reactionsAttribute = mergedMessageReactions(attributes: firstMessage.attributes, isTags: firstMessage.areReactionsTags(accountPeerId: item.context.account.peerId)), !reactionsAttribute.reactions.isEmpty {
         if result.last?.1 == ChatMessageTextBubbleContentNode.self {
         } else {
             if result.last?.1 == ChatMessagePollBubbleContentNode.self ||
@@ -671,14 +678,14 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
 
     /// The vertical offset the LIST last asked this node to hold, via `updateTrailingItemSpace`.
     ///
-    /// Remembered because the layout apply rewrites `mainContainerNode.frame` — it is the only place
-    /// the container's SIZE is set — and would otherwise discard the offset on every re-layout. The
+    /// Remembered because the layout apply rewrites `mainContainerNode.frame` вЂ” it is the only place
+    /// the container's SIZE is set вЂ” and would otherwise discard the offset on every re-layout. The
     /// list does re-issue the value at the end of the same pass, so the discard is invisible while
     /// that re-issue is immediate; on a pass whose transition is animated it is not, and the bubble
     /// springs from the discarded zero back to the position it never actually left.
     ///
     /// Unlike the info items, which opt in once in `init`, this node sets
-    /// `wantsTrailingItemSpaceUpdates` per layout — so the apply that clears the flag must also clear
+    /// `wantsTrailingItemSpaceUpdates` per layout вЂ” so the apply that clears the flag must also clear
     /// this, since no further call will arrive to reset it.
     private var trailingItemSpaceOffset: CGFloat = 0.0
     private let backgroundWallpaperNode: ChatMessageBubbleBackdrop
@@ -2049,6 +2056,15 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
         if (needsShareButton && !isSidePanelOpen) {
             maximumContentWidth -= 10.0
         }
+        let forceWideChannelPostBubbleWidth: CGFloat?
+        if forceWideChannelPost {
+            let horizontalEdgeInset = params.leftInset + layoutConstants.bubble.edgeInset + avatarInset
+            let wideBubbleWidth = max(1.0, params.width - params.rightInset - horizontalEdgeInset * 2.0 - deliveryFailedInset)
+            maximumContentWidth = max(0.0, wideBubbleWidth - layoutConstants.bubble.contentInsets.left - layoutConstants.bubble.contentInsets.right)
+            forceWideChannelPostBubbleWidth = wideBubbleWidth
+        } else {
+            forceWideChannelPostBubbleWidth = nil
+        }
         
         var hasInstantVideo = false
         for contentNodeItemValue in contentNodeMessagesAndClasses {
@@ -2615,7 +2631,13 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
         var mosaicStatusSizeAndApply: (CGSize, (ListViewItemUpdateAnimation) -> ChatMessageDateAndStatusNode)?
         
         if let mosaicRange = mosaicRange {
-            let maxSize = layoutConstants.image.maxDimensions.fittedToWidthOrSmaller(maximumContentWidth - layoutConstants.image.bubbleInsets.left - layoutConstants.image.bubbleInsets.right)
+            let mosaicAvailableWidth = max(1.0, maximumContentWidth - layoutConstants.image.bubbleInsets.left - layoutConstants.image.bubbleInsets.right)
+            let maxSize: CGSize
+            if forceWideChannelPost {
+                maxSize = CGSize(width: mosaicAvailableWidth, height: layoutConstants.image.maxDimensions.height)
+            } else {
+                maxSize = layoutConstants.image.maxDimensions.fittedToWidthOrSmaller(mosaicAvailableWidth)
+            }
             let (innerFramesAndPositions, innerSize) = chatMessageBubbleMosaicLayout(maxSize: maxSize, itemSizes: contentPropertiesAndLayouts[mosaicRange].map { item in
                 guard let size = item.0, size.width > 0.0, size.height > 0 else {
                     return CGSize(width: 256.0, height: 256.0)
@@ -2650,7 +2672,7 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
                 var dateReplies = 0
                 var starsCount: Int64?
                 var dateReactionsAndPeers = mergedMessageReactionsAndPeers(accountPeerId: item.context.account.peerId, accountPeer: item.associatedData.accountPeer, message: message)
-                if message.isRestricted(platform: "ios", contentSettings: item.context.currentContentSettings.with { $0 }) {
+                if message.isRestricted(platform: "ios", contentSettings: item.context.currentContentSettings.with { $0 }) || whiteGramShouldHideChannelPostReactions(message: message) {
                     dateReactionsAndPeers = ([], [])
                 }
                 for attribute in message.attributes {
@@ -2800,7 +2822,7 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
                             rankBadgeColor = UIColor(rgb: 0x49a355)
                         case let .member(rank):
                             if let rank, !rank.isEmpty {
-                                if rank == "0️⃣" {
+                                if rank == "0пёЏвѓЈ" {
                                     string = item.presentationData.strings.Chat_TagPlaceholder
                                     defaultRankColor = defaultRankColor.withMultipliedAlpha(0.5)
                                 } else {
@@ -3719,7 +3741,11 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
             minimalContentSize = layoutConstants.bubble.minimumSize
         }
         let calculatedBubbleHeight = headerSize.height + contentSize.height + layoutConstants.bubble.contentInsets.top + layoutConstants.bubble.contentInsets.bottom
-        let layoutBubbleSize = CGSize(width: max(contentSize.width, headerSize.width) + layoutConstants.bubble.contentInsets.left + layoutConstants.bubble.contentInsets.right, height: max(minimalContentSize.height, calculatedBubbleHeight - detachedContentNodesHeight))
+        var layoutBubbleWidth = max(contentSize.width, headerSize.width) + layoutConstants.bubble.contentInsets.left + layoutConstants.bubble.contentInsets.right
+        if let forceWideChannelPostBubbleWidth {
+            layoutBubbleWidth = max(layoutBubbleWidth, forceWideChannelPostBubbleWidth)
+        }
+        let layoutBubbleSize = CGSize(width: layoutBubbleWidth, height: max(minimalContentSize.height, calculatedBubbleHeight - detachedContentNodesHeight))
         var contentVerticalOffset: CGFloat = 0.0
         if minimalContentSize.height > calculatedBubbleHeight + 2.0 {
             contentVerticalOffset = floorToScreenPixels((minimalContentSize.height - calculatedBubbleHeight) / 2.0)
@@ -3985,11 +4011,11 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
         
         // The pass's own curve, rather than a locally reconstructed `.spring`. `ListViewItemUpdateAnimation`
         // already carries it (`transition.legacyAnimator.transition`), and it is `.immediate` for
-        // `.None`/`.Crossfade` — what this defaulted to. Rebuilding `.spring` here was correct only by
+        // `.None`/`.Crossfade` вЂ” what this defaulted to. Rebuilding `.spring` here was correct only by
         // accident: `ListViewImpl` hard-codes `curve: .spring` for every item update
         // (Display/Source/ListView.swift:1805), so the two always agreed. The CoreList chat backend routes
-        // real pass curves through the same channel — `.easeInOut` and `.custom(...)`
-        // (CoreListChatHistoryBackend.swift:689, :692) — and this then ran the bubble on a spring while
+        // real pass curves through the same channel вЂ” `.easeInOut` and `.custom(...)`
+        // (CoreListChatHistoryBackend.swift:689, :692) вЂ” and this then ran the bubble on a spring while
         // its row ran the pass curve. It also silently overrode the `.easeInOut` that the
         // extracted-to-context-preview branch just above explicitly asks for.
         var legacyTransition: ContainedViewLayoutTransition = animation.transition
@@ -4765,7 +4791,7 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
             }
         }
             
-        // Same reason as `legacyTransition` above — take the pass's curve instead of assuming a spring.
+        // Same reason as `legacyTransition` above вЂ” take the pass's curve instead of assuming a spring.
         // Drives the forwardInfo / threadInfo / replyInfo / content-node frame animations below, each of
         // which already takes its duration from the pass. Exactly equivalent under `ListViewImpl`, whose
         // curve is always `.spring` and whose `.spring.timingFunction` IS `kCAMediaTimingFunctionSpring`.
@@ -5120,7 +5146,7 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
                             return
                         }
 
-                        // `progress` is fulfilled for .url, .openWebApp and .callback — the only
+                        // `progress` is fulfilled for .url, .openWebApp and .callback вЂ” the only
                         // arms of performMessageButtonAction that take it. The others leave it
                         // unfulfilled and the tapped pill simply never shimmers.
                         strongSelf.performMessageButtonAction(button: button, progress: progress)
@@ -5284,8 +5310,8 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
             
             // Read after this node's `apply` (called at the top of this iteration) and after its
             // frame is settled, so both the node's page layout and its position are current.
-            // `contentNodeFrame` is in the item node's own space — `contentOrigin` is derived from
-            // `backgroundFrame.origin` — which is the space `backgroundFrame` is in.
+            // `contentNodeFrame` is in the item node's own space вЂ” `contentOrigin` is derived from
+            // `backgroundFrame.origin` вЂ” which is the space `backgroundFrame` is in.
             for area in contentNode.unsupportedContentAreas() {
                 unsupportedZones.append(area.offsetBy(dx: contentNodeFrame.minX, dy: contentNodeFrame.minY))
             }
@@ -5550,22 +5576,22 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
         }
         
         if case .System = animation/*, !strongSelf.mainContextSourceNode.isExtractedToContextPreview*/ {
-            // `previousBackgroundFrame` — the rect this node was laid out with last pass — rather
+            // `previousBackgroundFrame` вЂ” the rect this node was laid out with last pass вЂ” rather
             // than `backgroundNode.frame`, which cannot answer this question.
             //
             // `CALayer.frame` is DERIVED: `origin.y == position.y - bounds.height * anchor.y`. The
             // chat's bubble inset is 7/3, which is not representable, so writing the frame and
-            // reading it back loses ~1.5e-15 — measured on device as
+            // reading it back loses ~1.5e-15 вЂ” measured on device as
             // `2.3333333333333335` in, `2.333333333333332` out. `equalTo` is exact, so this guard
             // was TRUE on every pass, including the many that re-apply an unchanged layout, and the
             // whole animated block below re-ran each time.
             //
             // That is not merely wasted work. `ContainedViewLayoutTransition.updateFrame(layer:)`
             // has the same derived-frame guard, so the background and backdrop layers re-targeted
-            // too — each repeat pass restarting a fresh full-duration animation from the layer's
+            // too вЂ” each repeat pass restarting a fresh full-duration animation from the layer's
             // PRESENTATION value. The mask, its silhouette and the wallpaper portal are framed at
             // `(-1,-1,w+2,h+2)` / `(0,0,w,h)`, whose integral origins round-trip exactly, so their
-            // guard did fire and they stayed on the original timeline — leaving two halves of one
+            // guard did fire and they stayed on the original timeline вЂ” leaving two halves of one
             // bubble running on two clocks, which reads as the backdrop lagging its own outline.
             //
             // `backgroundFrame` is stored above from the value this pass computed, never through a
@@ -5829,6 +5855,14 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
         switch recognizer.state {
         case .ended:
             if let (gesture, location) = recognizer.lastRecognizedGestureAndLocation, let item = self.item {
+                if case .doubleTap = gesture, self.performWhiteGramChannelPostDoubleTapAction(item: item, location: location) {
+                    self.mainContainerNode.cancelGesture()
+                    return
+                }
+                if case .doubleTap = gesture, self.performWhiteGramPersonalDoubleTapAction(item: item, location: location) {
+                    self.mainContainerNode.cancelGesture()
+                    return
+                }
                 if let action = self.gestureRecognized(gesture: gesture, location: location, recognizer: nil) {
                     if case .doubleTap = gesture {
                         self.mainContainerNode.cancelGesture()
@@ -5858,6 +5892,92 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
         }
     }
     
+    private func whiteGramPersonalDoubleTapTarget(item: ChatMessageItem, location: CGPoint) -> (message: Message, subFrame: CGRect) {
+        var message = item.message
+        var subFrame = self.backgroundNode.frame.contains(CGPoint(x: self.frame.width - location.x, y: location.y)) ? self.backgroundNode.frame : self.bounds
+        if case .group = item.content {
+            for contentNode in self.contentNodes {
+                let convertedNodeFrame = contentNode.view.convert(contentNode.bounds, to: self.view).insetBy(dx: 0.0, dy: -10.0)
+                if convertedNodeFrame.contains(location), let contentMessage = contentNode.item?.message {
+                    message = contentMessage
+                    subFrame = contentNode.frame.insetBy(dx: 0.0, dy: -4.0)
+                    break
+                }
+            }
+        }
+        return (message, subFrame)
+    }
+
+    private func isWhiteGramChannelPost(_ message: Message) -> Bool {
+        if let channel = message.peers[message.id.peerId] as? TelegramChannel, case .broadcast = channel.info {
+            return true
+        }
+        return false
+    }
+
+    private func performWhiteGramChannelPostDoubleTapAction(item: ChatMessageItem, location: CGPoint) -> Bool {
+        let target = self.whiteGramPersonalDoubleTapTarget(item: item, location: location)
+        guard self.isWhiteGramChannelPost(target.message) else {
+            return false
+        }
+        let settings = WhiteGramChatSettings.current
+        switch settings.channelPostDoubleTapAction {
+        case .savedMessages:
+            if !item.controllerInteraction.performPersonalChatDoubleTapAction(target.message, .savedMessages) {
+                item.controllerInteraction.openMessageContextMenu(target.message, false, self, target.subFrame, nil, nil)
+            }
+        case .reaction:
+            if canAddMessageReactions(message: target.message) {
+                item.controllerInteraction.updateMessageReaction(target.message, .default, false, nil)
+            } else {
+                item.controllerInteraction.openMessageContextMenu(target.message, false, self, target.subFrame, nil, nil)
+            }
+        case .forward:
+            item.controllerInteraction.openMessageShareMenu(target.message.id)
+        case .reply:
+            item.controllerInteraction.setupReply(target.message.id)
+        case .select:
+            item.controllerInteraction.toggleMessagesSelection([target.message.id], true)
+        case .copy:
+            item.controllerInteraction.copyText(target.message.text)
+        case .contextMenu:
+            item.controllerInteraction.openMessageContextMenu(target.message, false, self, target.subFrame, nil, nil)
+        }
+        return true
+    }
+
+    private func performWhiteGramPersonalDoubleTapAction(item: ChatMessageItem, location: CGPoint) -> Bool {
+        let chatPeerId = item.chatLocation.peerId ?? item.message.id.peerId
+        guard chatPeerId.namespace == Namespaces.Peer.CloudUser || chatPeerId.namespace == Namespaces.Peer.SecretChat else {
+            return false
+        }
+        let target = self.whiteGramPersonalDoubleTapTarget(item: item, location: location)
+        let settings = WhiteGramChatSettings.current
+        switch settings.personalChatDoubleTapAction {
+        case .savedMessages, .edit, .pin:
+            if !item.controllerInteraction.performPersonalChatDoubleTapAction(target.message, settings.personalChatDoubleTapAction) {
+                item.controllerInteraction.openMessageContextMenu(target.message, false, self, target.subFrame, nil, nil)
+            }
+        case .reaction:
+            if canAddMessageReactions(message: target.message) {
+                item.controllerInteraction.updateMessageReaction(target.message, .default, false, nil)
+            } else {
+                item.controllerInteraction.openMessageContextMenu(target.message, false, self, target.subFrame, nil, nil)
+            }
+        case .forward:
+            item.controllerInteraction.openMessageShareMenu(target.message.id)
+        case .reply:
+            item.controllerInteraction.setupReply(target.message.id)
+        case .select:
+            item.controllerInteraction.toggleMessagesSelection([target.message.id], true)
+        case .copy:
+            item.controllerInteraction.copyText(target.message.text)
+        case .contextMenu:
+            item.controllerInteraction.openMessageContextMenu(target.message, false, self, target.subFrame, nil, nil)
+        }
+        return true
+    }
+
     private func gestureRecognized(gesture: TapLongTapOrDoubleTapGesture, location: CGPoint, recognizer: TapLongTapOrDoubleTapGestureRecognizer?) -> InternalBubbleTapAction? {
         var mediaMessage: Message?
         var forceOpen = false
@@ -7268,6 +7388,9 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
     
     private var playedSwipeToReplyHaptic = false
     @objc private func swipeToReplyGesture(_ recognizer: ChatSwipeToReplyRecognizer) {
+        guard WhiteGramChatSettings.current.swipeToReply else {
+            return
+        }
         var offset: CGFloat = 0.0
         var leftOffset: CGFloat = 0.0
         var swipeOffset: CGFloat = 45.0
@@ -7412,9 +7535,9 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
     /// it cannot render, so the "please update" pill sits in a gap rather than on top of the
     /// bubble.
     ///
-    /// Resolved ONCE here and handed to both surfaces. Exactly one of them draws at a time — the
+    /// Resolved ONCE here and handed to both surfaces. Exactly one of them draws at a time вЂ” the
     /// image-backed background for plain themes, the wallpaper backdrop for patterned and gradient
-    /// ones — but a `setTearZones` that re-resolved per surface would be a second spelling of the
+    /// ones вЂ” but a `setTearZones` that re-resolved per surface would be a second spelling of the
     /// policy, free to drift.
     private func updateBackgroundTear(_ zones: [CGRect], backgroundFrame: CGRect, animation: ListViewItemUpdateAnimation) {
         let resolved = resolveBubbleTearBands(

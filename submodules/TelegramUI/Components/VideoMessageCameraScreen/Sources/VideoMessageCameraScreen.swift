@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import LottieSettings
 import UIKit
 import Display
@@ -1724,6 +1724,7 @@ public class VideoMessageCameraScreen: ViewController {
     private let inputPanelFrame: (CGRect, Bool)
     fileprivate var allowLiveUpload: Bool
     fileprivate var viewOnceAvailable: Bool
+    fileprivate let initialFrontCamera: Bool
     
     fileprivate let completion: (EnqueueMessage?, Bool?, Int32?, Int32?) -> Void
     
@@ -1876,6 +1877,7 @@ public class VideoMessageCameraScreen: ViewController {
         updatedPresentationData: (initial: PresentationData, signal: Signal<PresentationData, NoError>)?,
         allowLiveUpload: Bool,
         viewOnceAvailable: Bool,
+        initialFrontCamera: Bool = true,
         inputPanelFrame: (CGRect, Bool),
         chatNode: ASDisplayNode?,
         completion: @escaping (EnqueueMessage?, Bool?, Int32?, Int32?) -> Void
@@ -1884,6 +1886,7 @@ public class VideoMessageCameraScreen: ViewController {
         self.updatedPresentationData = updatedPresentationData
         self.allowLiveUpload = allowLiveUpload
         self.viewOnceAvailable = viewOnceAvailable
+        self.initialFrontCamera = initialFrontCamera
         self.inputPanelFrame = inputPanelFrame
         self.chatNode = chatNode
         self.completion = completion

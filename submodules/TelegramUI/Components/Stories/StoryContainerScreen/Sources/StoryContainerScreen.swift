@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import UIKit
 import Display
 import ComponentFlow
@@ -2213,6 +2213,11 @@ public class StoryContainerScreen: ViewControllerComponentContainer, KeyShortcut
         ), navigationBarAppearance: .none, theme: .dark)
         
         self.statusBar.statusBarStyle = .White
+        if WhiteGramStorySettings.current.disableStories {
+            Queue.mainQueue().async { [weak self] in
+                self?.dismiss()
+            }
+        }
         self.navigationPresentation = .standaloneFlatModal
         self.blocksBackgroundWhenInOverlay = true
         self.automaticallyControlPresentationContextLayout = false

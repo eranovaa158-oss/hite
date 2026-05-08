@@ -105,7 +105,7 @@ public struct ExperimentalUISettings: Codable, Equatable {
             knockoutWallpaper: false,
             foldersTabAtBottom: false,
             disableVideoAspectScaling: false,
-            enableVoipTcp: false,
+            enableVoipTcp: true,
             experimentalCompatibility: false,
             enableDebugDataDisplay: false,
             fakeGlass: false,
@@ -285,7 +285,7 @@ public struct ExperimentalUISettings: Codable, Equatable {
         self.knockoutWallpaper = (try container.decodeIfPresent(Int32.self, forKey: "knockoutWallpaper") ?? 0) != 0
         self.foldersTabAtBottom = (try container.decodeIfPresent(Int32.self, forKey: "foldersTabAtBottom") ?? 0) != 0
         self.disableVideoAspectScaling = (try container.decodeIfPresent(Int32.self, forKey: "disableVideoAspectScaling") ?? 0) != 0
-        self.enableVoipTcp = (try container.decodeIfPresent(Int32.self, forKey: "enableVoipTcp") ?? 0) != 0
+        self.enableVoipTcp = (try container.decodeIfPresent(Int32.self, forKey: "enableVoipTcp") ?? 1) != 0
         self.experimentalCompatibility = (try container.decodeIfPresent(Int32.self, forKey: "experimentalCompatibility") ?? 0) != 0
         self.enableDebugDataDisplay = (try container.decodeIfPresent(Int32.self, forKey: "enableDebugDataDisplay") ?? 0) != 0
         self.fakeGlass = (try container.decodeIfPresent(Int32.self, forKey: "fakeGlass") ?? 0) != 0

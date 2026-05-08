@@ -1969,7 +1969,10 @@ final class ChatListControllerNode: ASDisplayNode, ASGestureRecognizerDelegate {
         }
         
         var effectiveStorySubscriptions: EngineStorySubscriptions?
-        if let controller = self.controller, case .forum = controller.location {
+        let whiteGramStorySettings = WhiteGramStorySettings.current
+        if whiteGramStorySettings.disableStories || whiteGramStorySettings.hideStories {
+            effectiveStorySubscriptions = EngineStorySubscriptions(accountItem: nil, items: [], hasMoreToken: nil)
+        } else if let controller = self.controller, case .forum = controller.location {
             effectiveStorySubscriptions = nil
         } else {
             if let controller = self.controller, let storySubscriptions = controller.orderedStorySubscriptions, shouldDisplayStoriesInChatListHeader(storySubscriptions: storySubscriptions, isHidden: controller.location == .chatList(groupId: .archive)) {
@@ -2804,6 +2807,10 @@ final class ChatListControllerNode: ASDisplayNode, ASGestureRecognizerDelegate {
 }
 
 func shouldDisplayStoriesInChatListHeader(storySubscriptions: EngineStorySubscriptions, isHidden: Bool) -> Bool {
+    let whiteGramStorySettings = WhiteGramStorySettings.current
+    if whiteGramStorySettings.disableStories || whiteGramStorySettings.hideStories {
+        return false
+    }
     if !storySubscriptions.items.isEmpty {
         return true
     }
