@@ -1,4 +1,4 @@
-load(":framework_exported_symbols.bzl", "framework_exported_symbols")
+﻿load(":framework_exported_symbols.bzl", "framework_exported_symbols")
 load("@rules_cc//cc:objc_library.bzl", "objc_library")
 
 load("@bazel_skylib//rules:common_settings.bzl",
@@ -161,7 +161,7 @@ genrule(
         "GeneratedPresentationStrings/Resources/PresentationStrings.data",
     ],
     # //Tests/ComposerHarness bundles the .data output. `-[_PresentationStrings
-    # initWithPrimaryComponent:…]` asserts when it cannot load it, so a standalone app that builds
+    # initWithPrimaryComponent:вЂ¦]` asserts when it cannot load it, so a standalone app that builds
     # a PresentationData dies at launch without it.
     visibility = ["//Tests:__subpackages__"],
 )
@@ -279,7 +279,7 @@ filegroup(
         "{}.lproj/Localizable.strings".format(language) for language in empty_languages
     ],
     # //Tests/ComposerHarness bundles these. `defaultPresentationStrings` FORCE-UNWRAPS
-    # `getAppBundle().path(forResource: "Localizable" …)`, so any standalone app that builds a
+    # `getAppBundle().path(forResource: "Localizable" вЂ¦)`, so any standalone app that builds a
     # PresentationData traps at launch without them.
     visibility = ["//Tests:__subpackages__"],
 )
