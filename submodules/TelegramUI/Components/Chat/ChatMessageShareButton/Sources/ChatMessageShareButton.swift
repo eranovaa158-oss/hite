@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import UIKit
 import AsyncDisplayKit
 import Display
@@ -33,6 +33,7 @@ public class ChatMessageShareButton: ASDisplayNode {
     private var isReplies: Bool = false
     private var hasMore: Bool = false
     private var isExpand: Bool = false
+    private var isTranslate: Bool = false
     
     private var textNode: ImmediateTextNode?
     
@@ -131,6 +132,11 @@ public class ChatMessageShareButton: ASDisplayNode {
             replyCount = 0
             isReplies = false
         }
+        if isSummarize || isTranslate {
+            replyCount = 0
+            isReplies = false
+            isNavigate = false
+        }
         
         var hasMore = false
         if let adAttribute = message.adAttribute, adAttribute.canReport {
@@ -142,16 +148,19 @@ public class ChatMessageShareButton: ASDisplayNode {
             isExpand = true
         }
         
-        if self.theme !== presentationData.theme.theme || self.isReplies != isReplies || self.hasMore != hasMore || self.isExpand != isExpand {
+        if self.theme !== presentationData.theme.theme || self.isReplies != isReplies || self.hasMore != hasMore || self.isExpand != isExpand || self.isTranslate != isTranslate {
             self.theme = presentationData.theme.theme
             self.isReplies = isReplies
             self.hasMore = hasMore
             self.isExpand = isExpand
+            self.isTranslate = isTranslate
 
             var updatedIconImage: UIImage?
             var updatedBottomIconImage: UIImage?
             var updatedIconOffset = CGPoint()
-            if isSummarize {
+            if isTranslate {
+                updatedIconImage = generateScaledImage(image: generateTintedImage(image: UIImage(bundleImageName: "Chat/Title Panels/Translate"), color: bubbleVariableColor(variableColor: presentationData.theme.theme.chat.message.shareButtonForegroundColor, wallpaper: presentationData.theme.wallpaper)), size: CGSize(width: 18.0, height: 18.0), opaque: false)
+            } else if isSummarize {
                 if isExpand {
                     updatedIconImage = PresentationResourcesChat.chatFreeExpandButtonIcon(presentationData.theme.theme, wallpaper: presentationData.theme.wallpaper)
                 } else {

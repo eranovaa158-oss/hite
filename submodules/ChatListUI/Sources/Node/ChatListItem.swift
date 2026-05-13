@@ -2644,6 +2644,20 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             if case .groupReference = item.content {
                 useInlineAuthorPrefix = true
             }
+            if compactChatLayout, case let .chat(itemPeer, _, _, _, _, _, _, _) = contentData {
+                if let messagePeer = itemPeer.chatMainPeer {
+                    switch messagePeer {
+                    case let .channel(channel):
+                        if case .group = channel.info {
+                            useInlineAuthorPrefix = true
+                        }
+                    case .legacyGroup:
+                        useInlineAuthorPrefix = true
+                    default:
+                        break
+                    }
+                }
+            }
             if !itemTags.isEmpty {
                 forumTopicData = nil
                 topForumTopicItems = []
@@ -2665,11 +2679,11 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             }
             
             if useInlineAuthorPrefix {
-                if case let .user(author) = messages.last?.author {
+                if let author = messages.last?.author {
                     if author.id == item.context.account.peerId {
                         inlineAuthorPrefix = item.presentationData.strings.DialogList_You
                     } else if messages.last?.id.peerId.namespace != Namespaces.Peer.CloudUser && messages.last?.id.peerId.namespace != Namespaces.Peer.SecretChat {
-                        inlineAuthorPrefix = EnginePeer.user(author).compactDisplayTitle
+                        inlineAuthorPrefix = author.compactDisplayTitle
                     }
                 }
             }
@@ -2838,7 +2852,7 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                     } else if let message = messages.last {
                         var composedString: NSMutableAttributedString
                         
-                        if let peerText = peerText {
+                        if let peerText = peerText, inlineAuthorPrefix == nil {
                             authorAttributedString = NSAttributedString(string: peerText, font: textFont, textColor: theme.authorNameColor)
                         }
                                        
@@ -3187,7 +3201,7 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                             }
                         }
                         
-                        if let peerText = peerText {
+                        if let peerText = peerText, inlineAuthorPrefix == nil {
                             authorAttributedString = NSAttributedString(string: peerText, font: textFont, textColor: theme.authorNameColor)
                         }
                     }
@@ -3725,8 +3739,6 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             
             var effectiveAuthorTitle = (hideAuthor && !hasDraft) ? nil : authorAttributedString
             
-            let isSearching = item.interaction.searchTextHighightState != nil
-            
             var isFirstForumThreadSelectable = false
             var forumThreads: [(id: Int64, threadPeer: EnginePeer?, title: NSAttributedString, iconId: Int64?, iconColor: Int32?)] = []
             var authorTopicArrowColor: UIColor?
@@ -3738,8 +3750,10 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                         forumThreads.append((id: forumThread.id, threadPeer: forumThread.threadPeer, title: NSAttributedString(string: forumThread.threadPeer?.compactDisplayTitle ?? " ", font: textFont, textColor: forumThread.isUnread || isSearching ? theme.authorNameColor : theme.messageTextColor), iconId: nil, iconColor: nil))
                     }
                     for topicItem in topForumTopicItems {
-                        if forumThread?.id != topicItem.id {
-                            forumThreads.append((id: topicItem.id, threadPeer: topicItem.threadPeer, title: NSAttributedString(string: topicItem.threadPeer?.compactDisplayTitle ?? " ", font: textFont, textColor: topicItem.isUnread || isSearching ? theme.authorNameColor : theme.messageTextColor), iconId: nil, iconColor: nil))
+                        if case let .peer(peer) = item.content, peer.peer.peerId.id._internalGetInt64Value() == topicItem.id {
+                            
+                        } else if forumThread?.id != topicItem.id {
+                            forumThreads.append((id: topicItem.id, threadPeer: topicItem.threadPeer, title: NSAttributedString(string: topicItem.title, font: textFont, textColor: topicItem.isUnread || isSearching ? theme.authorNameColor : theme.messageTextColor), iconId: topicItem.iconFileId, iconColor: topicItem.iconColor))
                         }
                     }
                     
@@ -3753,32 +3767,14 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                     
                     effectiveAuthorTitle = nil
                 }
-            } else if forumThread != nil || !topForumTopicItems.isEmpty {
-                if let forumThread = forumThread {
-                    if case let .peer(peer) = item.content, case .user = peer.peer.chatMainPeer {
-                        isFirstForumThreadSelectable = false
-                    } else {
-                        isFirstForumThreadSelectable = forumThread.isUnread
-                    }
-                    
-                    forumThreads.append((id: forumThread.id, threadPeer: forumThread.threadPeer, title: NSAttributedString(string: forumThread.title, font: textFont, textColor: forumThread.isUnread || isSearching ? theme.authorNameColor : theme.messageTextColor), iconId: forumThread.iconId, iconColor: forumThread.iconColor))
-                }
-                for topicItem in topForumTopicItems {
-                    if case let .peer(peer) = item.content, peer.peer.peerId.id._internalGetInt64Value() == topicItem.id {
-                        
-                    } else if forumThread?.id != topicItem.id {
-                        forumThreads.append((id: topicItem.id, threadPeer: topicItem.threadPeer, title: NSAttributedString(string: topicItem.title, font: textFont, textColor: topicItem.isUnread || isSearching ? theme.authorNameColor : theme.messageTextColor), iconId: topicItem.iconFileId, iconColor: topicItem.iconColor))
-                    }
-                }
+            }
+            
+            if compactChatLayout, let effectiveAuthorTitleValue = effectiveAuthorTitle, let textAttributedStringValue = textAttributedString {
+                let mutableTextAttributedString = NSMutableAttributedString()
+                mutableTextAttributedString.append(NSAttributedString(string: effectiveAuthorTitleValue.string + ": ", font: textFont, textColor: theme.authorNameColor))
+                mutableTextAttributedString.append(textAttributedStringValue)
                 
-                if let effectiveAuthorTitle, let textAttributedStringValue = textAttributedString {
-                    let mutableTextAttributedString = NSMutableAttributedString()
-                    mutableTextAttributedString.append(NSAttributedString(string: effectiveAuthorTitle.string + ": ", font: textFont, textColor: theme.authorNameColor))
-                    mutableTextAttributedString.append(textAttributedStringValue)
-                    
-                    textAttributedString = mutableTextAttributedString
-                }
-                
+                textAttributedString = mutableTextAttributedString
                 effectiveAuthorTitle = nil
             }
             

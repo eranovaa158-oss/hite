@@ -1,5 +1,6 @@
 import Foundation
 import UIKit
+import AVFoundation
 import CoreServices
 import Display
 import AsyncDisplayKit
@@ -10,6 +11,7 @@ import ComponentDisplayAdapters
 import TelegramPresentationData
 import AccountContext
 import TelegramCore
+import TelegramUIPreferences
 import MultilineTextComponent
 import DrawingUI
 import MediaEditor
@@ -89,6 +91,16 @@ func mediaEditorStickerPreviewFrame(screenSize: CGSize, safeInsets: UIEdgeInsets
     let frameMinY = topLimit + spaceAboveFrame + floorToScreenPixels(slack / 2.0)
     let previewMinY = frameMinY - floorToScreenPixels((previewHeight - actualFrameWidth) / 2.0)
     return CGRect(origin: CGPoint(x: bandMinX + floorToScreenPixels((bandWidth - previewWidth) / 2.0), y: previewMinY), size: CGSize(width: previewWidth, height: previewHeight))
+}
+
+private func whiteGramSetBuiltInMicrophoneIfNeeded() {
+    guard WhiteGramOtherSettings.current.forceDeviceMicrophone else {
+        return
+    }
+    guard let input = AVAudioSession.sharedInstance().availableInputs?.first(where: { $0.portType == .builtInMic }) else {
+        return
+    }
+    try? AVAudioSession.sharedInstance().setPreferredInput(input)
 }
 
 private let playbackButtonTag = GenericComponentViewTag()
@@ -7228,6 +7240,7 @@ public final class MediaEditorScreenImpl: ViewController, MediaEditorScreen, UID
         }
         if needsAudioSession {
             self.audioSessionDisposable = self.context.sharedContext.mediaManager.audioSession.push(audioSessionType: .record(speaker: false, video: true, withOthers: true), activate: { _ in
+                whiteGramSetBuiltInMicrophoneIfNeeded()
                 if #available(iOS 13.0, *) {
                     try? AVAudioSession.sharedInstance().setAllowHapticsAndSystemSoundsDuringRecording(true)
                 }

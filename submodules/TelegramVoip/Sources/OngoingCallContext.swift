@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import SwiftSignalKit
 import TelegramCore
 import Network
@@ -320,7 +320,7 @@ private extension UIImage {
         
         // 1) Create an ARGB8888 vImage buffer from the UIImage (CGImage).
         //    We will first allocate a buffer for ARGB pixels, then use
-        //    vImage to copy cgImage → argbBuffer.
+        //    vImage to copy cgImage в†’ argbBuffer.
         
         // Each ARGB pixel is 4 bytes
         let argbBytesPerPixel = 4
@@ -361,7 +361,7 @@ private extension UIImage {
         }
         
         // 2) Create a CVPixelBuffer in YUV 420 (bi-planar) format.
-        //    Typically, you’d choose either kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
+        //    Typically, youвЂ™d choose either kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
         //    or kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange.
         
         let pixelFormat = kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
@@ -795,6 +795,27 @@ public final class OngoingCallContextPresentationCallVideoView {
     }
 }
 
+private func updatedCallCustomParameters(
+    _ customParameters: String?,
+    forceTcpCalls: Bool
+) -> String? {
+    guard forceTcpCalls else {
+        return customParameters
+    }
+    
+    var parameters: [String: Any] = [:]
+    if let customParameters, let data = customParameters.data(using: .utf8), let value = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
+        parameters = value
+    }
+    parameters["network_use_tcponly"] = true
+    
+    guard let data = try? JSONSerialization.data(withJSONObject: parameters, options: []), let result = String(data: data, encoding: .utf8) else {
+        return customParameters
+    }
+    return result
+}
+
+
 public final class OngoingCallContext {
     public struct AuxiliaryServer {
         public enum Connection {
@@ -941,7 +962,7 @@ public final class OngoingCallContext {
         return result
     }
 
-    public init(account: Account, callSessionManager: CallSessionManager, callId: CallId, internalId: CallSessionInternalId, proxyServer: ProxyServerSettings?, initialNetworkType: NetworkType, updatedNetworkType: Signal<NetworkType, NoError>, serializedData: String?, dataSaving: VoiceCallDataSaving, key: Data, isOutgoing: Bool, video: OngoingCallVideoCapturer?, connections: CallSessionConnectionSet, maxLayer: Int32, version: String, customParameters: String?, allowP2P: Bool, enableTCP: Bool, enableStunMarking: Bool, audioSessionActive: Signal<Bool, NoError>, logName: String, preferredVideoCodec: String?, audioDevice: AudioDevice?) {
+    public init(account: Account, callSessionManager: CallSessionManager, callId: CallId, internalId: CallSessionInternalId, proxyServer: ProxyServerSettings?, initialNetworkType: NetworkType, updatedNetworkType: Signal<NetworkType, NoError>, serializedData: String?, dataSaving: VoiceCallDataSaving, key: Data, isOutgoing: Bool, video: OngoingCallVideoCapturer?, connections: CallSessionConnectionSet, maxLayer: Int32, version: String, customParameters: String?, allowP2P: Bool, enableTCP: Bool, forceTcpCalls: Bool, enableStunMarking: Bool, audioSessionActive: Signal<Bool, NoError>, logName: String, preferredVideoCodec: String?, audioDevice: AudioDevice?) {
         let _ = setupLogs
         
         self.callId = callId
@@ -969,6 +990,10 @@ public final class OngoingCallContext {
             if let strongSelf = self {
                 var allowP2P = allowP2P
                 
+                if forceTcpCalls {
+                    allowP2P = false
+                }
+                
                 var voipProxyServer: VoipProxyServerWebrtc?
                 if let proxyServer = proxyServer {
                     switch proxyServer.connection {
@@ -979,7 +1004,7 @@ public final class OngoingCallContext {
                     case .web:
                         // Calls are SOCKS5-only by design. A web proxy is secret-based (see
                         // ProxySettings.mtProxySettings) and cannot back a VoipProxyServerWebrtc,
-                        // which needs host/port/user/pass — same as .mtp.
+                        // which needs host/port/user/pass вЂ” same as .mtp.
                         break
                     }
                 }
@@ -1008,10 +1033,12 @@ public final class OngoingCallContext {
                 
                 var processedConnections: [CallSessionConnection] = []
                 var filteredConnections: [OngoingCallConnectionDescriptionWebrtc] = []
+                
                 connectionsLoop: for connection in unfilteredConnections {
                     if processedConnections.contains(connection) {
                         continue
                     }
+                    
                     processedConnections.append(connection)
                     
                     switch connection {
@@ -1029,6 +1056,9 @@ public final class OngoingCallContext {
                     
                     var webrtcConnections: [OngoingCallConnectionDescriptionWebrtc] = []
                     for connection in callConnectionDescriptionsWebrtc(connection, idMapping: reflectorIdMapping) {
+                        if forceTcpCalls && !connection.hasTcp {
+                            continue
+                        }
                         webrtcConnections.append(connection)
                     }
                     
@@ -1038,7 +1068,7 @@ public final class OngoingCallContext {
                 if let signalingReflector = signalingReflector {
                     if #available(iOS 12.0, *) {
                         let peerTag = dataWithHexString(signalingReflector.password)
-                        
+
                         strongSelf.signalingConnectionManager = QueueLocalObject(queue: queue, generate: {
                             return CallSignalingConnectionManager(queue: queue, peerTag: peerTag, servers: [signalingReflector], dataReceived: { data in
                                 guard let strongSelf = self else {
@@ -1053,7 +1083,7 @@ public final class OngoingCallContext {
                         })
                     }
                 }
-                
+
                 var directConnection: OngoingCallDirectConnection?
                 if version == "9.0.0" && !"".isEmpty {
                     if #available(iOS 12.0, *) {
@@ -1098,9 +1128,32 @@ public final class OngoingCallContext {
                 }
                 #endif*/
                 
+                let effectiveCustomParameters = updatedCallCustomParameters(
+                    customParameters,
+                    forceTcpCalls: forceTcpCalls
+                )
+                
+                if forceTcpCalls {
+                    Logger.shared.log(
+                        "TGVOIP",
+                        "Force TCP calls: enabled, enableTCP=\(enableTCP), allowP2P=\(allowP2P), connections=\(filteredConnections.count)"
+                    )
+                    
+                    if filteredConnections.isEmpty {
+                        Logger.shared.log("TGVOIP", "Force TCP calls: no TCP call connections were provided")
+                    } else {
+                        for connection in filteredConnections {
+                            Logger.shared.log(
+                                "TGVOIP",
+                                "Force TCP calls: connection tcp=\(connection.hasTcp), turn=\(connection.hasTurn), stun=\(connection.hasStun), ip=\(connection.ip), port=\(connection.port)"
+                            )
+                        }
+                    }
+                }
+                
                 let context = OngoingCallThreadLocalContextWebrtc(
                     version: version,
-                    customParameters: customParameters,
+                    customParameters: effectiveCustomParameters,
                     queue: OngoingCallThreadLocalContextQueueImpl(queue: queue),
                     proxy: voipProxyServer,
                     networkType: ongoingNetworkTypeForTypeWebrtc(initialNetworkType),
@@ -1111,7 +1164,7 @@ public final class OngoingCallContext {
                     connections: filteredConnections,
                     maxLayer: maxLayer,
                     allowP2P: allowP2P,
-                    allowTCP: enableTCP,
+                    allowTCP: enableTCP || forceTcpCalls,
                     enableStunMarking: enableStunMarking,
                     logPath: logPath,
                     statsLogPath: tempStatsLogPath,

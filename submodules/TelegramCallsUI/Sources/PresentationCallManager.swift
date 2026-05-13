@@ -1,4 +1,4 @@
-import Foundation
+﻿import Foundation
 import AsyncDisplayKit
 import TelegramCore
 import SwiftSignalKit

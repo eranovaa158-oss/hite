@@ -57,6 +57,7 @@ swift_library(
         "//submodules/LottieSettings:LottieSettings",
         "//submodules/Display",
         "//submodules/TelegramCore",
+        "//submodules/TelegramUIPreferences",
         "//submodules/MetalEngine",
         "//submodules/SSignalKit/SwiftSignalKit",
         "//submodules/ComponentFlow",

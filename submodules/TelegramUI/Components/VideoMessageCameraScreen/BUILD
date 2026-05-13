@@ -14,6 +14,7 @@ swift_library(
         "//submodules/LottieSettings:LottieSettings",
         "//submodules/Display",
         "//submodules/TelegramCore",
+        "//submodules/TelegramUIPreferences",
         "//submodules/SSignalKit/SwiftSignalKit",
         "//submodules/ComponentFlow",
         "//submodules/Components/ViewControllerComponent",

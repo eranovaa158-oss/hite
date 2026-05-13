@@ -1,6 +1,7 @@
 ﻿import Foundation
 import LottieSettings
 import UIKit
+import AVFoundation
 import Display
 import AsyncDisplayKit
 import ComponentFlow
@@ -29,6 +30,7 @@ import LocalMediaResources
 import ImageCompression
 import LegacyMediaPickerUI
 import TelegramAudio
+import TelegramUIPreferences
 import ChatSendMessageActionUI
 import ChatControllerInteraction
 import LottieComponent
@@ -116,6 +118,16 @@ struct CameraState: Equatable {
     func updatedIsViewOnceEnabled(_ isViewOnceEnabled: Bool) -> CameraState {
         return CameraState(position: self.position, flashMode: self.flashMode, flashModeDidChange: self.flashModeDidChange, flashTint: self.flashTint, flashTintSize: self.flashTintSize, recording: self.recording, duration: self.duration, isDualCameraEnabled: self.isDualCameraEnabled, isViewOnceEnabled: isViewOnceEnabled)
     }
+}
+
+private func whiteGramSetBuiltInMicrophoneIfNeeded() {
+    guard WhiteGramOtherSettings.current.forceDeviceMicrophone else {
+        return
+    }
+    guard let input = AVAudioSession.sharedInstance().availableInputs?.first(where: { $0.portType == .builtInMic }) else {
+        return
+    }
+    try? AVAudioSession.sharedInstance().setPreferredInput(input)
 }
 
 struct PreviewState: Equatable {
@@ -2218,6 +2230,7 @@ public class VideoMessageCameraScreen: ViewController {
       
         self.audioSessionDisposable = self.context.sharedContext.mediaManager.audioSession.push(audioSessionType: audioSessionType, activate: { [weak self] _ in
             if let self {
+                whiteGramSetBuiltInMicrophoneIfNeeded()
                 Queue.mainQueue().after(0.05) {
                     self.node.setupCamera()
                 }
