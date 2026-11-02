@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import Postbox
 import SwiftSignalKit
 import MtProtoKit

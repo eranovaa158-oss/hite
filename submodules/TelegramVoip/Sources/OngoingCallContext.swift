@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import SwiftSignalKit
 import TelegramCore
 import Network

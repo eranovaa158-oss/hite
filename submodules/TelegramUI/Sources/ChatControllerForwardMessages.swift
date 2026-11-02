@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import TelegramPresentationData
 import AccountContext
 import TelegramCore

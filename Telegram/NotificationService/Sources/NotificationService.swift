@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import PasscodeCore
 import UserNotifications
 import SwiftSignalKit

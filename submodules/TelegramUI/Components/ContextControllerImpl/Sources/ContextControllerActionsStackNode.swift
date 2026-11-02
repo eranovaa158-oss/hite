@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import LottieSettings
 import UIKit
 import AsyncDisplayKit
