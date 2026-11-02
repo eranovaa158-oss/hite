@@ -2,7 +2,7 @@
 
 hitegram is an unofficial Telegram iOS client with a redesigned proxy system and the ability to customize the interface.
 
-For the project description, feature list, IPA build command, and sideloading notes, see [EXTRA_README.md](EXTRA_README.md)
+Build on macOS via GitHub Actions (`.github/workflows/build.yml` in this repository): the workflow produces an unsigned IPA ready for Sideloadly / AltStore.
 
 ---
 
