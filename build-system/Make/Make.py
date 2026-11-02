@@ -531,7 +531,7 @@ def generate_project(bazel, arguments):
 
     if arguments.disableExtensions is not None:
         disable_extensions = arguments.disableExtensions
-    if arguments.disableProvisioningProfiles is not None:
+    if arguments.disableProvisioningProfiles:
         disable_provisioning_profiles = arguments.disableProvisioningProfiles
     if arguments.projectIncludeRelease is not None:
         project_include_release = arguments.projectIncludeRelease
