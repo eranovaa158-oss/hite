@@ -19,6 +19,7 @@ private func extraString(_ presentationData: ItemListPresentationData, ru: Strin
 private typealias ExtraOtherSettingsState = ExtraOtherSettings
 
 private enum ExtraOtherSettingsSection: Int32 {
+    case network
     case translation
     case voiceToText
     case voiceAndVideoRecording
@@ -27,6 +28,8 @@ private enum ExtraOtherSettingsSection: Int32 {
 
 private enum ExtraOtherSettingsEntry: ItemListNodeEntry {
     case header(ExtraOtherSettingsSection, String)
+    
+    case automaticProxy(Bool)
     
     case autoTranslate(Bool)
     case translationService(String)
@@ -44,6 +47,9 @@ private enum ExtraOtherSettingsEntry: ItemListNodeEntry {
         switch self {
         case let .header(section, _):
             return section.rawValue
+            
+        case .automaticProxy:
+            return ExtraOtherSettingsSection.network.rawValue
             
         case .autoTranslate, .translationService, .translationButton:
             return ExtraOtherSettingsSection.translation.rawValue
@@ -63,6 +69,9 @@ private enum ExtraOtherSettingsEntry: ItemListNodeEntry {
         switch self {
         case let .header(section, _):
             return section.rawValue * 1000
+            
+        case .automaticProxy:
+            return ExtraOtherSettingsSection.network.rawValue * 1000 + 1
             
         case .autoTranslate:
             return ExtraOtherSettingsSection.translation.rawValue * 1000 + 1
@@ -91,6 +100,12 @@ private enum ExtraOtherSettingsEntry: ItemListNodeEntry {
         case let .header(lhsSection, lhsText):
             if case let .header(rhsSection, rhsText) = rhs {
                 return lhsSection == rhsSection && lhsText == rhsText
+            }
+            return false
+            
+        case let .automaticProxy(lhsValue):
+            if case let .automaticProxy(rhsValue) = rhs {
+                return lhsValue == rhsValue
             }
             return false
             
@@ -157,6 +172,20 @@ private enum ExtraOtherSettingsEntry: ItemListNodeEntry {
                 presentationData: presentationData,
                 text: text,
                 sectionId: self.section
+            )
+            
+        case let .automaticProxy(value):
+            return ItemListSwitchItem(
+                presentationData: presentationData,
+                systemStyle: .glass,
+                title: extraString(presentationData, ru: "Автопоиск прокси", en: "Automatic Proxy Discovery"),
+                text: extraString(presentationData, ru: "Раз в 10 минут проверяет публичные списки MTProxy и автоматически подключает лучший доступный сервер. Выкл. по умолчанию.", en: "Every 10 minutes it checks public MTProxy lists and automatically connects to the best available server. Off by default."),
+                value: value,
+                sectionId: self.section,
+                style: .blocks,
+                updated: { value in
+                    arguments.updateAutomaticProxy(value)
+                }
             )
             
         case let .autoTranslate(value):
@@ -275,6 +304,7 @@ private enum ExtraOtherSettingsEntry: ItemListNodeEntry {
 }
 
 private final class ExtraOtherSettingsArguments {
+    let updateAutomaticProxy: (Bool) -> Void
     let updateAutoTranslate: (Bool) -> Void
     let openTranslationService: () -> Void
     let updateTranslationButton: (Bool) -> Void
@@ -288,6 +318,7 @@ private final class ExtraOtherSettingsArguments {
     let updateHideCameraPreviewInGallery: (Bool) -> Void
     
     init(
+        updateAutomaticProxy: @escaping (Bool) -> Void,
         updateAutoTranslate: @escaping (Bool) -> Void,
         openTranslationService: @escaping () -> Void,
         updateTranslationButton: @escaping (Bool) -> Void,
@@ -297,6 +328,7 @@ private final class ExtraOtherSettingsArguments {
         updateHideCameraInGallery: @escaping (Bool) -> Void,
         updateHideCameraPreviewInGallery: @escaping (Bool) -> Void
     ) {
+        self.updateAutomaticProxy = updateAutomaticProxy
         self.updateAutoTranslate = updateAutoTranslate
         self.openTranslationService = openTranslationService
         self.updateTranslationButton = updateTranslationButton
@@ -310,6 +342,9 @@ private final class ExtraOtherSettingsArguments {
 
 private func extraOtherSettingsEntries(strings: PresentationStrings, state: ExtraOtherSettingsState) -> [ExtraOtherSettingsEntry] {
     var entries: [ExtraOtherSettingsEntry] = []
+    
+    entries.append(.header(.network, extraString(strings, ru: "Сеть", en: "Network")))
+    entries.append(.automaticProxy(state.automaticProxy))
     
     entries.append(.header(.translation, extraString(strings, ru: "Перевод", en: "Translation")))
     entries.append(.autoTranslate(state.autoTranslate))
@@ -370,6 +405,10 @@ public func extraOtherSettingsController(context: AccountContext) -> ViewControl
     var pushController: ((ViewController) -> Void)?
     
     let arguments = ExtraOtherSettingsArguments(
+        updateAutomaticProxy: { value in
+            currentState.setAutomaticProxy(value)
+            statePromise.set(currentState)
+        },
         updateAutoTranslate: { value in
             currentState.setAutoTranslate(value)
             statePromise.set(currentState)

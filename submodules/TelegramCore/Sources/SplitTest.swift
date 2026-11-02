@@ -22,9 +22,6 @@ public protocol SplitTest {
 
 extension SplitTest {
     public func addEvent(_ event: Self.Event, data: JSON = []) {
-        if let bucket = self.bucket {
-            //TODO: merge additional data
-            _internal_addAppLogEvent(postbox: self.postbox, type: event.rawValue, data: ["bucket": bucket])
-        }
+        // Zero telemetry: split-test buckets are not reported in this fork.
     }
 }

@@ -492,7 +492,12 @@ private final class AutomaticProxyBootstrapContext {
     }
 }
 
+/// Opt-in only. The discovery feature fetches public MTProxy lists every 10 minutes,
+/// so it must stay disabled unless the user explicitly enables it in Settings > Extra > Other.
 func managedAutomaticProxyBootstrap(accountManager: AccountManager<TelegramAccountManagerTypes>, network: Network) -> Disposable {
+    guard UserDefaults.standard.object(forKey: "extra.other.automaticProxy") as? Bool ?? false else {
+        return EmptyDisposable
+    }
     let context = AutomaticProxyBootstrapContext(accountManager: accountManager, network: network)
     context.start()
     return ActionDisposable {

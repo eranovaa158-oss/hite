@@ -83,19 +83,11 @@ final class NetworkStatsContext {
         }
         
         private func maybeFlushStats() {
+            // Zero telemetry: download performance averages stay local in this fork
+            // (upstream posted them through help.saveAppLog and we do not).
             var removeKeys: [TargetKey] = []
-            for (targetKey, averageStats) in self.averageTargetStats {
-                if averageStats.count >= 1000 || averageStats.size >= 4 * 1024 * 1024 {
-                    if let postbox = self.postbox {
-                        _internal_addAppLogEvent(postbox: postbox, type: "download", data: .dictionary([
-                            "n": .number(Double(targetKey.networkType.rawValue)),
-                            "d": .number(Double(targetKey.datacenterId)),
-                            "b": .number(averageStats.networkBps / Double(averageStats.count)),
-                            "nd": .number(averageStats.networkDelay / Double(averageStats.count))
-                        ]))
-                    }
-                    removeKeys.append(targetKey)
-                }
+            for (targetKey, _) in self.averageTargetStats {
+                removeKeys.append(targetKey)
             }
             for key in removeKeys {
                 self.averageTargetStats.removeValue(forKey: key)

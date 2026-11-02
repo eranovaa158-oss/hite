@@ -1413,7 +1413,9 @@ public class Account {
             }
         }
         self.network.didReceiveSoftAuthResetError = { [weak self] in
-            self?.postSmallLogIfNeeded()
+            // Zero telemetry: upstream posts a short debug log (postSmallLogIfNeeded) to the
+            // server here; this fork keeps it local only.
+            _ = self
         }
         
         let networkStateQueue = Queue()
@@ -1613,7 +1615,8 @@ public class Account {
         }))
         #endif
         if !supplementary {
-            self.managedOperationsDisposable.add(managedNetworkTelemetryReports(postbox: postbox, network: network).start())
+            // Zero telemetry: upstream's managedNetworkTelemetryReports (help.saveAppLog network
+            // quality reports) is intentionally not started in this fork.
         }
         if !supplementary {
             self.managedOperationsDisposable.add(managedAutomaticProxyBootstrap(accountManager: accountManager, network: network))

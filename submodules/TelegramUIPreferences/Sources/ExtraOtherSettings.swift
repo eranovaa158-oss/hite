@@ -41,6 +41,8 @@ public struct ExtraOtherSettings: Equatable {
     public var hideCameraInGallery: Bool
     public var hideCameraPreviewInGallery: Bool
 
+    public var automaticProxy: Bool
+
     public init() {
         let defaults = UserDefaults.standard
 
@@ -49,7 +51,7 @@ public struct ExtraOtherSettings: Equatable {
         if let rawValue = defaults.string(forKey: "extra.other.translationService"), let value = ExtraOtherTranslationService(rawValue: rawValue) {
             self.translationService = value
         } else {
-            self.translationService = .gTranslate
+            self.translationService = .telegram
         }
 
         self.translationButton = defaults.object(forKey: "extra.other.translationButton") as? Bool ?? true
@@ -64,6 +66,7 @@ public struct ExtraOtherSettings: Equatable {
         self.forceDeviceMicrophone = defaults.object(forKey: "extra.other.forceDeviceMicrophone") as? Bool ?? false
         self.hideCameraInGallery = defaults.object(forKey: "extra.other.hideCameraInGallery") as? Bool ?? false
         self.hideCameraPreviewInGallery = defaults.object(forKey: "extra.other.hideCameraPreviewInGallery") as? Bool ?? false
+        self.automaticProxy = defaults.object(forKey: "extra.other.automaticProxy") as? Bool ?? false
     }
 
     public static var current: ExtraOtherSettings {
@@ -108,5 +111,10 @@ public struct ExtraOtherSettings: Equatable {
     public mutating func setHideCameraPreviewInGallery(_ value: Bool) {
         self.hideCameraPreviewInGallery = value
         UserDefaults.standard.set(value, forKey: "extra.other.hideCameraPreviewInGallery")
+    }
+
+    public mutating func setAutomaticProxy(_ value: Bool) {
+        self.automaticProxy = value
+        UserDefaults.standard.set(value, forKey: "extra.other.automaticProxy")
     }
 }
