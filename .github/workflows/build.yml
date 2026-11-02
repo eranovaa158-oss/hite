@@ -64,6 +64,7 @@ jobs:
             --configurationPath="build-system/appstore-configuration.json" \
             --codesigningInformationPath=build-system/fake-codesigning \
             --configuration=release_arm64 \
+            --disableProvisioningProfiles \
             --buildNumber="$BUILD_NUMBER"
 
           OUTPUT_PATH="build/artifacts"
