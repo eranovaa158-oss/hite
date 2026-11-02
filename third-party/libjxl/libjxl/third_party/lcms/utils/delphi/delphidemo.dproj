@@ -1,4 +1,4 @@
-﻿	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 		<PropertyGroup>
 			<ProjectGuid>{E3F889E8-CB8A-49AE-8173-4DDA022466BE}</ProjectGuid>
 			<MainSource>delphidemo.dpr</MainSource>
