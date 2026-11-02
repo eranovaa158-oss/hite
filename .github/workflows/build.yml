@@ -33,6 +33,7 @@ jobs:
           set -x
           sudo mkdir -p /Users/Shared
           sudo cp -R $GITHUB_WORKSPACE /Users/Shared/hitegram-build
+            sudo chown -R $(whoami):staff /Users/Shared/hitegram-build
           cd /Users/Shared/hitegram-build
           # Submodules were checked out into $GITHUB_WORKSPACE; make sure they came along.
           ls third-party/mtproto-engine | head -3
