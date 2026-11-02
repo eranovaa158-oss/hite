@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import UIKit
 import Display
 import AsyncDisplayKit
@@ -87,7 +87,7 @@ public final class TelegramRootController: NavigationController, TelegramRootCon
     private var presentationDataDisposable: Disposable?
     private var presentationData: PresentationData
     private var currentShowCallsTab: Bool = true
-    private var whiteGramTabSettingsObserver: NSObjectProtocol?
+    private var extraTabSettingsObserver: NSObjectProtocol?
     
     private var detailsPlaceholderNode: DetailsChatPlaceholderNode?
     
@@ -125,8 +125,8 @@ public final class TelegramRootController: NavigationController, TelegramRootCon
         })
         
         if context.sharedContext.applicationBindings.isMainApp {
-            self.whiteGramTabSettingsObserver = NotificationCenter.default.addObserver(forName: WhiteGramTabSettings.updatedNotification, object: nil, queue: .main, using: { [weak self] _ in
-                self?.applyWhiteGramTabSettings(transition: .animated(duration: 0.35, curve: .spring))
+            self.extraTabSettingsObserver = NotificationCenter.default.addObserver(forName: ExtraTabSettings.updatedNotification, object: nil, queue: .main, using: { [weak self] _ in
+                self?.applyExtraTabSettings(transition: .animated(duration: 0.35, curve: .spring))
             })
 
             self.applicationInFocusDisposable = (context.sharedContext.applicationBindings.applicationIsActive
@@ -155,8 +155,8 @@ public final class TelegramRootController: NavigationController, TelegramRootCon
         self.presentationDataDisposable?.dispose()
         self.applicationInFocusDisposable?.dispose()
         self.storyUploadEventsDisposable?.dispose()
-        if let whiteGramTabSettingsObserver = self.whiteGramTabSettingsObserver {
-            NotificationCenter.default.removeObserver(whiteGramTabSettingsObserver)
+        if let extraTabSettingsObserver = self.extraTabSettingsObserver {
+            NotificationCenter.default.removeObserver(extraTabSettingsObserver)
         }
     }
     
@@ -223,11 +223,11 @@ public final class TelegramRootController: NavigationController, TelegramRootCon
         contactsController.switchToChatsController = {  [weak self] in
             self?.openChatsController(activateSearch: false)
         }
-        if whiteGramTabSettings.compactPanel || !whiteGramTabSettings.hideContactsTab {
+        if extraTabSettings.compactPanel || !extraTabSettings.hideContactsTab {
             controllers.append(contactsController)
         }
         
-        if showCallsTab && (whiteGramTabSettings.compactPanel || !whiteGramTabSettings.hideCallsTab) {
+        if showCallsTab && (extraTabSettings.compactPanel || !extraTabSettings.hideCallsTab) {
             controllers.append(callListController)
         }
         controllers.append(chatListController)
@@ -271,13 +271,13 @@ public final class TelegramRootController: NavigationController, TelegramRootCon
             return
         }
         self.currentShowCallsTab = showCallsTab
-        let whiteGramTabSettings = self.effectiveWhiteGramTabSettings()
-        rootTabController.whiteGramTabSettings = whiteGramTabSettings
+        let extraTabSettings = self.effectiveExtraTabSettings()
+        rootTabController.extraTabSettings = extraTabSettings
         var controllers: [ViewController] = []
-        if whiteGramTabSettings.compactPanel || !whiteGramTabSettings.hideContactsTab {
+        if extraTabSettings.compactPanel || !extraTabSettings.hideContactsTab {
             controllers.append(self.contactsController!)
         }
-        if showCallsTab && (whiteGramTabSettings.compactPanel || !whiteGramTabSettings.hideCallsTab) {
+        if showCallsTab && (extraTabSettings.compactPanel || !extraTabSettings.hideCallsTab) {
             controllers.append(self.callListController!)
         }
         controllers.append(self.chatListController!)
@@ -294,15 +294,15 @@ public final class TelegramRootController: NavigationController, TelegramRootCon
         rootTabController.setControllers(controllers, selectedIndex: selectedIndex)
     }
     
-    private func effectiveWhiteGramTabSettings() -> WhiteGramTabSettings {
-        return WhiteGramTabSettings.current
+    private func effectiveExtraTabSettings() -> ExtraTabSettings {
+        return ExtraTabSettings.current
     }
 
-    private func applyWhiteGramTabSettings(transition: ContainedViewLayoutTransition) {
+    private func applyExtraTabSettings(transition: ContainedViewLayoutTransition) {
         guard let rootTabController = self.rootTabController as? TabBarControllerImpl else {
             return
         }
-        rootTabController.whiteGramTabSettings = self.effectiveWhiteGramTabSettings()
+        rootTabController.extraTabSettings = self.effectiveExtraTabSettings()
         self.updateRootControllers(showCallsTab: self.currentShowCallsTab)
         rootTabController.updateLayout(transition: transition)
     }
@@ -356,8 +356,8 @@ public final class TelegramRootController: NavigationController, TelegramRootCon
     
     @discardableResult
     public func openStoryCamera(mode: StoryCameraMode, customTarget: Stories.PendingTarget?, resumeLiveStream: Bool, transitionIn: StoryCameraTransitionIn?, transitionedIn: @escaping () -> Void, transitionOut: @escaping (Stories.PendingTarget?, Bool) -> StoryCameraTransitionOut?) -> StoryCameraTransitionInCoordinator? {
-        let whiteGramStorySettings = WhiteGramStorySettings.current
-        if whiteGramStorySettings.disableStories || whiteGramStorySettings.disableStoryRecording {
+        let extraStorySettings = ExtraStorySettings.current
+        if extraStorySettings.disableStories || extraStorySettings.disableStoryRecording {
             return nil
         }
         guard let controller = self.viewControllers.last as? ViewController else {

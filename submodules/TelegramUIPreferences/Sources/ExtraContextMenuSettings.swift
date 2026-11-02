@@ -1,6 +1,6 @@
 import Foundation
 
-public enum WhiteGramContextMenuOption: String, CaseIterable {
+public enum ExtraContextMenuOption: String, CaseIterable {
     case chatListFolder
     case chatListMark
     case chatListArchive
@@ -45,16 +45,16 @@ public enum WhiteGramContextMenuOption: String, CaseIterable {
     case settingsFeatures
 
     public var storageKey: String {
-        return "whitegram.contextMenus.\(self.rawValue)"
+        return "extra.contextMenus.\(self.rawValue)"
     }
 }
 
-public struct WhiteGramContextMenuSettings: Equatable {
-    public var values: [WhiteGramContextMenuOption: Bool]
+public struct ExtraContextMenuSettings: Equatable {
+    public var values: [ExtraContextMenuOption: Bool]
 
     public init() {
-        var values: [WhiteGramContextMenuOption: Bool] = [:]
-        for option in WhiteGramContextMenuOption.allCases {
+        var values: [ExtraContextMenuOption: Bool] = [:]
+        for option in ExtraContextMenuOption.allCases {
             if UserDefaults.standard.object(forKey: option.storageKey) == nil {
                 values[option] = true
             } else {
@@ -64,15 +64,15 @@ public struct WhiteGramContextMenuSettings: Equatable {
         self.values = values
     }
 
-    public static var current: WhiteGramContextMenuSettings {
-        return WhiteGramContextMenuSettings()
+    public static var current: ExtraContextMenuSettings {
+        return ExtraContextMenuSettings()
     }
 
-    public func isEnabled(_ option: WhiteGramContextMenuOption) -> Bool {
+    public func isEnabled(_ option: ExtraContextMenuOption) -> Bool {
         return self.values[option] ?? true
     }
 
-    public mutating func setValue(_ value: Bool, for option: WhiteGramContextMenuOption) {
+    public mutating func setValue(_ value: Bool, for option: ExtraContextMenuOption) {
         self.values[option] = value
         UserDefaults.standard.set(value, forKey: option.storageKey)
     }

@@ -8,25 +8,25 @@ import TelegramUIPreferences
 import ItemListUI
 import AccountContext
 
-private func whiteGramString(_ strings: PresentationStrings, ru: String, en: String) -> String {
+private func extraString(_ strings: PresentationStrings, ru: String, en: String) -> String {
     return strings.baseLanguageCode.lowercased().hasPrefix("ru") ? ru : en
 }
 
-private func whiteGramString(_ presentationData: ItemListPresentationData, ru: String, en: String) -> String {
-    return whiteGramString(presentationData.strings, ru: ru, en: en)
+private func extraString(_ presentationData: ItemListPresentationData, ru: String, en: String) -> String {
+    return extraString(presentationData.strings, ru: ru, en: en)
 }
 
-private typealias WhiteGramOtherSettingsState = WhiteGramOtherSettings
+private typealias ExtraOtherSettingsState = ExtraOtherSettings
 
-private enum WhiteGramOtherSettingsSection: Int32 {
+private enum ExtraOtherSettingsSection: Int32 {
     case translation
     case voiceToText
     case voiceAndVideoRecording
     case gallery
 }
 
-private enum WhiteGramOtherSettingsEntry: ItemListNodeEntry {
-    case header(WhiteGramOtherSettingsSection, String)
+private enum ExtraOtherSettingsEntry: ItemListNodeEntry {
+    case header(ExtraOtherSettingsSection, String)
     
     case autoTranslate(Bool)
     case translationService(String)
@@ -46,16 +46,16 @@ private enum WhiteGramOtherSettingsEntry: ItemListNodeEntry {
             return section.rawValue
             
         case .autoTranslate, .translationService, .translationButton:
-            return WhiteGramOtherSettingsSection.translation.rawValue
+            return ExtraOtherSettingsSection.translation.rawValue
             
         case .voiceTranscription, .transcriptionService:
-            return WhiteGramOtherSettingsSection.voiceToText.rawValue
+            return ExtraOtherSettingsSection.voiceToText.rawValue
             
         case .forceDeviceMicrophone:
-            return WhiteGramOtherSettingsSection.voiceAndVideoRecording.rawValue
+            return ExtraOtherSettingsSection.voiceAndVideoRecording.rawValue
             
         case .hideCameraInGallery, .hideCameraPreviewInGallery:
-            return WhiteGramOtherSettingsSection.gallery.rawValue
+            return ExtraOtherSettingsSection.gallery.rawValue
         }
     }
     
@@ -65,28 +65,28 @@ private enum WhiteGramOtherSettingsEntry: ItemListNodeEntry {
             return section.rawValue * 1000
             
         case .autoTranslate:
-            return WhiteGramOtherSettingsSection.translation.rawValue * 1000 + 1
+            return ExtraOtherSettingsSection.translation.rawValue * 1000 + 1
         case .translationService:
-            return WhiteGramOtherSettingsSection.translation.rawValue * 1000 + 2
+            return ExtraOtherSettingsSection.translation.rawValue * 1000 + 2
         case .translationButton:
-            return WhiteGramOtherSettingsSection.translation.rawValue * 1000 + 3
+            return ExtraOtherSettingsSection.translation.rawValue * 1000 + 3
             
         case .voiceTranscription:
-            return WhiteGramOtherSettingsSection.voiceToText.rawValue * 1000 + 1
+            return ExtraOtherSettingsSection.voiceToText.rawValue * 1000 + 1
         case .transcriptionService:
-            return WhiteGramOtherSettingsSection.voiceToText.rawValue * 1000 + 2
+            return ExtraOtherSettingsSection.voiceToText.rawValue * 1000 + 2
             
         case .forceDeviceMicrophone:
-            return WhiteGramOtherSettingsSection.voiceAndVideoRecording.rawValue * 1000 + 1
+            return ExtraOtherSettingsSection.voiceAndVideoRecording.rawValue * 1000 + 1
             
         case .hideCameraInGallery:
-            return WhiteGramOtherSettingsSection.gallery.rawValue * 1000 + 1
+            return ExtraOtherSettingsSection.gallery.rawValue * 1000 + 1
         case .hideCameraPreviewInGallery:
-            return WhiteGramOtherSettingsSection.gallery.rawValue * 1000 + 2
+            return ExtraOtherSettingsSection.gallery.rawValue * 1000 + 2
         }
     }
     
-    static func ==(lhs: WhiteGramOtherSettingsEntry, rhs: WhiteGramOtherSettingsEntry) -> Bool {
+    static func ==(lhs: ExtraOtherSettingsEntry, rhs: ExtraOtherSettingsEntry) -> Bool {
         switch lhs {
         case let .header(lhsSection, lhsText):
             if case let .header(rhsSection, rhsText) = rhs {
@@ -144,12 +144,12 @@ private enum WhiteGramOtherSettingsEntry: ItemListNodeEntry {
         }
     }
     
-    static func <(lhs: WhiteGramOtherSettingsEntry, rhs: WhiteGramOtherSettingsEntry) -> Bool {
+    static func <(lhs: ExtraOtherSettingsEntry, rhs: ExtraOtherSettingsEntry) -> Bool {
         return lhs.stableId < rhs.stableId
     }
     
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
-        let arguments = arguments as! WhiteGramOtherSettingsArguments
+        let arguments = arguments as! ExtraOtherSettingsArguments
         
         switch self {
         case let .header(_, text):
@@ -163,8 +163,8 @@ private enum WhiteGramOtherSettingsEntry: ItemListNodeEntry {
             return ItemListSwitchItem(
                 presentationData: presentationData,
                 systemStyle: .glass,
-                title: whiteGramString(presentationData, ru: "Включить автоперевод", en: "Enable Auto-Translate"),
-                text: whiteGramString(presentationData, ru: "Автоматически переводит посты и сообщения без дополнительных действий.", en: "Automatically translates posts and messages without any extra action."),
+                title: extraString(presentationData, ru: "Включить автоперевод", en: "Enable Auto-Translate"),
+                text: extraString(presentationData, ru: "Автоматически переводит посты и сообщения без дополнительных действий.", en: "Automatically translates posts and messages without any extra action."),
                 value: value,
                 sectionId: self.section,
                 style: .blocks,
@@ -178,7 +178,7 @@ private enum WhiteGramOtherSettingsEntry: ItemListNodeEntry {
                 presentationData: presentationData,
                 systemStyle: .glass,
                 icon: nil,
-                title: whiteGramString(presentationData, ru: "Сервис", en: "Service"),
+                title: extraString(presentationData, ru: "Сервис", en: "Service"),
                 label: value,
                 sectionId: self.section,
                 style: .blocks,
@@ -192,7 +192,7 @@ private enum WhiteGramOtherSettingsEntry: ItemListNodeEntry {
             return ItemListSwitchItem(
                 presentationData: presentationData,
                 systemStyle: .glass,
-                title: whiteGramString(presentationData, ru: "Кнопка перевода", en: "Translate Button"),
+                title: extraString(presentationData, ru: "Кнопка перевода", en: "Translate Button"),
                 value: value,
                 sectionId: self.section,
                 style: .blocks,
@@ -205,8 +205,8 @@ private enum WhiteGramOtherSettingsEntry: ItemListNodeEntry {
             return ItemListSwitchItem(
                 presentationData: presentationData,
                 systemStyle: .glass,
-                title: whiteGramString(presentationData, ru: "Транскрибация", en: "Transcription"),
-                text: whiteGramString(presentationData, ru: "Включает или отключает преобразование голоса в текст.", en: "Enables or disables voice-to-text."),
+                title: extraString(presentationData, ru: "Транскрибация", en: "Transcription"),
+                text: extraString(presentationData, ru: "Включает или отключает преобразование голоса в текст.", en: "Enables or disables voice-to-text."),
                 value: value,
                 sectionId: self.section,
                 style: .blocks,
@@ -220,7 +220,7 @@ private enum WhiteGramOtherSettingsEntry: ItemListNodeEntry {
                 presentationData: presentationData,
                 systemStyle: .glass,
                 icon: nil,
-                title: whiteGramString(presentationData, ru: "Сервис", en: "Service"),
+                title: extraString(presentationData, ru: "Сервис", en: "Service"),
                 label: value,
                 sectionId: self.section,
                 style: .blocks,
@@ -234,8 +234,8 @@ private enum WhiteGramOtherSettingsEntry: ItemListNodeEntry {
             return ItemListSwitchItem(
                 presentationData: presentationData,
                 systemStyle: .glass,
-                title: whiteGramString(presentationData, ru: "Микрофон устройства", en: "Device Microphone"),
-                text: whiteGramString(presentationData, ru: "Записывает с микрофона устройства, даже когда подключены другие устройства записи.", en: "Records from the device microphone even when other recording devices are connected."),
+                title: extraString(presentationData, ru: "Микрофон устройства", en: "Device Microphone"),
+                text: extraString(presentationData, ru: "Записывает с микрофона устройства, даже когда подключены другие устройства записи.", en: "Records from the device microphone even when other recording devices are connected."),
                 value: value,
                 sectionId: self.section,
                 style: .blocks,
@@ -248,7 +248,7 @@ private enum WhiteGramOtherSettingsEntry: ItemListNodeEntry {
             return ItemListSwitchItem(
                 presentationData: presentationData,
                 systemStyle: .glass,
-                title: whiteGramString(presentationData, ru: "Камера в галерее", en: "Camera in Gallery"),
+                title: extraString(presentationData, ru: "Камера в галерее", en: "Camera in Gallery"),
                 value: value,
                 sectionId: self.section,
                 style: .blocks,
@@ -261,7 +261,7 @@ private enum WhiteGramOtherSettingsEntry: ItemListNodeEntry {
             return ItemListSwitchItem(
                 presentationData: presentationData,
                 systemStyle: .glass,
-                title: whiteGramString(presentationData, ru: "Превью камеры в галерее", en: "Camera Preview in Gallery"),
+                title: extraString(presentationData, ru: "Превью камеры в галерее", en: "Camera Preview in Gallery"),
                 value: value,
                 enabled: enabled,
                 sectionId: self.section,
@@ -274,7 +274,7 @@ private enum WhiteGramOtherSettingsEntry: ItemListNodeEntry {
     }
 }
 
-private final class WhiteGramOtherSettingsArguments {
+private final class ExtraOtherSettingsArguments {
     let updateAutoTranslate: (Bool) -> Void
     let openTranslationService: () -> Void
     let updateTranslationButton: (Bool) -> Void
@@ -308,29 +308,29 @@ private final class WhiteGramOtherSettingsArguments {
     }
 }
 
-private func whiteGramOtherSettingsEntries(strings: PresentationStrings, state: WhiteGramOtherSettingsState) -> [WhiteGramOtherSettingsEntry] {
-    var entries: [WhiteGramOtherSettingsEntry] = []
+private func extraOtherSettingsEntries(strings: PresentationStrings, state: ExtraOtherSettingsState) -> [ExtraOtherSettingsEntry] {
+    var entries: [ExtraOtherSettingsEntry] = []
     
-    entries.append(.header(.translation, whiteGramString(strings, ru: "Перевод", en: "Translation")))
+    entries.append(.header(.translation, extraString(strings, ru: "Перевод", en: "Translation")))
     entries.append(.autoTranslate(state.autoTranslate))
     entries.append(.translationService(state.translationService.title))
     entries.append(.translationButton(state.translationButton))
     
-    entries.append(.header(.voiceToText, whiteGramString(strings, ru: "Голос в текст", en: "Voice to Text")))
+    entries.append(.header(.voiceToText, extraString(strings, ru: "Голос в текст", en: "Voice to Text")))
     entries.append(.voiceTranscription(state.voiceTranscription))
     entries.append(.transcriptionService(state.transcriptionService.title))
     
-    entries.append(.header(.voiceAndVideoRecording, whiteGramString(strings, ru: "Запись голоса и видео", en: "Voice and Video Recording")))
+    entries.append(.header(.voiceAndVideoRecording, extraString(strings, ru: "Запись голоса и видео", en: "Voice and Video Recording")))
     entries.append(.forceDeviceMicrophone(state.forceDeviceMicrophone))
     
-    entries.append(.header(.gallery, whiteGramString(strings, ru: "Галерея", en: "Gallery")))
+    entries.append(.header(.gallery, extraString(strings, ru: "Галерея", en: "Gallery")))
     entries.append(.hideCameraInGallery(!state.hideCameraInGallery))
     entries.append(.hideCameraPreviewInGallery(!state.hideCameraPreviewInGallery, !state.hideCameraInGallery))
     
     return entries
 }
 
-private func whiteGramSelectionCheckIcon(color: UIColor) -> UIImage? {
+private func extraSelectionCheckIcon(color: UIColor) -> UIImage? {
     let size = CGSize(width: 22.0, height: 22.0)
     UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
     
@@ -355,7 +355,7 @@ private func whiteGramSelectionCheckIcon(color: UIColor) -> UIImage? {
     return image
 }
 
-private func whiteGramSelectionEmptyIcon() -> UIImage? {
+private func extraSelectionEmptyIcon() -> UIImage? {
     let size = CGSize(width: 22.0, height: 22.0)
     UIGraphicsBeginImageContextWithOptions(size, false, 0.0)
     let image = UIGraphicsGetImageFromCurrentImageContext()
@@ -363,19 +363,19 @@ private func whiteGramSelectionEmptyIcon() -> UIImage? {
     return image
 }
 
-public func whiteGramOtherSettingsController(context: AccountContext) -> ViewController {
-    var currentState = WhiteGramOtherSettingsState()
-    let statePromise = ValuePromise<WhiteGramOtherSettingsState>(currentState, ignoreRepeated: true)
+public func extraOtherSettingsController(context: AccountContext) -> ViewController {
+    var currentState = ExtraOtherSettingsState()
+    let statePromise = ValuePromise<ExtraOtherSettingsState>(currentState, ignoreRepeated: true)
     
     var pushController: ((ViewController) -> Void)?
     
-    let arguments = WhiteGramOtherSettingsArguments(
+    let arguments = ExtraOtherSettingsArguments(
         updateAutoTranslate: { value in
             currentState.setAutoTranslate(value)
             statePromise.set(currentState)
         },
         openTranslationService: {
-            pushController?(whiteGramOtherTranslationServiceController(
+            pushController?(extraOtherTranslationServiceController(
                 context: context,
                 statePromise: statePromise,
                 updateService: { value in
@@ -393,7 +393,7 @@ public func whiteGramOtherSettingsController(context: AccountContext) -> ViewCon
             statePromise.set(currentState)
         },
         openTranscriptionService: {
-            pushController?(whiteGramOtherTranscriptionServiceController(
+            pushController?(extraOtherTranscriptionServiceController(
                 context: context,
                 statePromise: statePromise,
                 updateService: { value in
@@ -419,15 +419,15 @@ public func whiteGramOtherSettingsController(context: AccountContext) -> ViewCon
         }
     )
     
-    let signal: Signal<(ItemListControllerState, (ItemListNodeState, WhiteGramOtherSettingsArguments)), NoError> = combineLatest(
+    let signal: Signal<(ItemListControllerState, (ItemListNodeState, ExtraOtherSettingsArguments)), NoError> = combineLatest(
         context.sharedContext.presentationData,
         statePromise.get()
     )
     |> deliverOnMainQueue
-    |> map { presentationData, state -> (ItemListControllerState, (ItemListNodeState, WhiteGramOtherSettingsArguments)) in
+    |> map { presentationData, state -> (ItemListControllerState, (ItemListNodeState, ExtraOtherSettingsArguments)) in
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text(whiteGramString(presentationData.strings, ru: "Другие", en: "Other")),
+            title: .text(extraString(presentationData.strings, ru: "Другие", en: "Other")),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back),
@@ -436,7 +436,7 @@ public func whiteGramOtherSettingsController(context: AccountContext) -> ViewCon
         
         let listState = ItemListNodeState(
             presentationData: ItemListPresentationData(presentationData),
-            entries: whiteGramOtherSettingsEntries(strings: presentationData.strings, state: state),
+            entries: extraOtherSettingsEntries(strings: presentationData.strings, state: state),
             style: .blocks,
             animateChanges: true
         )
@@ -453,16 +453,16 @@ public func whiteGramOtherSettingsController(context: AccountContext) -> ViewCon
 
 // MARK: - Translation Service Selection
 
-private enum WhiteGramOtherTranslationServiceSelectionSection: Int32 {
+private enum ExtraOtherTranslationServiceSelectionSection: Int32 {
     case main
 }
 
-private enum WhiteGramOtherTranslationServiceSelectionEntry: ItemListNodeEntry {
-    case service(WhiteGramOtherTranslationService, Bool)
+private enum ExtraOtherTranslationServiceSelectionEntry: ItemListNodeEntry {
+    case service(ExtraOtherTranslationService, Bool)
     case info(String)
     
     var section: ItemListSectionId {
-        return WhiteGramOtherTranslationServiceSelectionSection.main.rawValue
+        return ExtraOtherTranslationServiceSelectionSection.main.rawValue
     }
     
     var stableId: Int32 {
@@ -479,7 +479,7 @@ private enum WhiteGramOtherTranslationServiceSelectionEntry: ItemListNodeEntry {
         }
     }
     
-    static func ==(lhs: WhiteGramOtherTranslationServiceSelectionEntry, rhs: WhiteGramOtherTranslationServiceSelectionEntry) -> Bool {
+    static func ==(lhs: ExtraOtherTranslationServiceSelectionEntry, rhs: ExtraOtherTranslationServiceSelectionEntry) -> Bool {
         switch lhs {
         case let .service(lhsService, lhsSelected):
             if case let .service(rhsService, rhsSelected) = rhs {
@@ -495,19 +495,19 @@ private enum WhiteGramOtherTranslationServiceSelectionEntry: ItemListNodeEntry {
         }
     }
     
-    static func <(lhs: WhiteGramOtherTranslationServiceSelectionEntry, rhs: WhiteGramOtherTranslationServiceSelectionEntry) -> Bool {
+    static func <(lhs: ExtraOtherTranslationServiceSelectionEntry, rhs: ExtraOtherTranslationServiceSelectionEntry) -> Bool {
         return lhs.stableId < rhs.stableId
     }
     
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
-        let arguments = arguments as! WhiteGramOtherTranslationServiceSelectionArguments
+        let arguments = arguments as! ExtraOtherTranslationServiceSelectionArguments
         
         switch self {
         case let .service(service, selected):
             return ItemListDisclosureItem(
                 presentationData: presentationData,
                 systemStyle: .glass,
-                icon: selected ? whiteGramSelectionCheckIcon(color: presentationData.theme.list.itemAccentColor) : whiteGramSelectionEmptyIcon(),
+                icon: selected ? extraSelectionCheckIcon(color: presentationData.theme.list.itemAccentColor) : extraSelectionEmptyIcon(),
                 title: service.title,
                 label: "",
                 sectionId: self.section,
@@ -528,42 +528,42 @@ private enum WhiteGramOtherTranslationServiceSelectionEntry: ItemListNodeEntry {
     }
 }
 
-private final class WhiteGramOtherTranslationServiceSelectionArguments {
-    let selectService: (WhiteGramOtherTranslationService) -> Void
+private final class ExtraOtherTranslationServiceSelectionArguments {
+    let selectService: (ExtraOtherTranslationService) -> Void
     
-    init(selectService: @escaping (WhiteGramOtherTranslationService) -> Void) {
+    init(selectService: @escaping (ExtraOtherTranslationService) -> Void) {
         self.selectService = selectService
     }
 }
 
-private func whiteGramOtherTranslationServiceSelectionEntries(strings: PresentationStrings, state: WhiteGramOtherSettingsState) -> [WhiteGramOtherTranslationServiceSelectionEntry] {
+private func extraOtherTranslationServiceSelectionEntries(strings: PresentationStrings, state: ExtraOtherSettingsState) -> [ExtraOtherTranslationServiceSelectionEntry] {
     return [
         .service(.telegram, state.translationService == .telegram),
         .service(.gTranslate, state.translationService == .gTranslate),
-        .info(whiteGramString(strings, ru: "WhiteGram будет использовать Google Translate, если Telegram недоступен.", en: "WhiteGram will use Google Translate if Telegram is unavailable."))
+        .info(extraString(strings, ru: "Extra будет использовать Google Translate, если Telegram недоступен.", en: "Extra will use Google Translate if Telegram is unavailable."))
     ]
 }
 
-private func whiteGramOtherTranslationServiceController(
+private func extraOtherTranslationServiceController(
     context: AccountContext,
-    statePromise: ValuePromise<WhiteGramOtherSettingsState>,
-    updateService: @escaping (WhiteGramOtherTranslationService) -> Void
+    statePromise: ValuePromise<ExtraOtherSettingsState>,
+    updateService: @escaping (ExtraOtherTranslationService) -> Void
 ) -> ViewController {
-    let arguments = WhiteGramOtherTranslationServiceSelectionArguments(
+    let arguments = ExtraOtherTranslationServiceSelectionArguments(
         selectService: { service in
             updateService(service)
         }
     )
     
-    let signal: Signal<(ItemListControllerState, (ItemListNodeState, WhiteGramOtherTranslationServiceSelectionArguments)), NoError> = combineLatest(
+    let signal: Signal<(ItemListControllerState, (ItemListNodeState, ExtraOtherTranslationServiceSelectionArguments)), NoError> = combineLatest(
         context.sharedContext.presentationData,
         statePromise.get()
     )
     |> deliverOnMainQueue
-    |> map { presentationData, state -> (ItemListControllerState, (ItemListNodeState, WhiteGramOtherTranslationServiceSelectionArguments)) in
+    |> map { presentationData, state -> (ItemListControllerState, (ItemListNodeState, ExtraOtherTranslationServiceSelectionArguments)) in
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text(whiteGramString(presentationData.strings, ru: "Сервис перевода", en: "Translation Service")),
+            title: .text(extraString(presentationData.strings, ru: "Сервис перевода", en: "Translation Service")),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back),
@@ -572,7 +572,7 @@ private func whiteGramOtherTranslationServiceController(
         
         let listState = ItemListNodeState(
             presentationData: ItemListPresentationData(presentationData),
-            entries: whiteGramOtherTranslationServiceSelectionEntries(strings: presentationData.strings, state: state),
+            entries: extraOtherTranslationServiceSelectionEntries(strings: presentationData.strings, state: state),
             style: .blocks,
             animateChanges: true
         )
@@ -585,16 +585,16 @@ private func whiteGramOtherTranslationServiceController(
 
 // MARK: - Transcription Service Selection
 
-private enum WhiteGramOtherTranscriptionServiceSelectionSection: Int32 {
+private enum ExtraOtherTranscriptionServiceSelectionSection: Int32 {
     case main
 }
 
-private enum WhiteGramOtherTranscriptionServiceSelectionEntry: ItemListNodeEntry {
-    case service(WhiteGramOtherTranscriptionService, Bool)
+private enum ExtraOtherTranscriptionServiceSelectionEntry: ItemListNodeEntry {
+    case service(ExtraOtherTranscriptionService, Bool)
     case info(String)
     
     var section: ItemListSectionId {
-        return WhiteGramOtherTranscriptionServiceSelectionSection.main.rawValue
+        return ExtraOtherTranscriptionServiceSelectionSection.main.rawValue
     }
     
     var stableId: Int32 {
@@ -611,7 +611,7 @@ private enum WhiteGramOtherTranscriptionServiceSelectionEntry: ItemListNodeEntry
         }
     }
     
-    static func ==(lhs: WhiteGramOtherTranscriptionServiceSelectionEntry, rhs: WhiteGramOtherTranscriptionServiceSelectionEntry) -> Bool {
+    static func ==(lhs: ExtraOtherTranscriptionServiceSelectionEntry, rhs: ExtraOtherTranscriptionServiceSelectionEntry) -> Bool {
         switch lhs {
         case let .service(lhsService, lhsSelected):
             if case let .service(rhsService, rhsSelected) = rhs {
@@ -627,19 +627,19 @@ private enum WhiteGramOtherTranscriptionServiceSelectionEntry: ItemListNodeEntry
         }
     }
     
-    static func <(lhs: WhiteGramOtherTranscriptionServiceSelectionEntry, rhs: WhiteGramOtherTranscriptionServiceSelectionEntry) -> Bool {
+    static func <(lhs: ExtraOtherTranscriptionServiceSelectionEntry, rhs: ExtraOtherTranscriptionServiceSelectionEntry) -> Bool {
         return lhs.stableId < rhs.stableId
     }
     
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
-        let arguments = arguments as! WhiteGramOtherTranscriptionServiceSelectionArguments
+        let arguments = arguments as! ExtraOtherTranscriptionServiceSelectionArguments
         
         switch self {
         case let .service(service, selected):
             return ItemListDisclosureItem(
                 presentationData: presentationData,
                 systemStyle: .glass,
-                icon: selected ? whiteGramSelectionCheckIcon(color: presentationData.theme.list.itemAccentColor) : whiteGramSelectionEmptyIcon(),
+                icon: selected ? extraSelectionCheckIcon(color: presentationData.theme.list.itemAccentColor) : extraSelectionEmptyIcon(),
                 title: service.title,
                 label: "",
                 sectionId: self.section,
@@ -660,42 +660,42 @@ private enum WhiteGramOtherTranscriptionServiceSelectionEntry: ItemListNodeEntry
     }
 }
 
-private final class WhiteGramOtherTranscriptionServiceSelectionArguments {
-    let selectService: (WhiteGramOtherTranscriptionService) -> Void
+private final class ExtraOtherTranscriptionServiceSelectionArguments {
+    let selectService: (ExtraOtherTranscriptionService) -> Void
     
-    init(selectService: @escaping (WhiteGramOtherTranscriptionService) -> Void) {
+    init(selectService: @escaping (ExtraOtherTranscriptionService) -> Void) {
         self.selectService = selectService
     }
 }
 
-private func whiteGramOtherTranscriptionServiceSelectionEntries(strings: PresentationStrings, state: WhiteGramOtherSettingsState) -> [WhiteGramOtherTranscriptionServiceSelectionEntry] {
+private func extraOtherTranscriptionServiceSelectionEntries(strings: PresentationStrings, state: ExtraOtherSettingsState) -> [ExtraOtherTranscriptionServiceSelectionEntry] {
     return [
         .service(.telegram, state.transcriptionService == .telegram),
         .service(.apple, state.transcriptionService == .apple),
-        .info(whiteGramString(strings, ru: "WhiteGram будет использовать Apple, если Telegram недоступен.", en: "WhiteGram will use Apple if Telegram is unavailable."))
+        .info(extraString(strings, ru: "Extra будет использовать Apple, если Telegram недоступен.", en: "Extra will use Apple if Telegram is unavailable."))
     ]
 }
 
-private func whiteGramOtherTranscriptionServiceController(
+private func extraOtherTranscriptionServiceController(
     context: AccountContext,
-    statePromise: ValuePromise<WhiteGramOtherSettingsState>,
-    updateService: @escaping (WhiteGramOtherTranscriptionService) -> Void
+    statePromise: ValuePromise<ExtraOtherSettingsState>,
+    updateService: @escaping (ExtraOtherTranscriptionService) -> Void
 ) -> ViewController {
-    let arguments = WhiteGramOtherTranscriptionServiceSelectionArguments(
+    let arguments = ExtraOtherTranscriptionServiceSelectionArguments(
         selectService: { service in
             updateService(service)
         }
     )
     
-    let signal: Signal<(ItemListControllerState, (ItemListNodeState, WhiteGramOtherTranscriptionServiceSelectionArguments)), NoError> = combineLatest(
+    let signal: Signal<(ItemListControllerState, (ItemListNodeState, ExtraOtherTranscriptionServiceSelectionArguments)), NoError> = combineLatest(
         context.sharedContext.presentationData,
         statePromise.get()
     )
     |> deliverOnMainQueue
-    |> map { presentationData, state -> (ItemListControllerState, (ItemListNodeState, WhiteGramOtherTranscriptionServiceSelectionArguments)) in
+    |> map { presentationData, state -> (ItemListControllerState, (ItemListNodeState, ExtraOtherTranscriptionServiceSelectionArguments)) in
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text(whiteGramString(presentationData.strings, ru: "Сервис транскрибации", en: "Transcription Service")),
+            title: .text(extraString(presentationData.strings, ru: "Сервис транскрибации", en: "Transcription Service")),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back),
@@ -704,7 +704,7 @@ private func whiteGramOtherTranscriptionServiceController(
         
         let listState = ItemListNodeState(
             presentationData: ItemListPresentationData(presentationData),
-            entries: whiteGramOtherTranscriptionServiceSelectionEntries(strings: presentationData.strings, state: state),
+            entries: extraOtherTranscriptionServiceSelectionEntries(strings: presentationData.strings, state: state),
             style: .blocks,
             animateChanges: true
         )

@@ -173,7 +173,7 @@ final class WebAppWebView: WKWebView {
         
         let videoScript = WKUserScript(source: videoSource, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         contentController.addUserScript(videoScript)
-        whiteGramInstallWebTrackerBlocker(into: contentController)
+        extraInstallWebTrackerBlocker(into: contentController)
         
         configuration.userContentController = contentController
         

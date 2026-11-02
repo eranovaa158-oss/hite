@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import LottieSettings
 import UIKit
 import AsyncDisplayKit
@@ -91,7 +91,7 @@ import ChatMessageSuggestedPostInfoNode
 import PremiumAlertController
 import TranslateUI
 
-private func whiteGramNormalizedInterfaceLanguageCode(_ code: String) -> String {
+private func extraNormalizedInterfaceLanguageCode(_ code: String) -> String {
     var code = code
     let rawSuffix = "-raw"
     if code.hasSuffix(rawSuffix) {
@@ -482,7 +482,7 @@ private func contentNodeMessagesAndClassesForItem(_ item: ChatMessageItem) -> ([
 
     let firstMessage = item.content.firstMessage
     let hideChannelPostReactions: Bool
-    if let channel = firstMessage.peers[firstMessage.id.peerId] as? TelegramChannel, case .broadcast = channel.info, !WhiteGramChatSettings.current.channelPostReactions {
+    if let channel = firstMessage.peers[firstMessage.id.peerId] as? TelegramChannel, case .broadcast = channel.info, !ExtraChatSettings.current.channelPostReactions {
         hideChannelPostReactions = true
         needReactions = false
     } else {
@@ -2033,8 +2033,8 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
             needsTranslateButton = false
         }
 
-        if incoming && WhiteGramOtherSettings.current.translationButton && item.associatedData.translateToLanguage == nil && !item.controllerInteraction.expandedTranslationMessageStableIds.contains(item.message.stableId) && !item.message.text.isEmpty {
-            let interfaceLanguage = whiteGramNormalizedInterfaceLanguageCode(item.presentationData.strings.baseLanguageCode)
+        if incoming && ExtraOtherSettings.current.translationButton && item.associatedData.translateToLanguage == nil && !item.controllerInteraction.expandedTranslationMessageStableIds.contains(item.message.stableId) && !item.message.text.isEmpty {
+            let interfaceLanguage = extraNormalizedInterfaceLanguageCode(item.presentationData.strings.baseLanguageCode)
             let (canTranslate, _) = canTranslateText(context: item.context, text: item.message.text, showTranslate: true, ignoredLanguages: [interfaceLanguage])
             needsTranslateButton = canTranslate
         }
@@ -2697,7 +2697,7 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
                 var dateReplies = 0
                 var starsCount: Int64?
                 var dateReactionsAndPeers = mergedMessageReactionsAndPeers(accountPeerId: item.context.account.peerId, accountPeer: item.associatedData.accountPeer, message: message)
-                if message.isRestricted(platform: "ios", contentSettings: item.context.currentContentSettings.with { $0 }) || whiteGramShouldHideChannelPostReactions(message: message) {
+                if message.isRestricted(platform: "ios", contentSettings: item.context.currentContentSettings.with { $0 }) || extraShouldHideChannelPostReactions(message: message) {
                     dateReactionsAndPeers = ([], [])
                 }
                 for attribute in message.attributes {
@@ -5447,7 +5447,7 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
                 strongSelf.translateButtonNode = translateButtonNode
                 strongSelf.insertSubnode(translateButtonNode, belowSubnode: strongSelf.messageAccessibilityArea)
                 translateButtonNode.pressed = { [weak strongSelf] in
-                    strongSelf?.whiteGramTranslateButtonPressed()
+                    strongSelf?.extraTranslateButtonPressed()
                 }
             }
         } else if let translateButtonNode = strongSelf.translateButtonNode {
@@ -5926,11 +5926,11 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
         switch recognizer.state {
         case .ended:
             if let (gesture, location) = recognizer.lastRecognizedGestureAndLocation, let item = self.item {
-                if case .doubleTap = gesture, self.performWhiteGramChannelPostDoubleTapAction(item: item, location: location) {
+                if case .doubleTap = gesture, self.performExtraChannelPostDoubleTapAction(item: item, location: location) {
                     self.mainContainerNode.cancelGesture()
                     return
                 }
-                if case .doubleTap = gesture, self.performWhiteGramPersonalDoubleTapAction(item: item, location: location) {
+                if case .doubleTap = gesture, self.performExtraPersonalDoubleTapAction(item: item, location: location) {
                     self.mainContainerNode.cancelGesture()
                     return
                 }
@@ -5963,7 +5963,7 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
         }
     }
 
-    private func whiteGramPersonalDoubleTapTarget(item: ChatMessageItem, location: CGPoint) -> (message: Message, subFrame: CGRect) {
+    private func extraPersonalDoubleTapTarget(item: ChatMessageItem, location: CGPoint) -> (message: Message, subFrame: CGRect) {
         var message = item.message
         var subFrame = self.backgroundNode.frame.contains(CGPoint(x: self.frame.width - location.x, y: location.y)) ? self.backgroundNode.frame : self.bounds
         if case .group = item.content {
@@ -5979,19 +5979,19 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
         return (message, subFrame)
     }
 
-    private func isWhiteGramChannelPost(_ message: Message) -> Bool {
+    private func isExtraChannelPost(_ message: Message) -> Bool {
         if let channel = message.peers[message.id.peerId] as? TelegramChannel, case .broadcast = channel.info {
             return true
         }
         return false
     }
 
-    private func performWhiteGramChannelPostDoubleTapAction(item: ChatMessageItem, location: CGPoint) -> Bool {
-        let target = self.whiteGramPersonalDoubleTapTarget(item: item, location: location)
-        guard self.isWhiteGramChannelPost(target.message) else {
+    private func performExtraChannelPostDoubleTapAction(item: ChatMessageItem, location: CGPoint) -> Bool {
+        let target = self.extraPersonalDoubleTapTarget(item: item, location: location)
+        guard self.isExtraChannelPost(target.message) else {
             return false
         }
-        let settings = WhiteGramChatSettings.current
+        let settings = ExtraChatSettings.current
         switch settings.channelPostDoubleTapAction {
         case .savedMessages:
             if !item.controllerInteraction.performPersonalChatDoubleTapAction(target.message, .savedMessages) {
@@ -6017,13 +6017,13 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
         return true
     }
 
-    private func performWhiteGramPersonalDoubleTapAction(item: ChatMessageItem, location: CGPoint) -> Bool {
+    private func performExtraPersonalDoubleTapAction(item: ChatMessageItem, location: CGPoint) -> Bool {
         let chatPeerId = item.chatLocation.peerId ?? item.message.id.peerId
         guard chatPeerId.namespace == Namespaces.Peer.CloudUser || chatPeerId.namespace == Namespaces.Peer.SecretChat else {
             return false
         }
-        let target = self.whiteGramPersonalDoubleTapTarget(item: item, location: location)
-        let settings = WhiteGramChatSettings.current
+        let target = self.extraPersonalDoubleTapTarget(item: item, location: location)
+        let settings = ExtraChatSettings.current
         switch settings.personalChatDoubleTapAction {
         case .savedMessages, .edit, .pin:
             if !item.controllerInteraction.performPersonalChatDoubleTapAction(target.message, settings.personalChatDoubleTapAction) {
@@ -7385,12 +7385,12 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
         }
     }
 
-    private func whiteGramTranslateButtonPressed() {
+    private func extraTranslateButtonPressed() {
         guard let item = self.item else {
             return
         }
 
-        let toLang = whiteGramNormalizedInterfaceLanguageCode(item.presentationData.strings.baseLanguageCode)
+        let toLang = extraNormalizedInterfaceLanguageCode(item.presentationData.strings.baseLanguageCode)
         let (_, detectedLanguage) = canTranslateText(context: item.context, text: item.message.text, showTranslate: true, ignoredLanguages: [toLang])
         let fromLang = detectedLanguage.map { normalizeTranslationLanguage($0) }
 
@@ -7501,7 +7501,7 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
 
     private var playedSwipeToReplyHaptic = false
     @objc private func swipeToReplyGesture(_ recognizer: ChatSwipeToReplyRecognizer) {
-        guard WhiteGramChatSettings.current.swipeToReply else {
+        guard ExtraChatSettings.current.swipeToReply else {
             return
         }
         var offset: CGFloat = 0.0

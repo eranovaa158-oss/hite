@@ -14,15 +14,15 @@ import MultiAnimationRenderer
 import TelegramStringFormatting
 import TelegramUIPreferences
 
-public func whiteGramShouldHideChannelPostReactions(message: Message) -> Bool {
-    if let channel = message.peers[message.id.peerId] as? TelegramChannel, case .broadcast = channel.info, !WhiteGramChatSettings.current.channelPostReactions {
+public func extraShouldHideChannelPostReactions(message: Message) -> Bool {
+    if let channel = message.peers[message.id.peerId] as? TelegramChannel, case .broadcast = channel.info, !ExtraChatSettings.current.channelPostReactions {
         return true
     }
     return false
 }
 
-public func whiteGramShouldUseWideChannelPostLayout(message: Message) -> Bool {
-    if let channel = message.peers[message.id.peerId] as? TelegramChannel, case .broadcast = channel.info, WhiteGramChatSettings.current.wideChannelPosts {
+public func extraShouldUseWideChannelPostLayout(message: Message) -> Bool {
+    if let channel = message.peers[message.id.peerId] as? TelegramChannel, case .broadcast = channel.info, ExtraChatSettings.current.wideChannelPosts {
         return true
     }
     return false

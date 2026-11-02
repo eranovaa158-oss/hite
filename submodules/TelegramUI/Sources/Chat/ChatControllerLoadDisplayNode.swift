@@ -271,7 +271,7 @@ extension ChatControllerImpl {
         self.chatDisplayNode.overlayTitle = contentData.overlayTitle
         self.chatDisplayNode.overlayTitleContent = contentData.state.chatTitleContent
         
-        if WhiteGramChatSettings.current.channelSwipeToNext {
+        if ExtraChatSettings.current.channelSwipeToNext {
             self.chatDisplayNode.historyNode.nextChannelToRead = contentData.state.nextChannelToRead.flatMap { nextChannelToRead -> (peer: EnginePeer, threadData: (id: Int64, data: MessageHistoryThreadData)?, unreadCount: Int, location: TelegramEngine.NextUnreadChannelLocation)? in
                 return (
                     nextChannelToRead.peer,
@@ -697,7 +697,7 @@ extension ChatControllerImpl {
             }
         }
         
-        if WhiteGramOtherSettings.current.translationService == .gTranslate {
+        if ExtraOtherSettings.current.translationService == .gTranslate {
             engineExperimentalInternalTranslationService = ExperimentalGoogleTranslationServiceImpl()
         } else {
             engineExperimentalInternalTranslationService = nil
@@ -2681,7 +2681,7 @@ extension ChatControllerImpl {
                 return
             }
                         
-            if !isVideo && WhiteGramChatSettings.current.confirmVoiceRecording && !strongSelf.skipNextVoiceRecordingConfirmation {
+            if !isVideo && ExtraChatSettings.current.confirmVoiceRecording && !strongSelf.skipNextVoiceRecordingConfirmation {
                 strongSelf.present(textAlertController(context: strongSelf.context, updatedPresentationData: strongSelf.updatedPresentationData, title: "Записать голосовое?", text: "Подтвердите начало записи голосового сообщения.", actions: [
                     TextAlertAction(type: .genericAction, title: strongSelf.presentationData.strings.Common_Cancel, action: {
                     }),
@@ -2728,7 +2728,7 @@ extension ChatControllerImpl {
                             strongSelf.lockNextMediaRecordingOnStart = false
                         }
                         if isVideo {
-                            let settings = WhiteGramChatSettings.current
+                            let settings = ExtraChatSettings.current
                             let startWithFrontCamera: Bool
                             switch settings.videoMessageCamera {
                             case .front:
@@ -2769,7 +2769,7 @@ extension ChatControllerImpl {
                             }
                         })
                     }
-                    if WhiteGramChatSettings.current.videoMessageCamera == .ask {
+                    if ExtraChatSettings.current.videoMessageCamera == .ask {
                         strongSelf.present(textAlertController(context: strongSelf.context, updatedPresentationData: strongSelf.updatedPresentationData, title: "Камера видеосообщения", text: "Выберите камеру для записи видеосообщения.", actions: [
                             TextAlertAction(type: .defaultAction, title: "Фронтальная", action: {
                                 requestedVideoFrontCamera = true
@@ -5573,7 +5573,7 @@ extension ChatControllerImpl {
             guard let strongSelf = self else {
                 return false
             }
-            guard WhiteGramChatSettings.current.channelSwipeToNext else {
+            guard ExtraChatSettings.current.channelSwipeToNext else {
                 return
             }
             if let navigationController = strongSelf.effectiveNavigationController {

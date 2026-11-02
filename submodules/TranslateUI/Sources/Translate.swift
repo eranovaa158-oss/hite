@@ -174,8 +174,8 @@ public func normalizeTranslationLanguage(_ code: String) -> String {
 }
 
 public func canTranslateChats(context: AccountContext) -> Bool {
-    let whiteGramOtherSettings = WhiteGramOtherSettings.current
-    if whiteGramOtherSettings.autoTranslate || whiteGramOtherSettings.translationButton {
+    let extraOtherSettings = ExtraOtherSettings.current
+    if extraOtherSettings.autoTranslate || extraOtherSettings.translationButton {
         return true
     }
 
@@ -196,15 +196,15 @@ public func canTranslateChats(context: AccountContext) -> Bool {
 }
 
 public func canTranslateText(context: AccountContext, text: String, showTranslate: Bool, showTranslateIfTopical: Bool = false, ignoredLanguages: [String]?) -> (canTranslate: Bool, language: String?) {
-    let whiteGramOtherSettings = WhiteGramOtherSettings.current
-    let effectiveShowTranslate = whiteGramOtherSettings.translationButton
+    let extraOtherSettings = ExtraOtherSettings.current
+    let effectiveShowTranslate = extraOtherSettings.translationButton
 
     guard effectiveShowTranslate, text.count > 0 else {
         return (false, nil)
     }
 
     let translationConfiguration = TranslationConfiguration.with(appConfiguration: context.currentAppConfiguration.with { $0 })
-    var translateButtonAvailable = whiteGramOtherSettings.translationButton || whiteGramOtherSettings.translationService == .gTranslate
+    var translateButtonAvailable = extraOtherSettings.translationButton || extraOtherSettings.translationService == .gTranslate
     switch translationConfiguration.manual {
     case .enabled, .alternative:
         translateButtonAvailable = true

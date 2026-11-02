@@ -1,12 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "WhiteGram@2x.png",
+      "filename" : "Extra@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "WhiteGram@3x.png",
+      "filename" : "Extra@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

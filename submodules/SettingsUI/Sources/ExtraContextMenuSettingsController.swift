@@ -8,105 +8,105 @@ import TelegramUIPreferences
 import ItemListUI
 import AccountContext
 
-private func whiteGramString(_ strings: PresentationStrings, ru: String, en: String) -> String {
+private func extraString(_ strings: PresentationStrings, ru: String, en: String) -> String {
     return strings.baseLanguageCode.lowercased().hasPrefix("ru") ? ru : en
 }
 
-private enum WhiteGramContextMenusSettingsSection: Int32 {
+private enum ExtraContextMenusSettingsSection: Int32 {
     case chatList
     case privateAndGroups
     case channels
     case settings
 }
 
-private extension WhiteGramContextMenuOption {
+private extension ExtraContextMenuOption {
     func title(strings: PresentationStrings) -> String {
         switch self {
         case .chatListFolder:
-            return whiteGramString(strings, ru: "Добавить или убрать в/из папки", en: "Add or Remove from Folder")
+            return extraString(strings, ru: "Добавить или убрать в/из папки", en: "Add or Remove from Folder")
         case .chatListMark:
-            return whiteGramString(strings, ru: "Пометить", en: "Mark")
+            return extraString(strings, ru: "Пометить", en: "Mark")
         case .chatListArchive:
-            return whiteGramString(strings, ru: "Архивировать", en: "Archive")
+            return extraString(strings, ru: "Архивировать", en: "Archive")
         case .chatListPin:
-            return whiteGramString(strings, ru: "Закрепить", en: "Pin")
+            return extraString(strings, ru: "Закрепить", en: "Pin")
         case .chatListMute:
-            return whiteGramString(strings, ru: "Выкл. или вкл. уведомления", en: "Mute or Unmute")
+            return extraString(strings, ru: "Выкл. или вкл. уведомления", en: "Mute or Unmute")
         case .chatListDelete:
-            return whiteGramString(strings, ru: "Удалить", en: "Delete")
+            return extraString(strings, ru: "Удалить", en: "Delete")
             
         case .privateReply:
-            return whiteGramString(strings, ru: "Ответить", en: "Reply")
+            return extraString(strings, ru: "Ответить", en: "Reply")
         case .privateCopy:
-            return whiteGramString(strings, ru: "Скопировать", en: "Copy")
+            return extraString(strings, ru: "Скопировать", en: "Copy")
         case .privateEdit:
-            return whiteGramString(strings, ru: "Редактировать", en: "Edit")
+            return extraString(strings, ru: "Редактировать", en: "Edit")
         case .privateForward:
-            return whiteGramString(strings, ru: "Переслать", en: "Forward")
+            return extraString(strings, ru: "Переслать", en: "Forward")
         case .privateHideName:
-            return whiteGramString(strings, ru: "Спрятать имя", en: "Hide Name")
+            return extraString(strings, ru: "Спрятать имя", en: "Hide Name")
         case .privateDelete:
-            return whiteGramString(strings, ru: "Удалить", en: "Delete")
+            return extraString(strings, ru: "Удалить", en: "Delete")
         case .privateAddToFavorites:
-            return whiteGramString(strings, ru: "Добавить в избранное", en: "Add to Favorites")
+            return extraString(strings, ru: "Добавить в избранное", en: "Add to Favorites")
         case .privatePin:
-            return whiteGramString(strings, ru: "Закрепить", en: "Pin")
+            return extraString(strings, ru: "Закрепить", en: "Pin")
         case .privateRemove:
-            return whiteGramString(strings, ru: "Удалить", en: "Remove")
+            return extraString(strings, ru: "Удалить", en: "Remove")
         case .privateSelect:
-            return whiteGramString(strings, ru: "Выбрать", en: "Select")
+            return extraString(strings, ru: "Выбрать", en: "Select")
             
         case .channelReply:
-            return whiteGramString(strings, ru: "Ответить", en: "Reply")
+            return extraString(strings, ru: "Ответить", en: "Reply")
         case .channelCopy:
-            return whiteGramString(strings, ru: "Скопировать", en: "Copy")
+            return extraString(strings, ru: "Скопировать", en: "Copy")
         case .channelCopyLink:
-            return whiteGramString(strings, ru: "Скопировать ссылку", en: "Copy Link")
+            return extraString(strings, ru: "Скопировать ссылку", en: "Copy Link")
         case .channelEdit:
-            return whiteGramString(strings, ru: "Редактировать", en: "Edit")
+            return extraString(strings, ru: "Редактировать", en: "Edit")
         case .channelForward:
-            return whiteGramString(strings, ru: "Переслать", en: "Forward")
+            return extraString(strings, ru: "Переслать", en: "Forward")
         case .channelHideName:
-            return whiteGramString(strings, ru: "Спрятать имя", en: "Hide Name")
+            return extraString(strings, ru: "Спрятать имя", en: "Hide Name")
         case .channelReport:
-            return whiteGramString(strings, ru: "Пожаловаться", en: "Report")
+            return extraString(strings, ru: "Пожаловаться", en: "Report")
         case .channelDelete:
-            return whiteGramString(strings, ru: "Удалить", en: "Delete")
+            return extraString(strings, ru: "Удалить", en: "Delete")
         case .channelSaveToFavorites:
-            return whiteGramString(strings, ru: "Сохранить в избранное", en: "Save to Favorites")
+            return extraString(strings, ru: "Сохранить в избранное", en: "Save to Favorites")
         case .channelPin:
-            return whiteGramString(strings, ru: "Закрепить", en: "Pin")
+            return extraString(strings, ru: "Закрепить", en: "Pin")
         case .channelRemove:
-            return whiteGramString(strings, ru: "Удалить", en: "Remove")
+            return extraString(strings, ru: "Удалить", en: "Remove")
         case .channelSelect:
-            return whiteGramString(strings, ru: "Выбрать", en: "Select")
+            return extraString(strings, ru: "Выбрать", en: "Select")
             
         case .settingsSavedMessages:
-            return whiteGramString(strings, ru: "Избранное", en: "Saved Messages")
+            return extraString(strings, ru: "Избранное", en: "Saved Messages")
         case .settingsRecentCalls:
-            return whiteGramString(strings, ru: "Недавние звонки", en: "Recent Calls")
+            return extraString(strings, ru: "Недавние звонки", en: "Recent Calls")
         case .settingsDevices:
-            return whiteGramString(strings, ru: "Устройства", en: "Devices")
+            return extraString(strings, ru: "Устройства", en: "Devices")
         case .settingsChatFolders:
-            return whiteGramString(strings, ru: "Папки с чатами", en: "Chat Folders")
+            return extraString(strings, ru: "Папки с чатами", en: "Chat Folders")
         case .settingsPremium:
             return "Telegram Premium"
         case .settingsStars:
-            return whiteGramString(strings, ru: "Мои звезды", en: "My Stars")
+            return extraString(strings, ru: "Мои звезды", en: "My Stars")
         case .settingsBusiness:
-            return whiteGramString(strings, ru: "Telegram для бизнеса", en: "Telegram Business")
+            return extraString(strings, ru: "Telegram для бизнеса", en: "Telegram Business")
         case .settingsGifts:
             return "Telegram Gifts"
         case .settingsHelp:
-            return whiteGramString(strings, ru: "Помощь", en: "Help")
+            return extraString(strings, ru: "Помощь", en: "Help")
         case .settingsFAQ:
-            return whiteGramString(strings, ru: "Вопросы о Telegram", en: "Telegram FAQ")
+            return extraString(strings, ru: "Вопросы о Telegram", en: "Telegram FAQ")
         case .settingsFeatures:
-            return whiteGramString(strings, ru: "Возможности Telegram", en: "Telegram Features")
+            return extraString(strings, ru: "Возможности Telegram", en: "Telegram Features")
         }
     }
     
-    var section: WhiteGramContextMenusSettingsSection {
+    var section: ExtraContextMenusSettingsSection {
         switch self {
         case .chatListFolder, .chatListMark, .chatListArchive, .chatListPin, .chatListMute, .chatListDelete:
             return .chatList
@@ -124,25 +124,25 @@ private extension WhiteGramContextMenuOption {
     
 }
 
-private typealias WhiteGramContextMenusSettingsState = WhiteGramContextMenuSettings
+private typealias ExtraContextMenusSettingsState = ExtraContextMenuSettings
 
-private extension WhiteGramContextMenuSettings {
-    func value(_ option: WhiteGramContextMenuOption) -> Bool {
+private extension ExtraContextMenuSettings {
+    func value(_ option: ExtraContextMenuOption) -> Bool {
         return self.isEnabled(option)
     }
 }
 
-private final class WhiteGramContextMenusSettingsArguments {
-    let updateOption: (WhiteGramContextMenuOption, Bool) -> Void
+private final class ExtraContextMenusSettingsArguments {
+    let updateOption: (ExtraContextMenuOption, Bool) -> Void
     
-    init(updateOption: @escaping (WhiteGramContextMenuOption, Bool) -> Void) {
+    init(updateOption: @escaping (ExtraContextMenuOption, Bool) -> Void) {
         self.updateOption = updateOption
     }
 }
 
-private enum WhiteGramContextMenusSettingsEntry: ItemListNodeEntry {
-    case header(WhiteGramContextMenusSettingsSection, String)
-    case option(WhiteGramContextMenuOption, Bool)
+private enum ExtraContextMenusSettingsEntry: ItemListNodeEntry {
+    case header(ExtraContextMenusSettingsSection, String)
+    case option(ExtraContextMenuOption, Bool)
     
     var section: ItemListSectionId {
         switch self {
@@ -158,12 +158,12 @@ private enum WhiteGramContextMenusSettingsEntry: ItemListNodeEntry {
         case let .header(section, _):
             return section.rawValue * 1000
         case let .option(option, _):
-            let index = WhiteGramContextMenuOption.allCases.firstIndex(of: option) ?? 0
+            let index = ExtraContextMenuOption.allCases.firstIndex(of: option) ?? 0
             return option.section.rawValue * 1000 + Int32(index + 1)
         }
     }
     
-    static func ==(lhs: WhiteGramContextMenusSettingsEntry, rhs: WhiteGramContextMenusSettingsEntry) -> Bool {
+    static func ==(lhs: ExtraContextMenusSettingsEntry, rhs: ExtraContextMenusSettingsEntry) -> Bool {
         switch lhs {
         case let .header(lhsSection, lhsText):
             if case let .header(rhsSection, rhsText) = rhs {
@@ -179,12 +179,12 @@ private enum WhiteGramContextMenusSettingsEntry: ItemListNodeEntry {
         }
     }
     
-    static func <(lhs: WhiteGramContextMenusSettingsEntry, rhs: WhiteGramContextMenusSettingsEntry) -> Bool {
+    static func <(lhs: ExtraContextMenusSettingsEntry, rhs: ExtraContextMenusSettingsEntry) -> Bool {
         return lhs.stableId < rhs.stableId
     }
     
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
-        let arguments = arguments as! WhiteGramContextMenusSettingsArguments
+        let arguments = arguments as! ExtraContextMenusSettingsArguments
         
         switch self {
         case let .header(_, text):
@@ -210,10 +210,10 @@ private enum WhiteGramContextMenusSettingsEntry: ItemListNodeEntry {
     }
 }
 
-private func whiteGramContextMenusSettingsEntries(strings: PresentationStrings, state: WhiteGramContextMenusSettingsState) -> [WhiteGramContextMenusSettingsEntry] {
-    var entries: [WhiteGramContextMenusSettingsEntry] = []
+private func extraContextMenusSettingsEntries(strings: PresentationStrings, state: ExtraContextMenusSettingsState) -> [ExtraContextMenusSettingsEntry] {
+    var entries: [ExtraContextMenusSettingsEntry] = []
     
-    entries.append(.header(.chatList, whiteGramString(strings, ru: "Список чатов", en: "Chat List")))
+    entries.append(.header(.chatList, extraString(strings, ru: "Список чатов", en: "Chat List")))
     entries.append(.option(.chatListFolder, state.value(.chatListFolder)))
     entries.append(.option(.chatListMark, state.value(.chatListMark)))
     entries.append(.option(.chatListArchive, state.value(.chatListArchive)))
@@ -221,7 +221,7 @@ private func whiteGramContextMenusSettingsEntries(strings: PresentationStrings, 
     entries.append(.option(.chatListMute, state.value(.chatListMute)))
     entries.append(.option(.chatListDelete, state.value(.chatListDelete)))
     
-    entries.append(.header(.privateAndGroups, whiteGramString(strings, ru: "Внутри чатов - личные сообщения или группы", en: "Inside Chats - Private Messages or Groups")))
+    entries.append(.header(.privateAndGroups, extraString(strings, ru: "Внутри чатов - личные сообщения или группы", en: "Inside Chats - Private Messages or Groups")))
     entries.append(.option(.privateReply, state.value(.privateReply)))
     entries.append(.option(.privateCopy, state.value(.privateCopy)))
     entries.append(.option(.privateEdit, state.value(.privateEdit)))
@@ -233,7 +233,7 @@ private func whiteGramContextMenusSettingsEntries(strings: PresentationStrings, 
     entries.append(.option(.privateRemove, state.value(.privateRemove)))
     entries.append(.option(.privateSelect, state.value(.privateSelect)))
     
-    entries.append(.header(.channels, whiteGramString(strings, ru: "Внутри чатов - каналы", en: "Inside Chats - Channels")))
+    entries.append(.header(.channels, extraString(strings, ru: "Внутри чатов - каналы", en: "Inside Chats - Channels")))
     entries.append(.option(.channelReply, state.value(.channelReply)))
     entries.append(.option(.channelCopy, state.value(.channelCopy)))
     entries.append(.option(.channelCopyLink, state.value(.channelCopyLink)))
@@ -247,7 +247,7 @@ private func whiteGramContextMenusSettingsEntries(strings: PresentationStrings, 
     entries.append(.option(.channelRemove, state.value(.channelRemove)))
     entries.append(.option(.channelSelect, state.value(.channelSelect)))
     
-    entries.append(.header(.settings, whiteGramString(strings, ru: "Настройки", en: "Settings")))
+    entries.append(.header(.settings, extraString(strings, ru: "Настройки", en: "Settings")))
     entries.append(.option(.settingsSavedMessages, state.value(.settingsSavedMessages)))
     entries.append(.option(.settingsRecentCalls, state.value(.settingsRecentCalls)))
     entries.append(.option(.settingsDevices, state.value(.settingsDevices)))
@@ -263,26 +263,26 @@ private func whiteGramContextMenusSettingsEntries(strings: PresentationStrings, 
     return entries
 }
 
-public func whiteGramContextMenusSettingsController(context: AccountContext) -> ViewController {
-    var currentState = WhiteGramContextMenusSettingsState()
-    let statePromise = ValuePromise<WhiteGramContextMenusSettingsState>(currentState, ignoreRepeated: true)
+public func extraContextMenusSettingsController(context: AccountContext) -> ViewController {
+    var currentState = ExtraContextMenusSettingsState()
+    let statePromise = ValuePromise<ExtraContextMenusSettingsState>(currentState, ignoreRepeated: true)
     
-    let arguments = WhiteGramContextMenusSettingsArguments(
+    let arguments = ExtraContextMenusSettingsArguments(
         updateOption: { option, value in
             currentState.setValue(value, for: option)
             statePromise.set(currentState)
         }
     )
     
-    let signal: Signal<(ItemListControllerState, (ItemListNodeState, WhiteGramContextMenusSettingsArguments)), NoError> = combineLatest(
+    let signal: Signal<(ItemListControllerState, (ItemListNodeState, ExtraContextMenusSettingsArguments)), NoError> = combineLatest(
         context.sharedContext.presentationData,
         statePromise.get()
     )
     |> deliverOnMainQueue
-    |> map { presentationData, state -> (ItemListControllerState, (ItemListNodeState, WhiteGramContextMenusSettingsArguments)) in
+    |> map { presentationData, state -> (ItemListControllerState, (ItemListNodeState, ExtraContextMenusSettingsArguments)) in
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text(whiteGramString(presentationData.strings, ru: "Контекстные меню", en: "Context Menus")),
+            title: .text(extraString(presentationData.strings, ru: "Контекстные меню", en: "Context Menus")),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back),
@@ -291,7 +291,7 @@ public func whiteGramContextMenusSettingsController(context: AccountContext) -> 
         
         let listState = ItemListNodeState(
             presentationData: ItemListPresentationData(presentationData),
-            entries: whiteGramContextMenusSettingsEntries(strings: presentationData.strings, state: state),
+            entries: extraContextMenusSettingsEntries(strings: presentationData.strings, state: state),
             style: .blocks,
             animateChanges: true
         )

@@ -1,8 +1,8 @@
-# WhiteGram
+# hitegram
 
-WhiteGram is an unofficial Telegram iOS client with a redesigned proxy system and the ability to customize the interface.
+hitegram is an unofficial Telegram iOS client with a redesigned proxy system and the ability to customize the interface.
 
-For the project description, feature list, IPA build command, and sideloading notes, see [WHITEGRAM_README.md](WHITEGRAM_README.md)
+For the project description, feature list, IPA build command, and sideloading notes, see [EXTRA_README.md](EXTRA_README.md)
 
 ---
 

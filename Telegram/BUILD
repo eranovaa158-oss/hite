@@ -1,4 +1,4 @@
-﻿load(":framework_exported_symbols.bzl", "framework_exported_symbols")
+load(":framework_exported_symbols.bzl", "framework_exported_symbols")
 load("@rules_cc//cc:objc_library.bzl", "objc_library")
 
 load("@bazel_skylib//rules:common_settings.bzl",
@@ -642,7 +642,7 @@ plist_fragment(
     template =
     """
     <key>CFBundleDisplayName</key>
-    <string>WhiteGram</string>
+    <string>hitegram</string>
     """
 )
 
@@ -1697,11 +1697,11 @@ plist_fragment(
     <key>CFBundleDevelopmentRegion</key>
     <string>en</string>
     <key>CFBundleDisplayName</key>
-    <string>WhiteGram</string>
+    <string>hitegram</string>
     <key>CFBundleIdentifier</key>
     <string>{telegram_bundle_id}</string>
     <key>CFBundleName</key>
-    <string>WhiteGram</string>
+    <string>hitegram</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleSignature</key>

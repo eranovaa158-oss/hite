@@ -33,8 +33,8 @@ private func getNextRecorderContextId() -> Int32 {
     return OSAtomicIncrement32(&nextRecorderContextId)
 }
 
-private func whiteGramSetBuiltInMicrophoneIfNeeded() {
-    guard WhiteGramOtherSettings.current.forceDeviceMicrophone else {
+private func extraSetBuiltInMicrophoneIfNeeded() {
+    guard ExtraOtherSettings.current.forceDeviceMicrophone else {
         return
     }
     guard let input = AVAudioSession.sharedInstance().availableInputs?.first(where: { $0.portType == .builtInMic }) else {
@@ -454,7 +454,7 @@ final class ManagedAudioRecorderContext {
             self.audioSessionDisposable = self.mediaManager.audioSession.push(audioSessionType: .voiceMessageRecording(beginWithTone: self.beginWithTone, pauseMusicOnRecording: self.pauseMusicOnRecording), activate: { [weak self] state in
                 queue.async {
                     if let strongSelf = self, !strongSelf.paused {
-                        whiteGramSetBuiltInMicrophoneIfNeeded()
+                        extraSetBuiltInMicrophoneIfNeeded()
                         strongSelf.hasAudioSession = true
                         strongSelf.setupAudioUnit()
                         strongSelf.audioSessionAcquired(headset: state.isHeadsetConnected)

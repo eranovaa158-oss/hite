@@ -3,9 +3,9 @@ import Foundation
 #if canImport(WebKit)
 import WebKit
 
-private let whiteGramWebTrackerRuleListIdentifier = "WhiteGramWebTrackerBlocker.v1"
+private let extraWebTrackerRuleListIdentifier = "ExtraWebTrackerBlocker.v1"
 
-public func whiteGramWebTrackerContentRuleListJSON() -> String {
+public func extraWebTrackerContentRuleListJSON() -> String {
     let blockedHosts = [
         "google-analytics\\.com",
         "googletagmanager\\.com",
@@ -42,11 +42,11 @@ public func whiteGramWebTrackerContentRuleListJSON() -> String {
     return string
 }
 
-public func whiteGramInstallWebTrackerBlocker(into contentController: WKUserContentController) {
+public func extraInstallWebTrackerBlocker(into contentController: WKUserContentController) {
     if #available(iOS 11.0, *) {
         WKContentRuleListStore.default().compileContentRuleList(
-            forIdentifier: whiteGramWebTrackerRuleListIdentifier,
-            encodedContentRuleList: whiteGramWebTrackerContentRuleListJSON(),
+            forIdentifier: extraWebTrackerRuleListIdentifier,
+            encodedContentRuleList: extraWebTrackerContentRuleListJSON(),
             completionHandler: { ruleList, _ in
                 if let ruleList = ruleList {
                     DispatchQueue.main.async {

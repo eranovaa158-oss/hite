@@ -1,9 +1,9 @@
 import Foundation
 
-public struct WhiteGramTabSettings: Codable, Equatable {
-    private static let storageKey = "WhiteGramTabSettings.v1"
+public struct ExtraTabSettings: Codable, Equatable {
+    private static let storageKey = "ExtraTabSettings.v1"
     
-    public static let updatedNotification = Notification.Name("WhiteGramTabSettingsUpdated")
+    public static let updatedNotification = Notification.Name("ExtraTabSettingsUpdated")
     
     public var compactPanel: Bool
     public var hideContactsTab: Bool
@@ -12,7 +12,7 @@ public struct WhiteGramTabSettings: Codable, Equatable {
     public var hideSearchButton: Bool
     public var widePanel: Bool
     
-    public static let defaultSettings = WhiteGramTabSettings(
+    public static let defaultSettings = ExtraTabSettings(
         compactPanel: false,
         hideContactsTab: false,
         hideCallsTab: false,
@@ -21,8 +21,8 @@ public struct WhiteGramTabSettings: Codable, Equatable {
         widePanel: false
     )
     
-    public static var current: WhiteGramTabSettings {
-        if let data = UserDefaults.standard.data(forKey: self.storageKey), let value = try? JSONDecoder().decode(WhiteGramTabSettings.self, from: data) {
+    public static var current: ExtraTabSettings {
+        if let data = UserDefaults.standard.data(forKey: self.storageKey), let value = try? JSONDecoder().decode(ExtraTabSettings.self, from: data) {
             return value
         }
         return .defaultSettings

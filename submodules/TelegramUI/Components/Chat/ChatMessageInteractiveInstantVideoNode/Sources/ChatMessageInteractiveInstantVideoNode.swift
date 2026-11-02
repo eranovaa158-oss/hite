@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import UIKit
 import AsyncDisplayKit
 import Display
@@ -519,7 +519,7 @@ public class ChatMessageInteractiveInstantVideoNode: ASDisplayNode {
             var dateReplies = 0
             var starsCount: Int64?
             var dateReactionsAndPeers = mergedMessageReactionsAndPeers(accountPeerId: item.context.account.peerId, accountPeer: item.associatedData.accountPeer, message: item.message)
-            if item.message.isRestricted(platform: "ios", contentSettings: item.context.currentContentSettings.with { $0 }) || whiteGramShouldHideChannelPostReactions(message: item.message) {
+            if item.message.isRestricted(platform: "ios", contentSettings: item.context.currentContentSettings.with { $0 }) || extraShouldHideChannelPostReactions(message: item.message) {
                 dateReactionsAndPeers = ([], [])
             }
             for attribute in item.message.attributes {
@@ -624,7 +624,7 @@ public class ChatMessageInteractiveInstantVideoNode: ASDisplayNode {
             }
 
             let currentTime = Int32(Date().timeIntervalSince1970)
-            if !WhiteGramOtherSettings.current.voiceTranscription, transcribedText == nil, let cooldownUntilTime = item.associatedData.audioTranscriptionTrial.cooldownUntilTime, cooldownUntilTime > currentTime {
+            if !ExtraOtherSettings.current.voiceTranscription, transcribedText == nil, let cooldownUntilTime = item.associatedData.audioTranscriptionTrial.cooldownUntilTime, cooldownUntilTime > currentTime {
                 updatedAudioTranscriptionState = .locked
             }
 
@@ -844,10 +844,10 @@ public class ChatMessageInteractiveInstantVideoNode: ASDisplayNode {
                             }
                         }
                     }
-                    let whiteGramVoiceTranscription = WhiteGramOtherSettings.current.voiceTranscription
-                    if whiteGramVoiceTranscription && item.message.id.peerId.namespace != Namespaces.Peer.SecretChat && statusDisplayType == .free && !isViewOnceMessage && !item.presentationData.isPreview {
+                    let extraVoiceTranscription = ExtraOtherSettings.current.voiceTranscription
+                    if extraVoiceTranscription && item.message.id.peerId.namespace != Namespaces.Peer.SecretChat && statusDisplayType == .free && !isViewOnceMessage && !item.presentationData.isPreview {
                         displayTranscribe = true
-                    } else if !whiteGramVoiceTranscription {
+                    } else if !extraVoiceTranscription {
                         displayTranscribe = false
                     }
 
@@ -1819,7 +1819,7 @@ public class ChatMessageInteractiveInstantVideoNode: ASDisplayNode {
         guard let item = self.item, item.message.id.namespace == Namespaces.Message.Cloud else {
             return
         }
-        guard WhiteGramOtherSettings.current.voiceTranscription else {
+        guard ExtraOtherSettings.current.voiceTranscription else {
             return
         }
 
@@ -1827,9 +1827,9 @@ public class ChatMessageInteractiveInstantVideoNode: ASDisplayNode {
             return
         }
 
-        let whiteGramOtherSettings = WhiteGramOtherSettings.current
-        let whiteGramAppleTranscription = whiteGramOtherSettings.voiceTranscription && whiteGramOtherSettings.transcriptionService == .apple
-        let whiteGramTelegramTranscription = whiteGramOtherSettings.voiceTranscription && whiteGramOtherSettings.transcriptionService == .telegram
+        let extraOtherSettings = ExtraOtherSettings.current
+        let extraAppleTranscription = extraOtherSettings.voiceTranscription && extraOtherSettings.transcriptionService == .apple
+        let extraTelegramTranscription = extraOtherSettings.voiceTranscription && extraOtherSettings.transcriptionService == .telegram
         let presentationData = item.context.sharedContext.currentPresentationData.with { $0 }
         let premiumConfiguration = PremiumConfiguration.with(appConfiguration: item.context.currentAppConfiguration.with { $0 })
         
@@ -1894,7 +1894,7 @@ public class ChatMessageInteractiveInstantVideoNode: ASDisplayNode {
                 self.audioTranscriptionState = .inProgress
                 self.requestUpdateLayout(true)
 
-                if whiteGramOtherSettings.transcriptionService == .apple {
+                if extraOtherSettings.transcriptionService == .apple {
                     let appLocale = presentationData.strings.baseLanguageCode
 
                     let signal: Signal<LocallyTranscribedAudio?, NoError> = item.context.engine.data.get(TelegramEngine.EngineData.Item.Messages.Message(id: item.message.id))
@@ -1946,7 +1946,7 @@ public class ChatMessageInteractiveInstantVideoNode: ASDisplayNode {
                         strongSelf.transcribeDisposable?.dispose()
                         strongSelf.transcribeDisposable = nil
 
-                        if let item = strongSelf.item, !whiteGramTelegramTranscription && !item.associatedData.isPremium && !item.associatedData.alwaysDisplayTranscribeButton.providedByGroupBoost {
+                        if let item = strongSelf.item, !extraTelegramTranscription && !item.associatedData.isPremium && !item.associatedData.alwaysDisplayTranscribeButton.providedByGroupBoost {
                             Queue.mainQueue().after(0.1, {
                                 let _ = strongSelf.presentAudioTranscriptionTooltip(finished: true)
                             })

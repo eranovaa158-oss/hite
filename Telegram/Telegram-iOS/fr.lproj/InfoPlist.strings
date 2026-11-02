@@ -1,5 +1,5 @@
 /* Localized versions of Info.plist keys */
-"CFBundleDisplayName" = "WhiteGram";
+"CFBundleDisplayName" = "hitegram";
 
 "NSContactsUsageDescription" = "Telegram va synchroniser en continu vos contacts sur ses serveurs chiffrés pour vous permettre de joindre vos amis sur tous vos appareils.";
 "NSLocationWhenInUseUsageDescription" = "Quand vous envoyez votre position à vos amis, Telegram doit accéder à votre position pour leur montrer une carte.";

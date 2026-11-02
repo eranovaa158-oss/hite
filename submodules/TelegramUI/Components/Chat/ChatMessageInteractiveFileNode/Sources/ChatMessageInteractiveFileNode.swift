@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import UIKit
 import AsyncDisplayKit
 import SwiftSignalKit
@@ -352,7 +352,7 @@ public final class ChatMessageInteractiveFileNode: ASDisplayNode {
         guard let arguments = self.arguments, let context = self.context, let message = self.message else {
             return
         }
-        guard WhiteGramOtherSettings.current.voiceTranscription else {
+        guard ExtraOtherSettings.current.voiceTranscription else {
             return
         }
         
@@ -360,9 +360,9 @@ public final class ChatMessageInteractiveFileNode: ASDisplayNode {
             return
         }
         
-        let whiteGramOtherSettings = WhiteGramOtherSettings.current
-        let whiteGramAppleTranscription = whiteGramOtherSettings.voiceTranscription && whiteGramOtherSettings.transcriptionService == .apple
-        let whiteGramTelegramTranscription = whiteGramOtherSettings.voiceTranscription && whiteGramOtherSettings.transcriptionService == .telegram
+        let extraOtherSettings = ExtraOtherSettings.current
+        let extraAppleTranscription = extraOtherSettings.voiceTranscription && extraOtherSettings.transcriptionService == .apple
+        let extraTelegramTranscription = extraOtherSettings.voiceTranscription && extraOtherSettings.transcriptionService == .telegram
         let presentationData = context.sharedContext.currentPresentationData.with { $0 }
         let premiumConfiguration = PremiumConfiguration.with(appConfiguration: arguments.context.currentAppConfiguration.with { $0 })
         
@@ -426,7 +426,7 @@ public final class ChatMessageInteractiveFileNode: ASDisplayNode {
                 self.audioTranscriptionState = .inProgress
                 self.requestUpdateLayout(true)
                 
-                if whiteGramOtherSettings.transcriptionService == .apple {
+                if extraOtherSettings.transcriptionService == .apple {
                     let appLocale = presentationData.strings.baseLanguageCode
                     
                     let signal: Signal<LocallyTranscribedAudio?, NoError> = context.engine.data.get(TelegramEngine.EngineData.Item.Messages.Message(id: message.id))
@@ -489,7 +489,7 @@ public final class ChatMessageInteractiveFileNode: ASDisplayNode {
                         strongSelf.transcribeDisposable?.dispose()
                         strongSelf.transcribeDisposable = nil
                         
-                        if let arguments = strongSelf.arguments, !whiteGramTelegramTranscription && !arguments.associatedData.isPremium && !arguments.associatedData.alwaysDisplayTranscribeButton.providedByGroupBoost {
+                        if let arguments = strongSelf.arguments, !extraTelegramTranscription && !arguments.associatedData.isPremium && !arguments.associatedData.alwaysDisplayTranscribeButton.providedByGroupBoost {
                             Queue.mainQueue().after(0.1, {
                                 let _ = strongSelf.presentAudioTranscriptionTooltip(finished: true)
                             })
@@ -794,10 +794,10 @@ public final class ChatMessageInteractiveFileNode: ASDisplayNode {
                         }
                     }
                 }
-                let whiteGramVoiceTranscription = WhiteGramOtherSettings.current.voiceTranscription
-                if whiteGramVoiceTranscription && arguments.message.id.peerId.namespace != Namespaces.Peer.SecretChat && !isViewOnceMessage && !arguments.presentationData.isPreview {
+                let extraVoiceTranscription = ExtraOtherSettings.current.voiceTranscription
+                if extraVoiceTranscription && arguments.message.id.peerId.namespace != Namespaces.Peer.SecretChat && !isViewOnceMessage && !arguments.presentationData.isPreview {
                     displayTranscribe = true
-                } else if !whiteGramVoiceTranscription {
+                } else if !extraVoiceTranscription {
                     displayTranscribe = false
                 }
                 
@@ -813,7 +813,7 @@ public final class ChatMessageInteractiveFileNode: ASDisplayNode {
                 }
                 
                 let currentTime = Int32(Date().timeIntervalSince1970)
-                if !WhiteGramOtherSettings.current.voiceTranscription, transcribedText == nil, let cooldownUntilTime = arguments.associatedData.audioTranscriptionTrial.cooldownUntilTime, cooldownUntilTime > currentTime {
+                if !ExtraOtherSettings.current.voiceTranscription, transcribedText == nil, let cooldownUntilTime = arguments.associatedData.audioTranscriptionTrial.cooldownUntilTime, cooldownUntilTime > currentTime {
                     updatedAudioTranscriptionState = .locked
                 }
                 
@@ -917,7 +917,7 @@ public final class ChatMessageInteractiveFileNode: ASDisplayNode {
                     var dateReplies = 0
                     var starsCount: Int64?
                     var dateReactionsAndPeers = mergedMessageReactionsAndPeers(accountPeerId: arguments.context.account.peerId, accountPeer: arguments.associatedData.accountPeer, message: arguments.topMessage)
-                    if arguments.topMessage.isRestricted(platform: "ios", contentSettings: arguments.context.currentContentSettings.with { $0 }) || arguments.presentationData.isPreview || whiteGramShouldHideChannelPostReactions(message: arguments.topMessage) {
+                    if arguments.topMessage.isRestricted(platform: "ios", contentSettings: arguments.context.currentContentSettings.with { $0 }) || arguments.presentationData.isPreview || extraShouldHideChannelPostReactions(message: arguments.topMessage) {
                         dateReactionsAndPeers = ([], [])
                     }
                     for attribute in arguments.message.attributes {

@@ -1538,13 +1538,13 @@ public final class AuthorizationSequenceController: NavigationController, ASAuth
         let formattedNumber = formatPhoneNumber(phoneNumber)
         
         var emailBody = ""
-        emailBody.append(whiteGramAuthorizationString(presentationData.strings.Login_EmailCodeBody(formattedNumber).string))
+        emailBody.append(extraAuthorizationString(presentationData.strings.Login_EmailCodeBody(formattedNumber).string))
         emailBody.append("\n\n")
         
         let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "unknown"
         let systemVersion = UIDevice.current.systemVersion
         let locale = Locale.current.identifier
-        emailBody.append("WhiteGram: \(appVersion)\n")
+        emailBody.append("Extra: \(appVersion)\n")
         emailBody.append("OS: \(systemVersion)\n")
         emailBody.append("Locale: \(locale)\n")
         emailBody.append("MNC: \(mnc)")

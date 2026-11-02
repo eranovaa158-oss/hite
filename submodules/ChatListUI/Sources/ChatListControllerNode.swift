@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import UIKit
 import AsyncDisplayKit
 import Display
@@ -54,7 +54,7 @@ public enum ChatListContainerNodeFilter: Equatable {
     }
 }
 
-private final class WhiteGramFolderContextLocationContentSource: ContextLocationContentSource {
+private final class ExtraFolderContextLocationContentSource: ContextLocationContentSource {
     private weak var sourceView: UIView?
 
     let keepInPlace: Bool = true
@@ -75,7 +75,7 @@ private final class WhiteGramFolderContextLocationContentSource: ContextLocation
     }
 }
 
-private final class WhiteGramFolderMenuButton: UIControl {
+private final class ExtraFolderMenuButton: UIControl {
     private let effectView = UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterial))
     private let folderLayer = CAShapeLayer()
     private let action: (UIView) -> Void
@@ -233,9 +233,9 @@ public final class ChatListContainerNode: ASDisplayNode, ASGestureRecognizerDele
     private var enableAdjacentFilterLoading: Bool = false
 
     private var panRecognizer: InteractiveTransitionGestureRecognizer?
-    private let whiteGramFolderTabsView = ComponentView<Empty>()
-    private var whiteGramFolderMenuButton: WhiteGramFolderMenuButton?
-    private var whiteGramFolderTabsFrame: CGRect?
+    private let extraFolderTabsView = ComponentView<Empty>()
+    private var extraFolderMenuButton: ExtraFolderMenuButton?
+    private var extraFolderTabsFrame: CGRect?
 
     let leftSeparatorLayer: SimpleLayer
 
@@ -668,7 +668,7 @@ public final class ChatListContainerNode: ASDisplayNode, ASGestureRecognizerDele
             guard let self, self.availableFilters.count > 1 || (self.controller?.isStoryPostingAvailable == true && !(self.context.sharedContext.callManager?.hasActiveCall ?? false)) else {
                 return []
             }
-            if let whiteGramFolderTabsFrame = self.whiteGramFolderTabsFrame, whiteGramFolderTabsFrame.insetBy(dx: 0.0, dy: -24.0).contains(point) {
+            if let extraFolderTabsFrame = self.extraFolderTabsFrame, extraFolderTabsFrame.insetBy(dx: 0.0, dy: -24.0).contains(point) {
                 return []
             }
             guard case .chatList(.root) = self.location else {
@@ -695,7 +695,7 @@ public final class ChatListContainerNode: ASDisplayNode, ASGestureRecognizerDele
             if self.availableFilters.count > 1 {
                 return [.leftCenter, .rightCenter]
             } else {
-                if WhiteGramStorySettings.current.disableStories || WhiteGramStorySettings.current.disableStoryRecording || WhiteGramStorySettings.current.disableStoryRecordingSwipe {
+                if ExtraStorySettings.current.disableStories || ExtraStorySettings.current.disableStoryRecording || ExtraStorySettings.current.disableStoryRecordingSwipe {
                     return []
                 }
                 return [.rightEdge]
@@ -1137,7 +1137,7 @@ public final class ChatListContainerNode: ASDisplayNode, ASGestureRecognizerDele
 
                         transition.animatePositionAdditive(node: itemNode, offset: CGPoint(x: -offset, y: 0.0))
 
-                        itemNode.bottomEdgeEffectMaxHeight = strongSelf.whiteGramBottomFolderEdgeEffectMaxHeight(bottomInset: layout.insets(options: []).bottom)
+                        itemNode.bottomEdgeEffectMaxHeight = strongSelf.extraBottomFolderEdgeEffectMaxHeight(bottomInset: layout.insets(options: []).bottom)
                         itemNode.updateLayout(size: layout.size, insets: insets, visualNavigationHeight: visualNavigationHeight, originalNavigationHeight: originalNavigationHeight, inlineNavigationLocation: inlineNavigationLocation, inlineNavigationTransitionFraction: inlineNavigationTransitionFraction, storiesInset: storiesInset, transition: .immediate)
                         if let scrollingOffset = strongSelf.scrollingOffset {
                             itemNode.updateScrollingOffset(navigationHeight: scrollingOffset.navigationHeight, offset: scrollingOffset.offset, transition: .immediate)
@@ -1159,7 +1159,7 @@ public final class ChatListContainerNode: ASDisplayNode, ASGestureRecognizerDele
                 }))
 
                 if let (layout, _, visualNavigationHeight, originalNavigationHeight, _, insets, _, _, inlineNavigationLocation, inlineNavigationTransitionFraction, storiesInset) = self.validLayout {
-                    itemNode.bottomEdgeEffectMaxHeight = self.whiteGramBottomFolderEdgeEffectMaxHeight(bottomInset: layout.insets(options: []).bottom)
+                    itemNode.bottomEdgeEffectMaxHeight = self.extraBottomFolderEdgeEffectMaxHeight(bottomInset: layout.insets(options: []).bottom)
                     itemNode.updateLayout(size: layout.size, insets: insets, visualNavigationHeight: visualNavigationHeight, originalNavigationHeight: originalNavigationHeight, inlineNavigationLocation: inlineNavigationLocation, inlineNavigationTransitionFraction: inlineNavigationTransitionFraction, storiesInset: storiesInset, transition: .immediate)
 
                     if let scrollingOffset = self.scrollingOffset {
@@ -1178,7 +1178,7 @@ public final class ChatListContainerNode: ASDisplayNode, ASGestureRecognizerDele
         }
     }
 
-    private func whiteGramFolderTabs(tabContainerData: ([ChatListFilterTabEntry], Bool, Int32?)) -> [HorizontalTabsComponent.Tab] {
+    private func extraFolderTabs(tabContainerData: ([ChatListFilterTabEntry], Bool, Int32?)) -> [HorizontalTabsComponent.Tab] {
         return tabContainerData.0.map { entry -> HorizontalTabsComponent.Tab in
             let id: HorizontalTabsComponent.Tab.Id
             let title: HorizontalTabsComponent.Tab.Title
@@ -1265,7 +1265,7 @@ public final class ChatListContainerNode: ASDisplayNode, ASGestureRecognizerDele
         }
     }
 
-    private func whiteGramSelectedFolderTab() -> HorizontalTabsComponent.Tab.Id {
+    private func extraSelectedFolderTab() -> HorizontalTabsComponent.Tab.Id {
         switch self.currentItemFilter {
         case .all:
             return AnyHashable(Int32.min)
@@ -1274,11 +1274,11 @@ public final class ChatListContainerNode: ASDisplayNode, ASGestureRecognizerDele
         }
     }
 
-    private func whiteGramBottomFolderEdgeEffectMaxHeight(bottomInset: CGFloat) -> CGFloat? {
-        let settings = WhiteGramChatFolderSettings.current
+    private func extraBottomFolderEdgeEffectMaxHeight(bottomInset: CGFloat) -> CGFloat? {
+        let settings = ExtraChatFolderSettings.current
         let hasFolders = (self.controller?.tabContainerData?.0.count ?? 0) > 1
         if !settings.disableFolders && settings.foldersAtBottom && !settings.compactPanel && hasFolders {
-            let tabSettings = WhiteGramTabSettings.current
+            let tabSettings = ExtraTabSettings.current
             let panelBottomInset: CGFloat
             if !tabSettings.compactPanel {
                 panelBottomInset = max(0.0, bottomInset + 12.0)
@@ -1290,7 +1290,7 @@ public final class ChatListContainerNode: ASDisplayNode, ASGestureRecognizerDele
         return nil
     }
 
-    private func openWhiteGramFolderMenu(sourceView: UIView) {
+    private func openExtraFolderMenu(sourceView: UIView) {
         guard let controller = self.controller, let tabContainerData = controller.tabContainerData else {
             return
         }
@@ -1314,7 +1314,7 @@ public final class ChatListContainerNode: ASDisplayNode, ASGestureRecognizerDele
 
         let contextController = makeContextController(
             presentationData: self.presentationData,
-            source: .location(WhiteGramFolderContextLocationContentSource(sourceView: sourceView)),
+            source: .location(ExtraFolderContextLocationContentSource(sourceView: sourceView)),
             items: .single(ContextController.Items(content: .list(items))),
             gesture: nil
         )
@@ -1324,10 +1324,10 @@ public final class ChatListContainerNode: ASDisplayNode, ASGestureRecognizerDele
         controller.presentInGlobalOverlay(contextController)
     }
 
-    func updateWhiteGramFolderControls(layout: ContainerViewLayout, bottomInset: CGFloat, settings: WhiteGramChatFolderSettings, transition: ComponentTransition) {
+    func updateExtraFolderControls(layout: ContainerViewLayout, bottomInset: CGFloat, settings: ExtraChatFolderSettings, transition: ComponentTransition) {
         let hasFolders = (self.controller?.tabContainerData?.0.count ?? 0) > 1
         let showBottomTabs = !settings.disableFolders && settings.foldersAtBottom && !settings.compactPanel && hasFolders
-        let tabSettings = WhiteGramTabSettings.current
+        let tabSettings = ExtraTabSettings.current
         let hasVisibleTabBar = !tabSettings.compactPanel
         let bottomTabsHeight: CGFloat = showBottomTabs ? 40.0 : 0.0
         let compactPanelLift: CGFloat = 24.0
@@ -1339,15 +1339,15 @@ public final class ChatListContainerNode: ASDisplayNode, ASGestureRecognizerDele
             let height: CGFloat = bottomTabsHeight
             let sideInset = layout.safeInsets.left
             let frame = CGRect(x: sideInset, y: layout.size.height - panelBottomInset - height, width: layout.size.width - sideInset - layout.safeInsets.right, height: height)
-            let size = self.whiteGramFolderTabsView.update(
+            let size = self.extraFolderTabsView.update(
                 transition: transition,
                 component: AnyComponent(HeaderPanelContainerComponent(
                     theme: self.presentationData.theme,
                     tabs: AnyComponent(HorizontalTabsComponent(
                         context: self.context,
                         theme: self.presentationData.theme,
-                        tabs: self.whiteGramFolderTabs(tabContainerData: tabContainerData),
-                        selectedTab: self.whiteGramSelectedFolderTab(),
+                        tabs: self.extraFolderTabs(tabContainerData: tabContainerData),
+                        selectedTab: self.extraSelectedFolderTab(),
                         isEditing: false,
                         liftWhileSwitching: true
                     )),
@@ -1356,7 +1356,7 @@ public final class ChatListContainerNode: ASDisplayNode, ASGestureRecognizerDele
                 environment: {},
                 containerSize: frame.size
             )
-            if let view = self.whiteGramFolderTabsView.view {
+            if let view = self.extraFolderTabsView.view {
                 if view.superview == nil {
                     self.view.addSubview(view)
                 }
@@ -1368,19 +1368,19 @@ public final class ChatListContainerNode: ASDisplayNode, ASGestureRecognizerDele
                 self.view.bringSubviewToFront(view)
                 transition.setFrame(view: view, frame: CGRect(origin: frame.origin, size: CGSize(width: frame.width, height: min(size.height, height))))
                 transition.setAlpha(view: view, alpha: 1.0)
-                self.whiteGramFolderTabsFrame = frame
+                self.extraFolderTabsFrame = frame
             }
         } else {
-            self.whiteGramFolderTabsFrame = nil
-            if let view = self.whiteGramFolderTabsView.view, view.superview != nil {
+            self.extraFolderTabsFrame = nil
+            if let view = self.extraFolderTabsView.view, view.superview != nil {
                 transition.setAlpha(view: view, alpha: 0.0, completion: { [weak view] _ in
                     view?.removeFromSuperview()
                 })
             }
         }
 
-        if let button = self.whiteGramFolderMenuButton {
-            self.whiteGramFolderMenuButton = nil
+        if let button = self.extraFolderMenuButton {
+            self.extraFolderMenuButton = nil
             transition.setAlpha(view: button, alpha: 0.0, completion: { [weak button] _ in
                 button?.removeFromSuperview()
             })
@@ -1460,7 +1460,7 @@ public final class ChatListContainerNode: ASDisplayNode, ASGestureRecognizerDele
                 }
 
                 itemNode.listNode.isMainTab.set(self.availableFilters.firstIndex(where: { $0.id == id }) == 0)
-                itemNode.bottomEdgeEffectMaxHeight = self.whiteGramBottomFolderEdgeEffectMaxHeight(bottomInset: layout.insets(options: []).bottom)
+                itemNode.bottomEdgeEffectMaxHeight = self.extraBottomFolderEdgeEffectMaxHeight(bottomInset: layout.insets(options: []).bottom)
                 itemNode.updateLayout(size: layout.size, insets: insets, visualNavigationHeight: visualNavigationHeight, originalNavigationHeight: originalNavigationHeight, inlineNavigationLocation: inlineNavigationLocation, inlineNavigationTransitionFraction: itemInlineNavigationTransitionFraction, storiesInset: storiesInset, transition: nodeTransition)
                 if let scrollingOffset = self.scrollingOffset {
                     itemNode.updateScrollingOffset(navigationHeight: scrollingOffset.navigationHeight, offset: scrollingOffset.offset, transition: nodeTransition)
@@ -1487,7 +1487,7 @@ public final class ChatListContainerNode: ASDisplayNode, ASGestureRecognizerDele
             }
         }
 
-        self.updateWhiteGramFolderControls(layout: layout, bottomInset: layout.insets(options: []).bottom, settings: WhiteGramChatFolderSettings.current, transition: ComponentTransition(transition))
+        self.updateExtraFolderControls(layout: layout, bottomInset: layout.insets(options: []).bottom, settings: ExtraChatFolderSettings.current, transition: ComponentTransition(transition))
     }
 }
 
@@ -1884,8 +1884,8 @@ final class ChatListControllerNode: ASDisplayNode, ASGestureRecognizerDelegate {
             )
         }
 
-        let whiteGramFolderSettings = WhiteGramChatFolderSettings.current
-        let shouldHideTopFolderTabs = whiteGramFolderSettings.disableFolders || whiteGramFolderSettings.compactPanel || whiteGramFolderSettings.foldersAtBottom
+        let extraFolderSettings = ExtraChatFolderSettings.current
+        let shouldHideTopFolderTabs = extraFolderSettings.disableFolders || extraFolderSettings.compactPanel || extraFolderSettings.foldersAtBottom
 
         var navigationHeaderPanels: AnyComponent<Empty>?
         if (self.controller?.tabContainerData != nil && !shouldHideTopFolderTabs) || !panels.isEmpty {
@@ -2035,8 +2035,8 @@ final class ChatListControllerNode: ASDisplayNode, ASGestureRecognizerDelegate {
         }
 
         var effectiveStorySubscriptions: EngineStorySubscriptions?
-        let whiteGramStorySettings = WhiteGramStorySettings.current
-        if whiteGramStorySettings.disableStories || whiteGramStorySettings.hideStories {
+        let extraStorySettings = ExtraStorySettings.current
+        if extraStorySettings.disableStories || extraStorySettings.hideStories {
             effectiveStorySubscriptions = EngineStorySubscriptions(accountItem: nil, items: [], hasMoreToken: nil)
         } else if let controller = self.controller, case .forum = controller.location {
             effectiveStorySubscriptions = nil
@@ -2358,14 +2358,14 @@ final class ChatListControllerNode: ASDisplayNode, ASGestureRecognizerDelegate {
         var mainNavigationBarHeight = navigationBarHeight
         var cleanMainNavigationBarHeight = cleanNavigationBarHeight
         var mainInsets = insets
-        let whiteGramFolderSettings = WhiteGramChatFolderSettings.current
-        let hasWhiteGramFolders = (self.controller?.tabContainerData?.0.count ?? 0) > 1
-        let whiteGramTabSettings = WhiteGramTabSettings.current
-        let whiteGramHasCompactButtons = (!whiteGramFolderSettings.disableFolders && whiteGramFolderSettings.compactPanel && hasWhiteGramFolders) || whiteGramTabSettings.compactPanel
-        let whiteGramHasVisibleTabBar = !whiteGramTabSettings.compactPanel
-        let whiteGramBottomFoldersHeight: CGFloat = (!whiteGramFolderSettings.disableFolders && whiteGramFolderSettings.foldersAtBottom && !whiteGramFolderSettings.compactPanel && hasWhiteGramFolders) ? (40.0 + (whiteGramHasCompactButtons ? 58.0 : 0.0) + (whiteGramHasVisibleTabBar ? 12.0 : 17.0)) : 0.0
-        if !whiteGramBottomFoldersHeight.isZero {
-            mainInsets.bottom += whiteGramBottomFoldersHeight
+        let extraFolderSettings = ExtraChatFolderSettings.current
+        let hasExtraFolders = (self.controller?.tabContainerData?.0.count ?? 0) > 1
+        let extraTabSettings = ExtraTabSettings.current
+        let extraHasCompactButtons = (!extraFolderSettings.disableFolders && extraFolderSettings.compactPanel && hasExtraFolders) || extraTabSettings.compactPanel
+        let extraHasVisibleTabBar = !extraTabSettings.compactPanel
+        let extraBottomFoldersHeight: CGFloat = (!extraFolderSettings.disableFolders && extraFolderSettings.foldersAtBottom && !extraFolderSettings.compactPanel && hasExtraFolders) ? (40.0 + (extraHasCompactButtons ? 58.0 : 0.0) + (extraHasVisibleTabBar ? 12.0 : 17.0)) : 0.0
+        if !extraBottomFoldersHeight.isZero {
+            mainInsets.bottom += extraBottomFoldersHeight
         }
         if self.inlineStackContainerNode != nil && "".isEmpty {
             mainNavigationBarHeight = visualNavigationHeight
@@ -2373,7 +2373,7 @@ final class ChatListControllerNode: ASDisplayNode, ASGestureRecognizerDelegate {
             mainInsets.top = visualNavigationHeight
         }
         self.mainContainerNode.update(layout: layout, navigationBarHeight: mainNavigationBarHeight, visualNavigationHeight: visualNavigationHeight, originalNavigationHeight: navigationBarHeight, cleanNavigationBarHeight: cleanMainNavigationBarHeight, insets: mainInsets, isReorderingFilters: self.isReorderingFilters, isEditing: self.isEditing, inlineNavigationLocation: self.inlineStackContainerNode?.location, inlineNavigationTransitionFraction: self.inlineStackContainerTransitionFraction, storiesInset: storiesInset, transition: transition)
-        self.mainContainerNode.updateWhiteGramFolderControls(layout: layout, bottomInset: layout.insets(options: []).bottom, settings: whiteGramFolderSettings, transition: ComponentTransition(transition))
+        self.mainContainerNode.updateExtraFolderControls(layout: layout, bottomInset: layout.insets(options: []).bottom, settings: extraFolderSettings, transition: ComponentTransition(transition))
 
         if let inlineStackContainerNode = self.inlineStackContainerNode {
             var inlineStackContainerNodeTransition = transition
@@ -2873,8 +2873,8 @@ final class ChatListControllerNode: ASDisplayNode, ASGestureRecognizerDelegate {
 }
 
 func shouldDisplayStoriesInChatListHeader(storySubscriptions: EngineStorySubscriptions, isHidden: Bool) -> Bool {
-    let whiteGramStorySettings = WhiteGramStorySettings.current
-    if whiteGramStorySettings.disableStories || whiteGramStorySettings.hideStories {
+    let extraStorySettings = ExtraStorySettings.current
+    if extraStorySettings.disableStories || extraStorySettings.hideStories {
         return false
     }
     if !storySubscriptions.items.isEmpty {

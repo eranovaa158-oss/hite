@@ -191,8 +191,8 @@ public func translateMessageIds(context: AccountContext, messageIds: [EngineMess
             }
         }
 
-        let whiteGramOtherSettings = WhiteGramOtherSettings.current
-        if !whiteGramOtherSettings.autoTranslate && !whiteGramOtherSettings.translationButton {
+        let extraOtherSettings = ExtraOtherSettings.current
+        if !extraOtherSettings.autoTranslate && !extraOtherSettings.translationButton {
             return .complete()
         }
 
@@ -202,7 +202,7 @@ public func translateMessageIds(context: AccountContext, messageIds: [EngineMess
         }
 
         let signal: Signal<Never, TranslationError>
-        switch whiteGramOtherSettings.translationService {
+        switch extraOtherSettings.translationService {
         case .gTranslate:
             signal = googleTranslate()
         case .telegram:
@@ -224,8 +224,8 @@ public func chatTranslationState(context: AccountContext, peerId: EnginePeer.Id,
         return .single(nil)
     }
 
-    let whiteGramOtherSettings = WhiteGramOtherSettings.current
-    guard (whiteGramOtherSettings.autoTranslate || whiteGramOtherSettings.translationButton), canTranslateChats(context: context) else {
+    let extraOtherSettings = ExtraOtherSettings.current
+    guard (extraOtherSettings.autoTranslate || extraOtherSettings.translationButton), canTranslateChats(context: context) else {
         return .single(nil)
     }
 
@@ -246,14 +246,14 @@ public func chatTranslationState(context: AccountContext, peerId: EnginePeer.Id,
             context.engine.data.subscribe(TelegramEngine.EngineData.Item.Peer.AutoTranslateEnabled(id: peerId))
         )
         |> mapToSignal { settings, autoTranslateEnabled in
-            let whiteGramAutoTranslate = whiteGramOtherSettings.autoTranslate
-            let whiteGramTranslationButton = whiteGramOtherSettings.translationButton
-            if !settings.translateChats && !autoTranslateEnabled && !whiteGramAutoTranslate && !whiteGramTranslationButton {
+            let extraAutoTranslate = extraOtherSettings.autoTranslate
+            let extraTranslationButton = extraOtherSettings.translationButton
+            if !settings.translateChats && !autoTranslateEnabled && !extraAutoTranslate && !extraTranslationButton {
                 return .single(nil)
             }
 
             var dontTranslateLanguages = Set<String>()
-            if whiteGramAutoTranslate {
+            if extraAutoTranslate {
                 dontTranslateLanguages.insert(baseLang)
             } else if let ignoredLanguages = settings.ignoredLanguages {
                 dontTranslateLanguages = Set(ignoredLanguages)
@@ -269,7 +269,7 @@ public func chatTranslationState(context: AccountContext, peerId: EnginePeer.Id,
                 let currentTime = Int32(CFAbsoluteTimeGetCurrent() + kCFAbsoluteTimeIntervalSince1970)
                 if let cached, let timestamp = cached.timestamp, cached.baseLang == baseLang && currentTime - timestamp < 60 * 60 {
                     if !dontTranslateLanguages.contains(cached.fromLang) {
-                        if whiteGramAutoTranslate && (cached.toLang != baseLang || !cached.isEnabled) {
+                        if extraAutoTranslate && (cached.toLang != baseLang || !cached.isEnabled) {
                             return .single(ChatTranslationState(
                                 baseLang: baseLang,
                                 fromLang: cached.fromLang,
@@ -375,7 +375,7 @@ public func chatTranslationState(context: AccountContext, peerId: EnginePeer.Id,
                             let isEnabled: Bool
                             if let currentIsEnabled = cached?.isEnabled {
                                 isEnabled = currentIsEnabled
-                            } else if autoTranslateEnabled || whiteGramAutoTranslate {
+                            } else if autoTranslateEnabled || extraAutoTranslate {
                                 isEnabled = true
                             } else {
                                 isEnabled = false
@@ -385,7 +385,7 @@ public func chatTranslationState(context: AccountContext, peerId: EnginePeer.Id,
                                 baseLang: baseLang,
                                 fromLang: fromLang,
                                 timestamp: currentTime,
-                                toLang: whiteGramAutoTranslate ? baseLang : cached?.toLang,
+                                toLang: extraAutoTranslate ? baseLang : cached?.toLang,
                                 isEnabled: isEnabled
                             )
                             let _ = updateChatTranslationState(engine: context.engine, peerId: peerId, threadId: threadId, state: state).start()

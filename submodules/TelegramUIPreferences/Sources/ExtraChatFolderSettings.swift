@@ -1,9 +1,9 @@
 import Foundation
 
-public struct WhiteGramChatFolderSettings: Codable, Equatable {
-    private static let storageKey = "WhiteGramChatFolderSettings.v1"
+public struct ExtraChatFolderSettings: Codable, Equatable {
+    private static let storageKey = "ExtraChatFolderSettings.v1"
 
-    public static let updatedNotification = Notification.Name("WhiteGramChatFolderSettingsUpdated")
+    public static let updatedNotification = Notification.Name("ExtraChatFolderSettingsUpdated")
 
     public var disableFolders: Bool
     public var compactPanel: Bool
@@ -11,7 +11,7 @@ public struct WhiteGramChatFolderSettings: Codable, Equatable {
     public var openLastFolder: Bool
     public var lastFolderId: Int32?
 
-    public static let defaultSettings = WhiteGramChatFolderSettings(
+    public static let defaultSettings = ExtraChatFolderSettings(
         disableFolders: false,
         compactPanel: false,
         foldersAtBottom: false,
@@ -19,8 +19,8 @@ public struct WhiteGramChatFolderSettings: Codable, Equatable {
         lastFolderId: nil
     )
 
-    public static var current: WhiteGramChatFolderSettings {
-        if let data = UserDefaults.standard.data(forKey: self.storageKey), let value = try? JSONDecoder().decode(WhiteGramChatFolderSettings.self, from: data) {
+    public static var current: ExtraChatFolderSettings {
+        if let data = UserDefaults.standard.data(forKey: self.storageKey), let value = try? JSONDecoder().decode(ExtraChatFolderSettings.self, from: data) {
             return value
         }
         return .defaultSettings

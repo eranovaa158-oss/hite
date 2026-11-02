@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import UIKit
 import SwiftSignalKit
 import Display
@@ -2316,10 +2316,10 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
                 )
                 
                 var translateToLanguage: (fromLang: String, toLang: String)?
-                let whiteGramOtherSettings = WhiteGramOtherSettings.current
-                let whiteGramTranslationEnabled = whiteGramOtherSettings.autoTranslate || whiteGramOtherSettings.translationButton
-                if let translationState, (isPremium || autoTranslate || whiteGramTranslationEnabled) && translationState.isEnabled {
-                    var languageCode = whiteGramOtherSettings.autoTranslate ? chatPresentationData.strings.baseLanguageCode : (translationState.toLang ?? chatPresentationData.strings.baseLanguageCode)
+                let extraOtherSettings = ExtraOtherSettings.current
+                let extraTranslationEnabled = extraOtherSettings.autoTranslate || extraOtherSettings.translationButton
+                if let translationState, (isPremium || autoTranslate || extraTranslationEnabled) && translationState.isEnabled {
+                    var languageCode = extraOtherSettings.autoTranslate ? chatPresentationData.strings.baseLanguageCode : (translationState.toLang ?? chatPresentationData.strings.baseLanguageCode)
                     let rawSuffix = "-raw"
                     if languageCode.hasSuffix(rawSuffix) {
                         languageCode = String(languageCode.dropLast(rawSuffix.count))
@@ -2908,7 +2908,7 @@ public final class ChatHistoryListNodeImpl: ASDisplayNode, ChatHistoryNode, Chat
         if self.freezeOverscrollControl {
             return
         }
-        if let offset = offset, offset < -0.1, WhiteGramChatSettings.current.channelSwipeToNext, self.offerNextChannelToRead, let chatControllerNode = self.controllerInteraction.chatControllerNode() as? ChatControllerNode, chatControllerNode.shouldAllowOverscrollActions {
+        if let offset = offset, offset < -0.1, ExtraChatSettings.current.channelSwipeToNext, self.offerNextChannelToRead, let chatControllerNode = self.controllerInteraction.chatControllerNode() as? ChatControllerNode, chatControllerNode.shouldAllowOverscrollActions {
             let overscrollView: ComponentHostView<Empty>
             if let current = self.overscrollView {
                 overscrollView = current

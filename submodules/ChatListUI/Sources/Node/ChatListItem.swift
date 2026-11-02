@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import UIKit
 import AsyncDisplayKit
 import Display
@@ -2025,9 +2025,9 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                 }
             }
             
-            let whiteGramChatSettings = WhiteGramChatSettings.effectiveChatListSettings
+            let extraChatSettings = ExtraChatSettings.effectiveChatListSettings
             var avatarDiameter = min(60.0, floor(item.presentationData.fontSize.baseDisplaySize * 60.0 / 17.0))
-            let compactChatLayout = whiteGramChatSettings.compactChatList
+            let compactChatLayout = extraChatSettings.compactChatList
             if compactChatLayout {
                 avatarDiameter = min(38.0, floor(item.presentationData.fontSize.baseDisplaySize * 38.0 / 17.0))
             }
@@ -4030,10 +4030,10 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                 peerRevealOptions = []
                 peerLeftRevealOptions = []
             }
-            if !whiteGramChatSettings.chatSwipeOptions {
+            if !extraChatSettings.chatSwipeOptions {
                 peerRevealOptions = []
                 peerLeftRevealOptions = []
-            } else if !whiteGramChatSettings.chatSwipeDelete {
+            } else if !extraChatSettings.chatSwipeDelete {
                 peerRevealOptions.removeAll(where: { $0.key == RevealOptionKey.delete.rawValue })
                 peerLeftRevealOptions.removeAll(where: { $0.key == RevealOptionKey.delete.rawValue })
             }
@@ -4063,7 +4063,7 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             if forceSingleLinePreview && canUseTwoLinePreview {
                 itemHeight = max(58.0, itemHeight - measureLayout.size.height)
             }
-            if whiteGramChatSettings.compactChatList {
+            if extraChatSettings.compactChatList {
                 let compactTextBlockHeight = titleLayout.size.height + textLayout.size.height
                 let compactTextHeight = rawContentTopInset + compactTextBlockHeight + 5.0
                 itemHeight = max(42.0, compactTextHeight, 38.0 + 4.0)

@@ -10,27 +10,27 @@ import TelegramUIPreferences
 import ItemListUI
 import AccountContext
 
-private func whiteGramString(_ strings: PresentationStrings, ru: String, en: String) -> String {
+private func extraString(_ strings: PresentationStrings, ru: String, en: String) -> String {
     return strings.baseLanguageCode.lowercased().hasPrefix("ru") ? ru : en
 }
 
-private func whiteGramString(_ presentationData: ItemListPresentationData, ru: String, en: String) -> String {
-    return whiteGramString(presentationData.strings, ru: ru, en: en)
+private func extraString(_ presentationData: ItemListPresentationData, ru: String, en: String) -> String {
+    return extraString(presentationData.strings, ru: ru, en: en)
 }
 
-private final class WhiteGramSettingsArguments {
-    let openCategory: (WhiteGramSettingsCategory) -> Void
+private final class ExtraSettingsArguments {
+    let openCategory: (ExtraSettingsCategory) -> Void
     
-    init(openCategory: @escaping (WhiteGramSettingsCategory) -> Void) {
+    init(openCategory: @escaping (ExtraSettingsCategory) -> Void) {
         self.openCategory = openCategory
     }
 }
 
-private enum WhiteGramSettingsSection: Int32 {
+private enum ExtraSettingsSection: Int32 {
     case main
 }
 
-private func whiteGramSettingsIcon(backgroundColors: [UIColor], drawGlyph: @escaping (CGContext, CGSize) -> Void) -> UIImage? {
+private func extraSettingsIcon(backgroundColors: [UIColor], drawGlyph: @escaping (CGContext, CGSize) -> Void) -> UIImage? {
     return generateImage(CGSize(width: 30.0, height: 30.0), contextGenerator: { size, context in
         let bounds = CGRect(origin: .zero, size: size)
         context.clear(bounds)
@@ -53,8 +53,8 @@ private func whiteGramSettingsIcon(backgroundColors: [UIColor], drawGlyph: @esca
     })
 }
 
-private enum WhiteGramSettingsIcons {
-    static let tabs = whiteGramSettingsIcon(backgroundColors: [UIColor(rgb: 0x32ADE6), UIColor(rgb: 0x5E5CE6)], drawGlyph: { context, _ in
+private enum ExtraSettingsIcons {
+    static let tabs = extraSettingsIcon(backgroundColors: [UIColor(rgb: 0x32ADE6), UIColor(rgb: 0x5E5CE6)], drawGlyph: { context, _ in
         let fillRoundedRect: (CGRect, CGFloat) -> Void = { rect, radius in
             context.addPath(UIBezierPath(roundedRect: rect, cornerRadius: radius).cgPath)
             context.fillPath()
@@ -80,7 +80,7 @@ private enum WhiteGramSettingsIcons {
         context.setAlpha(1.0)
     })
 
-    static let contextMenu = whiteGramSettingsIcon(backgroundColors: [UIColor(rgb: 0xAF52DE), UIColor(rgb: 0xFF2D55)], drawGlyph: { context, _ in
+    static let contextMenu = extraSettingsIcon(backgroundColors: [UIColor(rgb: 0xAF52DE), UIColor(rgb: 0xFF2D55)], drawGlyph: { context, _ in
         let fillRoundedRect: (CGRect, CGFloat) -> Void = { rect, radius in
             context.addPath(UIBezierPath(roundedRect: rect, cornerRadius: radius).cgPath)
             context.fillPath()
@@ -100,7 +100,7 @@ private enum WhiteGramSettingsIcons {
     })
 }
 
-private enum WhiteGramSettingsCategory: Int32, CaseIterable {
+private enum ExtraSettingsCategory: Int32, CaseIterable {
     case tabs
     case chatSettings
     case chatFolders
@@ -112,26 +112,26 @@ private enum WhiteGramSettingsCategory: Int32, CaseIterable {
     func title(strings: PresentationStrings) -> String {
         switch self {
         case .tabs:
-            return whiteGramString(strings, ru: "Вкладки", en: "Tabs")
+            return extraString(strings, ru: "Вкладки", en: "Tabs")
         case .chatSettings:
-            return whiteGramString(strings, ru: "Настройки чатов", en: "Chat Settings")
+            return extraString(strings, ru: "Настройки чатов", en: "Chat Settings")
         case .chatFolders:
-            return whiteGramString(strings, ru: "Папки с чатами", en: "Chat Folders")
+            return extraString(strings, ru: "Папки с чатами", en: "Chat Folders")
         case .stories:
-            return whiteGramString(strings, ru: "Истории", en: "Stories")
+            return extraString(strings, ru: "Истории", en: "Stories")
         case .media:
-            return whiteGramString(strings, ru: "Медиа", en: "Media")
+            return extraString(strings, ru: "Медиа", en: "Media")
         case .contextMenu:
-            return whiteGramString(strings, ru: "Контекстные меню", en: "Context Menus")
+            return extraString(strings, ru: "Контекстные меню", en: "Context Menus")
         case .other:
-            return whiteGramString(strings, ru: "Другие", en: "Other")
+            return extraString(strings, ru: "Другие", en: "Other")
         }
     }
     
     var icon: UIImage? {
         switch self {
         case .tabs:
-            return WhiteGramSettingsIcons.tabs
+            return ExtraSettingsIcons.tabs
         case .chatSettings:
             return PresentationResourcesSettings.chatAppearance
         case .chatFolders:
@@ -143,16 +143,16 @@ private enum WhiteGramSettingsCategory: Int32, CaseIterable {
         case .other:
             return PresentationResourcesSettings.settings
         case .contextMenu:
-            return WhiteGramSettingsIcons.contextMenu
+            return ExtraSettingsIcons.contextMenu
         }
     }
 }
 
-private enum WhiteGramSettingsEntry: ItemListNodeEntry {
-    case category(WhiteGramSettingsCategory)
+private enum ExtraSettingsEntry: ItemListNodeEntry {
+    case category(ExtraSettingsCategory)
     
     var section: ItemListSectionId {
-        return WhiteGramSettingsSection.main.rawValue
+        return ExtraSettingsSection.main.rawValue
     }
     
     var stableId: Int32 {
@@ -162,7 +162,7 @@ private enum WhiteGramSettingsEntry: ItemListNodeEntry {
         }
     }
     
-    static func ==(lhs: WhiteGramSettingsEntry, rhs: WhiteGramSettingsEntry) -> Bool {
+    static func ==(lhs: ExtraSettingsEntry, rhs: ExtraSettingsEntry) -> Bool {
         switch lhs {
         case let .category(lhsCategory):
             if case let .category(rhsCategory) = rhs {
@@ -172,12 +172,12 @@ private enum WhiteGramSettingsEntry: ItemListNodeEntry {
         }
     }
     
-    static func <(lhs: WhiteGramSettingsEntry, rhs: WhiteGramSettingsEntry) -> Bool {
+    static func <(lhs: ExtraSettingsEntry, rhs: ExtraSettingsEntry) -> Bool {
         return lhs.stableId < rhs.stableId
     }
     
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
-        let arguments = arguments as! WhiteGramSettingsArguments
+        let arguments = arguments as! ExtraSettingsArguments
         switch self {
         case let .category(category):
             return ItemListDisclosureItem(
@@ -197,31 +197,31 @@ private enum WhiteGramSettingsEntry: ItemListNodeEntry {
     }
 }
 
-private func whiteGramSettingsEntries() -> [WhiteGramSettingsEntry] {
-    return WhiteGramSettingsCategory.allCases.map(WhiteGramSettingsEntry.category)
+private func extraSettingsEntries() -> [ExtraSettingsEntry] {
+    return ExtraSettingsCategory.allCases.map(ExtraSettingsEntry.category)
 }
 
-public func whiteGramSettingsController(context: AccountContext) -> ViewController {
+public func extraSettingsController(context: AccountContext) -> ViewController {
     var pushController: ((ViewController) -> Void)?
     
-    let arguments = WhiteGramSettingsArguments(
+    let arguments = ExtraSettingsArguments(
         openCategory: { category in
-            print("WhiteGram category tapped:", category)
+            print("Extra category tapped:", category)
             switch category {
             case .tabs:
-                pushController?(whiteGramTabsSettingsController(context: context))
+                pushController?(extraTabsSettingsController(context: context))
             case .chatSettings:
-                pushController?(whiteGramChatSettingsController(context: context))
+                pushController?(extraChatSettingsController(context: context))
             case .chatFolders:
-                pushController?(whiteGramChatFoldersSettingsController(context: context))
+                pushController?(extraChatFoldersSettingsController(context: context))
             case .stories:
-                pushController?(whiteGramStorySettingsController(context: context))
+                pushController?(extraStorySettingsController(context: context))
             case .media:
                 break
             case .contextMenu:
-                pushController?(whiteGramContextMenusSettingsController(context: context))
+                pushController?(extraContextMenusSettingsController(context: context))
             case .other:
-                pushController?(whiteGramOtherSettingsController(context: context))
+                pushController?(extraOtherSettingsController(context: context))
             }
         }
     )
@@ -231,7 +231,7 @@ public func whiteGramSettingsController(context: AccountContext) -> ViewControll
     |> map { presentationData -> (ItemListControllerState, (ItemListNodeState, Any)) in
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text("WhiteGram"),
+            title: .text("Extra"),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back),
@@ -239,7 +239,7 @@ public func whiteGramSettingsController(context: AccountContext) -> ViewControll
         )
         let listState = ItemListNodeState(
             presentationData: ItemListPresentationData(presentationData),
-            entries: whiteGramSettingsEntries(),
+            entries: extraSettingsEntries(),
             style: .blocks,
             animateChanges: true
         )
@@ -254,27 +254,27 @@ public func whiteGramSettingsController(context: AccountContext) -> ViewControll
     return controller
 }
 
-private final class WhiteGramStorySettingsArguments {
-    let update: ((WhiteGramStorySettings) -> WhiteGramStorySettings) -> Void
+private final class ExtraStorySettingsArguments {
+    let update: ((ExtraStorySettings) -> ExtraStorySettings) -> Void
 
-    init(update: @escaping ((WhiteGramStorySettings) -> WhiteGramStorySettings) -> Void) {
+    init(update: @escaping ((ExtraStorySettings) -> ExtraStorySettings) -> Void) {
         self.update = update
     }
 }
 
-private enum WhiteGramStorySettingsSection: Int32 {
+private enum ExtraStorySettingsSection: Int32 {
     case options
 }
 
-private enum WhiteGramStorySettingsEntry: ItemListNodeEntry {
-    case disableStories(WhiteGramStorySettings)
-    case hideStories(WhiteGramStorySettings)
-    case disableStoryRecording(WhiteGramStorySettings)
-    case disableStoryRecordingSwipe(WhiteGramStorySettings)
-    case askBeforeViewingStories(WhiteGramStorySettings)
+private enum ExtraStorySettingsEntry: ItemListNodeEntry {
+    case disableStories(ExtraStorySettings)
+    case hideStories(ExtraStorySettings)
+    case disableStoryRecording(ExtraStorySettings)
+    case disableStoryRecordingSwipe(ExtraStorySettings)
+    case askBeforeViewingStories(ExtraStorySettings)
 
     var section: ItemListSectionId {
-        return WhiteGramStorySettingsSection.options.rawValue
+        return ExtraStorySettingsSection.options.rawValue
     }
 
     var stableId: Int32 {
@@ -292,7 +292,7 @@ private enum WhiteGramStorySettingsEntry: ItemListNodeEntry {
         }
     }
 
-    static func ==(lhs: WhiteGramStorySettingsEntry, rhs: WhiteGramStorySettingsEntry) -> Bool {
+    static func ==(lhs: ExtraStorySettingsEntry, rhs: ExtraStorySettingsEntry) -> Bool {
         switch lhs {
         case let .disableStories(lhsSettings):
             if case let .disableStories(rhsSettings) = rhs {
@@ -322,12 +322,12 @@ private enum WhiteGramStorySettingsEntry: ItemListNodeEntry {
         }
     }
 
-    static func <(lhs: WhiteGramStorySettingsEntry, rhs: WhiteGramStorySettingsEntry) -> Bool {
+    static func <(lhs: ExtraStorySettingsEntry, rhs: ExtraStorySettingsEntry) -> Bool {
         return lhs.stableId < rhs.stableId
     }
 
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
-        let arguments = arguments as! WhiteGramStorySettingsArguments
+        let arguments = arguments as! ExtraStorySettingsArguments
 
         func switchItem(title: String, text: String, value: Bool, enabled: Bool, update: @escaping (Bool) -> Void) -> ListViewItem {
             return ItemListSwitchItem(
@@ -346,7 +346,7 @@ private enum WhiteGramStorySettingsEntry: ItemListNodeEntry {
 
         switch self {
         case let .disableStories(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Отключить истории полностью", en: "Disable Stories Completely"), text: whiteGramString(presentationData, ru: "Скрывает истории и отключает просмотр, создание и запись.", en: "Hides stories and disables viewing, creating, and recording them."), value: settings.disableStories, enabled: true, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Отключить истории полностью", en: "Disable Stories Completely"), text: extraString(presentationData, ru: "Скрывает истории и отключает просмотр, создание и запись.", en: "Hides stories and disables viewing, creating, and recording them."), value: settings.disableStories, enabled: true, update: { value in
                 arguments.update { current in
                     var current = current
                     current.disableStories = value
@@ -359,7 +359,7 @@ private enum WhiteGramStorySettingsEntry: ItemListNodeEntry {
                 }
             })
         case let .hideStories(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Скрыть истории", en: "Hide Stories"), text: whiteGramString(presentationData, ru: "Скрывает истории сверху в списке чатов, но не отключает запись.", en: "Hides stories at the top of the chat list without disabling recording."), value: settings.hideStories, enabled: !settings.disableStories, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Скрыть истории", en: "Hide Stories"), text: extraString(presentationData, ru: "Скрывает истории сверху в списке чатов, но не отключает запись.", en: "Hides stories at the top of the chat list without disabling recording."), value: settings.hideStories, enabled: !settings.disableStories, update: { value in
                 arguments.update { current in
                     var current = current
                     current.hideStories = value
@@ -367,7 +367,7 @@ private enum WhiteGramStorySettingsEntry: ItemListNodeEntry {
                 }
             })
         case let .disableStoryRecording(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Отключить запись истории", en: "Disable Story Recording"), text: whiteGramString(presentationData, ru: "Отключает только создание историй, просмотр остается доступен.", en: "Disables creating stories only. Viewing remains available."), value: settings.disableStoryRecording, enabled: !settings.disableStories, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Отключить запись истории", en: "Disable Story Recording"), text: extraString(presentationData, ru: "Отключает только создание историй, просмотр остается доступен.", en: "Disables creating stories only. Viewing remains available."), value: settings.disableStoryRecording, enabled: !settings.disableStories, update: { value in
                 arguments.update { current in
                     var current = current
                     current.disableStoryRecording = value
@@ -375,7 +375,7 @@ private enum WhiteGramStorySettingsEntry: ItemListNodeEntry {
                 }
             })
         case let .disableStoryRecordingSwipe(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Отключить свайп для записи", en: "Disable Recording Swipe"), text: whiteGramString(presentationData, ru: "Отключает свайп вправо в списке чатов для записи истории.", en: "Disables swiping right in the chat list to record a story."), value: settings.disableStoryRecordingSwipe, enabled: !settings.disableStories && !settings.disableStoryRecording, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Отключить свайп для записи", en: "Disable Recording Swipe"), text: extraString(presentationData, ru: "Отключает свайп вправо в списке чатов для записи истории.", en: "Disables swiping right in the chat list to record a story."), value: settings.disableStoryRecordingSwipe, enabled: !settings.disableStories && !settings.disableStoryRecording, update: { value in
                 arguments.update { current in
                     var current = current
                     current.disableStoryRecordingSwipe = value
@@ -383,7 +383,7 @@ private enum WhiteGramStorySettingsEntry: ItemListNodeEntry {
                 }
             })
         case let .askBeforeViewingStories(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Спросить перед просмотром", en: "Ask Before Viewing"), text: whiteGramString(presentationData, ru: "Перед открытием истории показывает предупреждение, что владелец увидит просмотр.", en: "Shows a warning before opening a story that the owner will see your view."), value: settings.askBeforeViewingStories, enabled: !settings.disableStories, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Спросить перед просмотром", en: "Ask Before Viewing"), text: extraString(presentationData, ru: "Перед открытием истории показывает предупреждение, что владелец увидит просмотр.", en: "Shows a warning before opening a story that the owner will see your view."), value: settings.askBeforeViewingStories, enabled: !settings.disableStories, update: { value in
                 arguments.update { current in
                     var current = current
                     current.askBeforeViewingStories = value
@@ -394,7 +394,7 @@ private enum WhiteGramStorySettingsEntry: ItemListNodeEntry {
     }
 }
 
-private func whiteGramStorySettingsEntries(settings: WhiteGramStorySettings) -> [WhiteGramStorySettingsEntry] {
+private func extraStorySettingsEntries(settings: ExtraStorySettings) -> [ExtraStorySettingsEntry] {
     return [
         .disableStories(settings),
         .hideStories(settings),
@@ -404,12 +404,12 @@ private func whiteGramStorySettingsEntries(settings: WhiteGramStorySettings) -> 
     ]
 }
 
-private func whiteGramStorySettingsController(context: AccountContext) -> ViewController {
-    let initialSettings = WhiteGramStorySettings.current
+private func extraStorySettingsController(context: AccountContext) -> ViewController {
+    let initialSettings = ExtraStorySettings.current
     let statePromise = ValuePromise(initialSettings, ignoreRepeated: true)
     let stateValue = Atomic(value: initialSettings)
 
-    let arguments = WhiteGramStorySettingsArguments(update: { f in
+    let arguments = ExtraStorySettingsArguments(update: { f in
         let updated = stateValue.modify { current in
             let updated = f(current)
             updated.save()
@@ -423,7 +423,7 @@ private func whiteGramStorySettingsController(context: AccountContext) -> ViewCo
     |> map { presentationData, settings -> (ItemListControllerState, (ItemListNodeState, Any)) in
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text(whiteGramString(presentationData.strings, ru: "Истории", en: "Stories")),
+            title: .text(extraString(presentationData.strings, ru: "Истории", en: "Stories")),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back),
@@ -431,7 +431,7 @@ private func whiteGramStorySettingsController(context: AccountContext) -> ViewCo
         )
         let listState = ItemListNodeState(
             presentationData: ItemListPresentationData(presentationData),
-            entries: whiteGramStorySettingsEntries(settings: settings),
+            entries: extraStorySettingsEntries(settings: settings),
             style: .blocks,
             animateChanges: true
         )
@@ -442,31 +442,31 @@ private func whiteGramStorySettingsController(context: AccountContext) -> ViewCo
     return ItemListController(context: context, state: signal)
 }
 
-private final class WhiteGramTabsSettingsArguments {
-    let update: (((WhiteGramTabSettings) -> WhiteGramTabSettings), Bool) -> Void
+private final class ExtraTabsSettingsArguments {
+    let update: (((ExtraTabSettings) -> ExtraTabSettings), Bool) -> Void
     let restart: () -> Void
     
-    init(update: @escaping (((WhiteGramTabSettings) -> WhiteGramTabSettings), Bool) -> Void, restart: @escaping () -> Void) {
+    init(update: @escaping (((ExtraTabSettings) -> ExtraTabSettings), Bool) -> Void, restart: @escaping () -> Void) {
         self.update = update
         self.restart = restart
     }
 }
 
-private enum WhiteGramTabsSettingsSection: Int32 {
+private enum ExtraTabsSettingsSection: Int32 {
     case options
     case restart
 }
 
-private enum WhiteGramTabsSettingsEntry: ItemListNodeEntry {
-    case compactPanel(WhiteGramTabSettings)
-    case hideContacts(WhiteGramTabSettings)
-    case hideCalls(WhiteGramTabSettings)
-    case hideTitles(WhiteGramTabSettings)
-    case hideSearch(WhiteGramTabSettings)
-    case widePanel(WhiteGramTabSettings)
+private enum ExtraTabsSettingsEntry: ItemListNodeEntry {
+    case compactPanel(ExtraTabSettings)
+    case hideContacts(ExtraTabSettings)
+    case hideCalls(ExtraTabSettings)
+    case hideTitles(ExtraTabSettings)
+    case hideSearch(ExtraTabSettings)
+    case widePanel(ExtraTabSettings)
     
     var section: ItemListSectionId {
-        return WhiteGramTabsSettingsSection.options.rawValue
+        return ExtraTabsSettingsSection.options.rawValue
     }
     
     var stableId: Int32 {
@@ -486,7 +486,7 @@ private enum WhiteGramTabsSettingsEntry: ItemListNodeEntry {
         }
     }
     
-    static func ==(lhs: WhiteGramTabsSettingsEntry, rhs: WhiteGramTabsSettingsEntry) -> Bool {
+    static func ==(lhs: ExtraTabsSettingsEntry, rhs: ExtraTabsSettingsEntry) -> Bool {
         switch lhs {
         case let .compactPanel(lhsSettings):
             if case let .compactPanel(rhsSettings) = rhs {
@@ -521,12 +521,12 @@ private enum WhiteGramTabsSettingsEntry: ItemListNodeEntry {
         }
     }
     
-    static func <(lhs: WhiteGramTabsSettingsEntry, rhs: WhiteGramTabsSettingsEntry) -> Bool {
+    static func <(lhs: ExtraTabsSettingsEntry, rhs: ExtraTabsSettingsEntry) -> Bool {
         return lhs.stableId < rhs.stableId
     }
     
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
-        let arguments = arguments as! WhiteGramTabsSettingsArguments
+        let arguments = arguments as! ExtraTabsSettingsArguments
         
         func switchItem(title: String, text: String, value: Bool, enabled: Bool, update: @escaping (Bool) -> Void) -> ListViewItem {
             return ItemListSwitchItem(
@@ -545,7 +545,7 @@ private enum WhiteGramTabsSettingsEntry: ItemListNodeEntry {
         
         switch self {
         case let .compactPanel(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Сократить панель вкладок", en: "Compact Tab Bar"), text: whiteGramString(presentationData, ru: "Скрывает нижнюю панель и переносит вкладки в компактное меню.", en: "Hides the bottom bar and moves tabs into a compact menu."), value: settings.compactPanel, enabled: true, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Сократить панель вкладок", en: "Compact Tab Bar"), text: extraString(presentationData, ru: "Скрывает нижнюю панель и переносит вкладки в компактное меню.", en: "Hides the bottom bar and moves tabs into a compact menu."), value: settings.compactPanel, enabled: true, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.compactPanel = value
@@ -553,7 +553,7 @@ private enum WhiteGramTabsSettingsEntry: ItemListNodeEntry {
                 }, true)
             })
         case let .hideContacts(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Вкладка контакты", en: "Contacts Tab"), text: whiteGramString(presentationData, ru: "Показывает вкладку контактов в нижней панели.", en: "Shows the Contacts tab in the bottom bar."), value: !settings.hideContactsTab, enabled: !settings.compactPanel, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Вкладка контакты", en: "Contacts Tab"), text: extraString(presentationData, ru: "Показывает вкладку контактов в нижней панели.", en: "Shows the Contacts tab in the bottom bar."), value: !settings.hideContactsTab, enabled: !settings.compactPanel, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.hideContactsTab = !value
@@ -561,7 +561,7 @@ private enum WhiteGramTabsSettingsEntry: ItemListNodeEntry {
                 }, true)
             })
         case let .hideCalls(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Вкладка звонки", en: "Calls Tab"), text: whiteGramString(presentationData, ru: "Показывает вкладку звонков рядом с чатами.", en: "Shows the Calls tab next to Chats."), value: !settings.hideCallsTab, enabled: !settings.compactPanel, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Вкладка звонки", en: "Calls Tab"), text: extraString(presentationData, ru: "Показывает вкладку звонков рядом с чатами.", en: "Shows the Calls tab next to Chats."), value: !settings.hideCallsTab, enabled: !settings.compactPanel, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.hideCallsTab = !value
@@ -569,7 +569,7 @@ private enum WhiteGramTabsSettingsEntry: ItemListNodeEntry {
                 }, true)
             })
         case let .hideTitles(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Подписи вкладок", en: "Tab Labels"), text: whiteGramString(presentationData, ru: "Показывает названия вкладок под иконками.", en: "Shows tab names below the icons."), value: !settings.hideTabTitles, enabled: !settings.compactPanel, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Подписи вкладок", en: "Tab Labels"), text: extraString(presentationData, ru: "Показывает названия вкладок под иконками.", en: "Shows tab names below the icons."), value: !settings.hideTabTitles, enabled: !settings.compactPanel, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.hideTabTitles = !value
@@ -577,7 +577,7 @@ private enum WhiteGramTabsSettingsEntry: ItemListNodeEntry {
                 }, true)
             })
         case let .hideSearch(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Кнопка поиска", en: "Search Button"), text: whiteGramString(presentationData, ru: "Показывает отдельную кнопку поиска справа от вкладок.", en: "Shows a separate search button to the right of the tabs."), value: !settings.hideSearchButton, enabled: !settings.compactPanel, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Кнопка поиска", en: "Search Button"), text: extraString(presentationData, ru: "Показывает отдельную кнопку поиска справа от вкладок.", en: "Shows a separate search button to the right of the tabs."), value: !settings.hideSearchButton, enabled: !settings.compactPanel, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.hideSearchButton = !value
@@ -585,7 +585,7 @@ private enum WhiteGramTabsSettingsEntry: ItemListNodeEntry {
                 }, true)
             })
         case let .widePanel(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Широкая панель", en: "Wide Bar"), text: whiteGramString(presentationData, ru: "Растягивает панель по доступной ширине с обычными отступами.", en: "Stretches the bar to the available width with regular insets."), value: settings.widePanel, enabled: !settings.compactPanel, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Широкая панель", en: "Wide Bar"), text: extraString(presentationData, ru: "Растягивает панель по доступной ширине с обычными отступами.", en: "Stretches the bar to the available width with regular insets."), value: settings.widePanel, enabled: !settings.compactPanel, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.widePanel = value
@@ -596,7 +596,7 @@ private enum WhiteGramTabsSettingsEntry: ItemListNodeEntry {
     }
 }
 
-private final class WhiteGramRestartFooterItem: ItemListControllerFooterItem {
+private final class ExtraRestartFooterItem: ItemListControllerFooterItem {
     let presentationData: ItemListPresentationData
     let action: () -> Void
     
@@ -606,30 +606,30 @@ private final class WhiteGramRestartFooterItem: ItemListControllerFooterItem {
     }
     
     func isEqual(to: ItemListControllerFooterItem) -> Bool {
-        if let item = to as? WhiteGramRestartFooterItem {
+        if let item = to as? ExtraRestartFooterItem {
             return self.presentationData.theme === item.presentationData.theme && self.presentationData.strings.baseLanguageCode == item.presentationData.strings.baseLanguageCode
         }
         return false
     }
     
     func node(current: ItemListControllerFooterItemNode?) -> ItemListControllerFooterItemNode {
-        if let current = current as? WhiteGramRestartFooterItemNode {
+        if let current = current as? ExtraRestartFooterItemNode {
             current.item = self
             return current
         } else {
-            return WhiteGramRestartFooterItemNode(item: self)
+            return ExtraRestartFooterItemNode(item: self)
         }
     }
 }
 
-private final class WhiteGramRestartFooterItemNode: ItemListControllerFooterItemNode {
+private final class ExtraRestartFooterItemNode: ItemListControllerFooterItemNode {
     private let backgroundView = UIView()
     private let iconLabel = UILabel()
     private let titleLabel = UILabel()
     private let button = UIButton(type: .system)
     private var validLayout: ContainerViewLayout?
     
-    var item: WhiteGramRestartFooterItem {
+    var item: ExtraRestartFooterItem {
         didSet {
             self.updateItem()
             if let validLayout = self.validLayout {
@@ -638,7 +638,7 @@ private final class WhiteGramRestartFooterItemNode: ItemListControllerFooterItem
         }
     }
 
-    init(item: WhiteGramRestartFooterItem) {
+    init(item: ExtraRestartFooterItem) {
         self.item = item
 
         super.init()
@@ -675,8 +675,8 @@ private final class WhiteGramRestartFooterItemNode: ItemListControllerFooterItem
     }
 
     private func updateItem() {
-        self.titleLabel.text = whiteGramString(self.item.presentationData, ru: "Необходим\nперезапуск", en: "Restart\nRequired")
-        self.button.setTitle(whiteGramString(self.item.presentationData, ru: "Перезапустить Сейчас", en: "Restart Now"), for: [])
+        self.titleLabel.text = extraString(self.item.presentationData, ru: "Необходим\nперезапуск", en: "Restart\nRequired")
+        self.button.setTitle(extraString(self.item.presentationData, ru: "Перезапустить Сейчас", en: "Restart Now"), for: [])
     }
 
     override func updateLayout(layout: ContainerViewLayout, transition: ContainedViewLayoutTransition) -> CGFloat {
@@ -705,7 +705,7 @@ private final class WhiteGramRestartFooterItemNode: ItemListControllerFooterItem
     }
 }
 
-private func whiteGramTabsSettingsEntries(settings: WhiteGramTabSettings, initialSettings: WhiteGramTabSettings) -> [WhiteGramTabsSettingsEntry] {
+private func extraTabsSettingsEntries(settings: ExtraTabSettings, initialSettings: ExtraTabSettings) -> [ExtraTabsSettingsEntry] {
     return [
         .compactPanel(settings),
         .hideContacts(settings),
@@ -716,8 +716,8 @@ private func whiteGramTabsSettingsEntries(settings: WhiteGramTabSettings, initia
     ]
 }
 
-private func whiteGramTabsSettingsController(context: AccountContext) -> ViewController {
-    let initialSettings = WhiteGramTabSettings.current
+private func extraTabsSettingsController(context: AccountContext) -> ViewController {
+    let initialSettings = ExtraTabSettings.current
     let statePromise = ValuePromise(initialSettings, ignoreRepeated: true)
     let stateValue = Atomic(value: initialSettings)
     let restartWarningPromise = ValuePromise(false, ignoreRepeated: true)
@@ -733,7 +733,7 @@ private func whiteGramTabsSettingsController(context: AccountContext) -> ViewCon
         timer.start()
     }
     
-    let updateSettings: (((WhiteGramTabSettings) -> WhiteGramTabSettings), Bool) -> Void = { f, notify in
+    let updateSettings: (((ExtraTabSettings) -> ExtraTabSettings), Bool) -> Void = { f, notify in
         let updated = stateValue.modify { current in
             let previous = current
             let updated = f(current)
@@ -746,7 +746,7 @@ private func whiteGramTabsSettingsController(context: AccountContext) -> ViewCon
         statePromise.set(updated)
     }
     
-    let arguments = WhiteGramTabsSettingsArguments(
+    let arguments = ExtraTabsSettingsArguments(
         update: updateSettings,
         restart: {
             exit(0)
@@ -758,7 +758,7 @@ private func whiteGramTabsSettingsController(context: AccountContext) -> ViewCon
     |> map { presentationData, settings, showRestartWarning -> (ItemListControllerState, (ItemListNodeState, Any)) in
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text(whiteGramString(presentationData.strings, ru: "Вкладки", en: "Tabs")),
+            title: .text(extraString(presentationData.strings, ru: "Вкладки", en: "Tabs")),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back),
@@ -766,9 +766,9 @@ private func whiteGramTabsSettingsController(context: AccountContext) -> ViewCon
         )
         let listState = ItemListNodeState(
             presentationData: ItemListPresentationData(presentationData),
-            entries: whiteGramTabsSettingsEntries(settings: settings, initialSettings: initialSettings),
+            entries: extraTabsSettingsEntries(settings: settings, initialSettings: initialSettings),
             style: .blocks,
-            footerItem: showRestartWarning && settings.compactPanel != initialSettings.compactPanel ? WhiteGramRestartFooterItem(presentationData: ItemListPresentationData(presentationData), action: arguments.restart) : nil,
+            footerItem: showRestartWarning && settings.compactPanel != initialSettings.compactPanel ? ExtraRestartFooterItem(presentationData: ItemListPresentationData(presentationData), action: arguments.restart) : nil,
             animateChanges: true
         )
         
@@ -778,15 +778,15 @@ private func whiteGramTabsSettingsController(context: AccountContext) -> ViewCon
     return ItemListController(context: context, state: signal)
 }
 
-private final class WhiteGramChatSettingsArguments {
-    let update: (((WhiteGramChatSettings) -> WhiteGramChatSettings), Bool) -> Void
+private final class ExtraChatSettingsArguments {
+    let update: (((ExtraChatSettings) -> ExtraChatSettings), Bool) -> Void
     let openVideoMessageCamera: () -> Void
     let openPersonalChatDoubleTapAction: () -> Void
     let openChannelPostDoubleTapAction: () -> Void
     let restart: () -> Void
 
     init(
-        update: @escaping (((WhiteGramChatSettings) -> WhiteGramChatSettings), Bool) -> Void,
+        update: @escaping (((ExtraChatSettings) -> ExtraChatSettings), Bool) -> Void,
         openVideoMessageCamera: @escaping () -> Void,
         openPersonalChatDoubleTapAction: @escaping () -> Void,
         openChannelPostDoubleTapAction: @escaping () -> Void,
@@ -800,66 +800,66 @@ private final class WhiteGramChatSettingsArguments {
     }
 }
 
-private extension WhiteGramChatSettings.VideoMessageCamera {
+private extension ExtraChatSettings.VideoMessageCamera {
     func title(strings: PresentationStrings) -> String {
         switch self {
         case .front:
-            return whiteGramString(strings, ru: "Фронтальная", en: "Front")
+            return extraString(strings, ru: "Фронтальная", en: "Front")
         case .back:
-            return whiteGramString(strings, ru: "Задняя", en: "Back")
+            return extraString(strings, ru: "Задняя", en: "Back")
         case .ask:
-            return whiteGramString(strings, ru: "Спрашивать", en: "Ask")
+            return extraString(strings, ru: "Спрашивать", en: "Ask")
         }
     }
 }
 
-private extension WhiteGramChatSettings.PersonalChatDoubleTapAction {
+private extension ExtraChatSettings.PersonalChatDoubleTapAction {
     func title(strings: PresentationStrings) -> String {
         switch self {
         case .savedMessages:
-            return whiteGramString(strings, ru: "Избранное", en: "Saved Messages")
+            return extraString(strings, ru: "Избранное", en: "Saved Messages")
         case .reaction:
-            return whiteGramString(strings, ru: "Реакция", en: "Reaction")
+            return extraString(strings, ru: "Реакция", en: "Reaction")
         case .edit:
-            return whiteGramString(strings, ru: "Редактировать сообщение", en: "Edit Message")
+            return extraString(strings, ru: "Редактировать сообщение", en: "Edit Message")
         case .forward:
-            return whiteGramString(strings, ru: "Переслать", en: "Forward")
+            return extraString(strings, ru: "Переслать", en: "Forward")
         case .reply:
-            return whiteGramString(strings, ru: "Ответить", en: "Reply")
+            return extraString(strings, ru: "Ответить", en: "Reply")
         case .pin:
-            return whiteGramString(strings, ru: "Закрепить / открепить", en: "Pin / Unpin")
+            return extraString(strings, ru: "Закрепить / открепить", en: "Pin / Unpin")
         case .select:
-            return whiteGramString(strings, ru: "Выбрать", en: "Select")
+            return extraString(strings, ru: "Выбрать", en: "Select")
         case .copy:
-            return whiteGramString(strings, ru: "Скопировать", en: "Copy")
+            return extraString(strings, ru: "Скопировать", en: "Copy")
         case .contextMenu:
-            return whiteGramString(strings, ru: "Открыть контекстное меню", en: "Open Context Menu")
+            return extraString(strings, ru: "Открыть контекстное меню", en: "Open Context Menu")
         }
     }
 }
 
-private extension WhiteGramChatSettings.ChannelPostDoubleTapAction {
+private extension ExtraChatSettings.ChannelPostDoubleTapAction {
     func title(strings: PresentationStrings) -> String {
         switch self {
         case .savedMessages:
-            return whiteGramString(strings, ru: "Добавить в Избранное", en: "Add to Saved Messages")
+            return extraString(strings, ru: "Добавить в Избранное", en: "Add to Saved Messages")
         case .reaction:
-            return whiteGramString(strings, ru: "Реакция", en: "Reaction")
+            return extraString(strings, ru: "Реакция", en: "Reaction")
         case .forward:
-            return whiteGramString(strings, ru: "Переслать", en: "Forward")
+            return extraString(strings, ru: "Переслать", en: "Forward")
         case .reply:
-            return whiteGramString(strings, ru: "Ответить", en: "Reply")
+            return extraString(strings, ru: "Ответить", en: "Reply")
         case .select:
-            return whiteGramString(strings, ru: "Выбрать", en: "Select")
+            return extraString(strings, ru: "Выбрать", en: "Select")
         case .copy:
-            return whiteGramString(strings, ru: "Скопировать", en: "Copy")
+            return extraString(strings, ru: "Скопировать", en: "Copy")
         case .contextMenu:
-            return whiteGramString(strings, ru: "Открыть контекстное меню", en: "Open Context Menu")
+            return extraString(strings, ru: "Открыть контекстное меню", en: "Open Context Menu")
         }
     }
 }
 
-private enum WhiteGramChatSettingsSection: Int32 {
+private enum ExtraChatSettingsSection: Int32 {
     case chatList
     case general
     case stickerSize
@@ -869,47 +869,47 @@ private enum WhiteGramChatSettingsSection: Int32 {
     case restart
 }
 
-private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
+private enum ExtraChatSettingsEntry: ItemListNodeEntry {
     case generalHeader
-    case compactPinnedMessagesPanel(WhiteGramChatSettings)
+    case compactPinnedMessagesPanel(ExtraChatSettings)
     case stickerSizeHeader
-    case stickerSize(WhiteGramChatSettings)
-    case animateEmojiStickers(WhiteGramChatSettings)
+    case stickerSize(ExtraChatSettings)
+    case animateEmojiStickers(ExtraChatSettings)
     case messagesHeader
-    case showSecondsInMessageTimestamp(WhiteGramChatSettings)
-    case hideMessageTimestamp(WhiteGramChatSettings)
-    case videoMessageCamera(WhiteGramChatSettings)
-    case confirmVoiceRecording(WhiteGramChatSettings)
-    case voiceMessageButton(WhiteGramChatSettings)
-    case swipeToReply(WhiteGramChatSettings)
-    case personalChatDoubleTapAction(WhiteGramChatSettings)
+    case showSecondsInMessageTimestamp(ExtraChatSettings)
+    case hideMessageTimestamp(ExtraChatSettings)
+    case videoMessageCamera(ExtraChatSettings)
+    case confirmVoiceRecording(ExtraChatSettings)
+    case voiceMessageButton(ExtraChatSettings)
+    case swipeToReply(ExtraChatSettings)
+    case personalChatDoubleTapAction(ExtraChatSettings)
     case personalChatDoubleTapInfo
     case channelsHeader
-    case channelBottomPanel(WhiteGramChatSettings)
-    case wideChannelPosts(WhiteGramChatSettings)
-    case channelSwipeToNext(WhiteGramChatSettings)
-    case channelPostReactions(WhiteGramChatSettings)
-    case channelPostDoubleTapAction(WhiteGramChatSettings)
+    case channelBottomPanel(ExtraChatSettings)
+    case wideChannelPosts(ExtraChatSettings)
+    case channelSwipeToNext(ExtraChatSettings)
+    case channelPostReactions(ExtraChatSettings)
+    case channelPostDoubleTapAction(ExtraChatSettings)
     case channelPostDoubleTapInfo
     case chatListHeader
-    case compactChatList(WhiteGramChatSettings)
-    case chatSwipeOptions(WhiteGramChatSettings)
-    case chatSwipeDelete(WhiteGramChatSettings)
+    case compactChatList(ExtraChatSettings)
+    case chatSwipeOptions(ExtraChatSettings)
+    case chatSwipeDelete(ExtraChatSettings)
 
     var section: ItemListSectionId {
         switch self {
         case .generalHeader, .compactPinnedMessagesPanel:
-            return WhiteGramChatSettingsSection.general.rawValue
+            return ExtraChatSettingsSection.general.rawValue
         case .stickerSizeHeader, .stickerSize:
-            return WhiteGramChatSettingsSection.stickerSize.rawValue
+            return ExtraChatSettingsSection.stickerSize.rawValue
         case .animateEmojiStickers:
-            return WhiteGramChatSettingsSection.stickerOptions.rawValue
+            return ExtraChatSettingsSection.stickerOptions.rawValue
         case .messagesHeader, .showSecondsInMessageTimestamp, .hideMessageTimestamp, .videoMessageCamera, .confirmVoiceRecording, .voiceMessageButton, .swipeToReply, .personalChatDoubleTapAction, .personalChatDoubleTapInfo:
-            return WhiteGramChatSettingsSection.messages.rawValue
+            return ExtraChatSettingsSection.messages.rawValue
         case .channelsHeader, .channelBottomPanel, .wideChannelPosts, .channelSwipeToNext, .channelPostReactions, .channelPostDoubleTapAction, .channelPostDoubleTapInfo:
-            return WhiteGramChatSettingsSection.channels.rawValue
+            return ExtraChatSettingsSection.channels.rawValue
         case .chatListHeader, .compactChatList, .chatSwipeOptions, .chatSwipeDelete:
-            return WhiteGramChatSettingsSection.chatList.rawValue
+            return ExtraChatSettingsSection.chatList.rawValue
         }
     }
 
@@ -968,7 +968,7 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
         }
     }
 
-    static func ==(lhs: WhiteGramChatSettingsEntry, rhs: WhiteGramChatSettingsEntry) -> Bool {
+    static func ==(lhs: ExtraChatSettingsEntry, rhs: ExtraChatSettingsEntry) -> Bool {
         switch lhs {
         case .generalHeader:
             if case .generalHeader = rhs {
@@ -1098,12 +1098,12 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
         }
     }
 
-    static func <(lhs: WhiteGramChatSettingsEntry, rhs: WhiteGramChatSettingsEntry) -> Bool {
+    static func <(lhs: ExtraChatSettingsEntry, rhs: ExtraChatSettingsEntry) -> Bool {
         return lhs.stableId < rhs.stableId
     }
 
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
-        let arguments = arguments as! WhiteGramChatSettingsArguments
+        let arguments = arguments as! ExtraChatSettingsArguments
 
         func switchItem(title: String, text: String, value: Bool, enabled: Bool, update: @escaping (Bool) -> Void) -> ListViewItem {
             return ItemListSwitchItem(
@@ -1122,9 +1122,9 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
 
         switch self {
         case .generalHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: whiteGramString(presentationData, ru: "Закрепленные", en: "Pinned Messages"), sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: extraString(presentationData, ru: "Закрепленные", en: "Pinned Messages"), sectionId: self.section)
         case let .compactPinnedMessagesPanel(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Сократить закрепленные", en: "Compact Pinned Messages"), text: whiteGramString(presentationData, ru: "Сокращает закрепленные сообщения в небольшую клавишу.", en: "Turns the pinned messages panel into a small button."), value: settings.compactPinnedMessagesPanel, enabled: true, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Сократить закрепленные", en: "Compact Pinned Messages"), text: extraString(presentationData, ru: "Сокращает закрепленные сообщения в небольшую клавишу.", en: "Turns the pinned messages panel into a small button."), value: settings.compactPinnedMessagesPanel, enabled: true, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.compactPinnedMessagesPanel = value
@@ -1132,9 +1132,9 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
                 }, true)
             })
         case .stickerSizeHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: whiteGramString(presentationData, ru: "Размеры одиночных стикеров", en: "Standalone Sticker Size"), sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: extraString(presentationData, ru: "Размеры одиночных стикеров", en: "Standalone Sticker Size"), sectionId: self.section)
         case let .stickerSize(settings):
-            return WhiteGramStickerSizeSliderItem(
+            return ExtraStickerSizeSliderItem(
                 presentationData: presentationData,
                 value: settings.stickerSizePercent,
                 showTime: settings.showStickerTime,
@@ -1155,7 +1155,7 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
                 }
             )
         case let .animateEmojiStickers(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Анимация эмоджи стикеров", en: "Emoji Sticker Animation"), text: whiteGramString(presentationData, ru: "Включает анимацию обычных эмоджи-стикеров.", en: "Enables regular emoji sticker animation."), value: settings.animateEmojiStickers, enabled: true, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Анимация эмоджи стикеров", en: "Emoji Sticker Animation"), text: extraString(presentationData, ru: "Включает анимацию обычных эмоджи-стикеров.", en: "Enables regular emoji sticker animation."), value: settings.animateEmojiStickers, enabled: true, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.animateEmojiStickers = value
@@ -1163,9 +1163,9 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
                 }, true)
             })
         case .messagesHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: whiteGramString(presentationData, ru: "Сообщения", en: "Messages"), sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: extraString(presentationData, ru: "Сообщения", en: "Messages"), sectionId: self.section)
         case let .showSecondsInMessageTimestamp(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Секунды ко времени", en: "Show Seconds"), text: whiteGramString(presentationData, ru: "Показывает секунды рядом со временем сообщения.", en: "Shows seconds next to the message timestamp."), value: settings.showSecondsInMessageTimestamp, enabled: !settings.hideMessageTimestamp, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Секунды ко времени", en: "Show Seconds"), text: extraString(presentationData, ru: "Показывает секунды рядом со временем сообщения.", en: "Shows seconds next to the message timestamp."), value: settings.showSecondsInMessageTimestamp, enabled: !settings.hideMessageTimestamp, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.showSecondsInMessageTimestamp = value
@@ -1173,7 +1173,7 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
                 }, true)
             })
         case let .hideMessageTimestamp(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Отключить время", en: "Hide Timestamps"), text: whiteGramString(presentationData, ru: "Скрывает время у сообщений.", en: "Hides timestamps on messages."), value: settings.hideMessageTimestamp, enabled: true, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Отключить время", en: "Hide Timestamps"), text: extraString(presentationData, ru: "Скрывает время у сообщений.", en: "Hides timestamps on messages."), value: settings.hideMessageTimestamp, enabled: true, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.hideMessageTimestamp = value
@@ -1187,7 +1187,7 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
             return ItemListDisclosureItem(
                 presentationData: presentationData,
                 systemStyle: .glass,
-                title: whiteGramString(presentationData, ru: "Камера видеосообщения", en: "Video Message Camera"),
+                title: extraString(presentationData, ru: "Камера видеосообщения", en: "Video Message Camera"),
                 label: settings.videoMessageCamera.title(strings: presentationData.strings),
                 sectionId: self.section,
                 style: .blocks,
@@ -1195,7 +1195,7 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
                 action: arguments.openVideoMessageCamera
             )
         case let .confirmVoiceRecording(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Подтверждать запись голосового", en: "Confirm Voice Recording"), text: whiteGramString(presentationData, ru: "Показывает предупреждение перед началом записи голосового.", en: "Shows a warning before starting voice recording."), value: settings.confirmVoiceRecording, enabled: true, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Подтверждать запись голосового", en: "Confirm Voice Recording"), text: extraString(presentationData, ru: "Показывает предупреждение перед началом записи голосового.", en: "Shows a warning before starting voice recording."), value: settings.confirmVoiceRecording, enabled: true, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.confirmVoiceRecording = value
@@ -1203,7 +1203,7 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
                 }, true)
             })
         case let .voiceMessageButton(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Клавиша голосового сообщения", en: "Voice Message Button"), text: whiteGramString(presentationData, ru: "Показывает кнопку записи голосового сообщения.", en: "Shows the voice message recording button."), value: settings.voiceMessageButton, enabled: true, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Клавиша голосового сообщения", en: "Voice Message Button"), text: extraString(presentationData, ru: "Показывает кнопку записи голосового сообщения.", en: "Shows the voice message recording button."), value: settings.voiceMessageButton, enabled: true, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.voiceMessageButton = value
@@ -1211,7 +1211,7 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
                 }, true)
             })
         case let .swipeToReply(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Свайп для ответа на сообщение", en: "Swipe to Reply"), text: whiteGramString(presentationData, ru: "Включает ответ свайпом по сообщению.", en: "Enables replying by swiping on a message."), value: settings.swipeToReply, enabled: true, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Свайп для ответа на сообщение", en: "Swipe to Reply"), text: extraString(presentationData, ru: "Включает ответ свайпом по сообщению.", en: "Enables replying by swiping on a message."), value: settings.swipeToReply, enabled: true, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.swipeToReply = value
@@ -1222,7 +1222,7 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
             return ItemListDisclosureItem(
                 presentationData: presentationData,
                 systemStyle: .glass,
-                title: whiteGramString(presentationData, ru: "Двойной тап в личных чатах", en: "Double Tap in Private Chats"),
+                title: extraString(presentationData, ru: "Двойной тап в личных чатах", en: "Double Tap in Private Chats"),
                 label: settings.personalChatDoubleTapAction.title(strings: presentationData.strings),
                 sectionId: self.section,
                 style: .blocks,
@@ -1232,13 +1232,13 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
         case .personalChatDoubleTapInfo:
             return ItemListTextItem(
                 presentationData: presentationData,
-                text: .plain(whiteGramString(presentationData, ru: "Выбирает действие, которое выполняется при двойном тапе по сообщению в личных чатах.", en: "Selects the action performed when double-tapping a message in private chats.")),
+                text: .plain(extraString(presentationData, ru: "Выбирает действие, которое выполняется при двойном тапе по сообщению в личных чатах.", en: "Selects the action performed when double-tapping a message in private chats.")),
                 sectionId: self.section
             )
         case .channelsHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: whiteGramString(presentationData, ru: "Каналы", en: "Channels"), sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: extraString(presentationData, ru: "Каналы", en: "Channels"), sectionId: self.section)
         case let .channelBottomPanel(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Нижняя панель", en: "Bottom Panel"), text: whiteGramString(presentationData, ru: "Показывает нижнюю панель в каналах: подписаться, отправить подарок и другие действия.", en: "Shows the bottom panel in channels: subscribe, send gift, and other actions."), value: settings.channelBottomPanel, enabled: true, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Нижняя панель", en: "Bottom Panel"), text: extraString(presentationData, ru: "Показывает нижнюю панель в каналах: подписаться, отправить подарок и другие действия.", en: "Shows the bottom panel in channels: subscribe, send gift, and other actions."), value: settings.channelBottomPanel, enabled: true, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.channelBottomPanel = value
@@ -1246,7 +1246,7 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
                 }, true)
             })
         case let .wideChannelPosts(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Широкие посты", en: "Wide Posts"), text: whiteGramString(presentationData, ru: "Расширяет посты каналов до ширины экрана с учетом системных отступов.", en: "Expands channel posts to screen width while respecting system insets."), value: settings.wideChannelPosts, enabled: true, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Широкие посты", en: "Wide Posts"), text: extraString(presentationData, ru: "Расширяет посты каналов до ширины экрана с учетом системных отступов.", en: "Expands channel posts to screen width while respecting system insets."), value: settings.wideChannelPosts, enabled: true, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.wideChannelPosts = value
@@ -1254,7 +1254,7 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
                 }, true)
             })
         case let .channelSwipeToNext(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Свайп между каналами", en: "Swipe Between Channels"), text: whiteGramString(presentationData, ru: "Открывает следующий непрочитанный канал свайпом вверх в конце текущего.", en: "Opens the next unread channel by swiping up at the end of the current one."), value: settings.channelSwipeToNext, enabled: true, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Свайп между каналами", en: "Swipe Between Channels"), text: extraString(presentationData, ru: "Открывает следующий непрочитанный канал свайпом вверх в конце текущего.", en: "Opens the next unread channel by swiping up at the end of the current one."), value: settings.channelSwipeToNext, enabled: true, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.channelSwipeToNext = value
@@ -1262,7 +1262,7 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
                 }, true)
             })
         case let .channelPostReactions(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Реакции на постах", en: "Post Reactions"), text: whiteGramString(presentationData, ru: "Показывает реакции под постами каналов. Ставить реакции можно в любом случае.", en: "Shows reactions below channel posts. You can still react either way."), value: settings.channelPostReactions, enabled: true, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Реакции на постах", en: "Post Reactions"), text: extraString(presentationData, ru: "Показывает реакции под постами каналов. Ставить реакции можно в любом случае.", en: "Shows reactions below channel posts. You can still react either way."), value: settings.channelPostReactions, enabled: true, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.channelPostReactions = value
@@ -1273,7 +1273,7 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
             return ItemListDisclosureItem(
                 presentationData: presentationData,
                 systemStyle: .glass,
-                title: whiteGramString(presentationData, ru: "Двойной тап по посту", en: "Double Tap on Posts"),
+                title: extraString(presentationData, ru: "Двойной тап по посту", en: "Double Tap on Posts"),
                 label: settings.channelPostDoubleTapAction.title(strings: presentationData.strings),
                 sectionId: self.section,
                 style: .blocks,
@@ -1283,13 +1283,13 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
         case .channelPostDoubleTapInfo:
             return ItemListTextItem(
                 presentationData: presentationData,
-                text: .plain(whiteGramString(presentationData, ru: "Выбирает действие, которое выполняется при двойном тапе по посту в канале.", en: "Selects the action performed when double-tapping a channel post.")),
+                text: .plain(extraString(presentationData, ru: "Выбирает действие, которое выполняется при двойном тапе по посту в канале.", en: "Selects the action performed when double-tapping a channel post.")),
                 sectionId: self.section
             )
         case .chatListHeader:
-            return ItemListSectionHeaderItem(presentationData: presentationData, text: whiteGramString(presentationData, ru: "Список чатов", en: "Chat List"), sectionId: self.section)
+            return ItemListSectionHeaderItem(presentationData: presentationData, text: extraString(presentationData, ru: "Список чатов", en: "Chat List"), sectionId: self.section)
         case let .compactChatList(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Компактный список чатов", en: "Compact Chat List"), text: whiteGramString(presentationData, ru: "Уменьшает строки списка и показывает превью в одну строку.", en: "Reduces row height and shows previews on one line."), value: settings.compactChatList, enabled: true, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Компактный список чатов", en: "Compact Chat List"), text: extraString(presentationData, ru: "Уменьшает строки списка и показывает превью в одну строку.", en: "Reduces row height and shows previews on one line."), value: settings.compactChatList, enabled: true, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.compactChatList = value
@@ -1297,7 +1297,7 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
                 }, false)
             })
         case let .chatSwipeOptions(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Свайп для опций чатов", en: "Swipe for Chat Options"), text: whiteGramString(presentationData, ru: "Показывает инструменты при свайпе по превью чата.", en: "Shows tools when swiping a chat preview."), value: settings.chatSwipeOptions, enabled: true, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Свайп для опций чатов", en: "Swipe for Chat Options"), text: extraString(presentationData, ru: "Показывает инструменты при свайпе по превью чата.", en: "Shows tools when swiping a chat preview."), value: settings.chatSwipeOptions, enabled: true, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.chatSwipeOptions = value
@@ -1308,7 +1308,7 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
                 }, true)
             })
         case let .chatSwipeDelete(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Свайп для удаления", en: "Swipe to Delete"), text: whiteGramString(presentationData, ru: "Показывает удаление чата среди действий свайпа.", en: "Shows delete among the chat swipe actions."), value: settings.chatSwipeDelete, enabled: settings.chatSwipeOptions, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Свайп для удаления", en: "Swipe to Delete"), text: extraString(presentationData, ru: "Показывает удаление чата среди действий свайпа.", en: "Shows delete among the chat swipe actions."), value: settings.chatSwipeDelete, enabled: settings.chatSwipeOptions, update: { value in
                 arguments.update({ current in
                     var current = current
                     current.chatSwipeDelete = value
@@ -1319,7 +1319,7 @@ private enum WhiteGramChatSettingsEntry: ItemListNodeEntry {
     }
 }
 
-private func whiteGramChatSettingsEntries(settings: WhiteGramChatSettings, appliedSettings: WhiteGramChatSettings, initialSettings: WhiteGramChatSettings) -> [WhiteGramChatSettingsEntry] {
+private func extraChatSettingsEntries(settings: ExtraChatSettings, appliedSettings: ExtraChatSettings, initialSettings: ExtraChatSettings) -> [ExtraChatSettingsEntry] {
     return [
         .chatListHeader,
         .compactChatList(settings),
@@ -1349,9 +1349,9 @@ private func whiteGramChatSettingsEntries(settings: WhiteGramChatSettings, appli
     ]
 }
 
-private func whiteGramChatSettingsController(context: AccountContext) -> ViewController {
-    let appliedSettings = WhiteGramChatSettings.effectiveCompactSettings
-    let initialSettings = WhiteGramChatSettings.current
+private func extraChatSettingsController(context: AccountContext) -> ViewController {
+    let appliedSettings = ExtraChatSettings.effectiveCompactSettings
+    let initialSettings = ExtraChatSettings.current
     let statePromise = ValuePromise(initialSettings, ignoreRepeated: true)
     let stateValue = Atomic(value: initialSettings)
     var pushController: ((ViewController) -> Void)?
@@ -1368,7 +1368,7 @@ private func whiteGramChatSettingsController(context: AccountContext) -> ViewCon
         timer.start()
     }
 
-    let updateSettings: (((WhiteGramChatSettings) -> WhiteGramChatSettings), Bool) -> Void = { f, notify in
+    let updateSettings: (((ExtraChatSettings) -> ExtraChatSettings), Bool) -> Void = { f, notify in
         let updated = stateValue.modify { current in
             let previous = current
             let updated = f(current)
@@ -1381,16 +1381,16 @@ private func whiteGramChatSettingsController(context: AccountContext) -> ViewCon
         statePromise.set(updated)
     }
 
-    let arguments = WhiteGramChatSettingsArguments(
+    let arguments = ExtraChatSettingsArguments(
         update: updateSettings,
         openVideoMessageCamera: {
-            pushController?(whiteGramVideoMessageCameraSettingsController(context: context, statePromise: statePromise, updateSettings: updateSettings))
+            pushController?(extraVideoMessageCameraSettingsController(context: context, statePromise: statePromise, updateSettings: updateSettings))
         },
         openPersonalChatDoubleTapAction: {
-            pushController?(whiteGramPersonalChatDoubleTapSettingsController(context: context, statePromise: statePromise, updateSettings: updateSettings))
+            pushController?(extraPersonalChatDoubleTapSettingsController(context: context, statePromise: statePromise, updateSettings: updateSettings))
         },
         openChannelPostDoubleTapAction: {
-            pushController?(whiteGramChannelPostDoubleTapSettingsController(context: context, statePromise: statePromise, updateSettings: updateSettings))
+            pushController?(extraChannelPostDoubleTapSettingsController(context: context, statePromise: statePromise, updateSettings: updateSettings))
         },
         restart: {
             exit(0)
@@ -1402,7 +1402,7 @@ private func whiteGramChatSettingsController(context: AccountContext) -> ViewCon
     |> map { presentationData, settings, showRestartWarning -> (ItemListControllerState, (ItemListNodeState, Any)) in
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text(whiteGramString(presentationData.strings, ru: "Настройки чатов", en: "Chat Settings")),
+            title: .text(extraString(presentationData.strings, ru: "Настройки чатов", en: "Chat Settings")),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back),
@@ -1410,9 +1410,9 @@ private func whiteGramChatSettingsController(context: AccountContext) -> ViewCon
         )
         let listState = ItemListNodeState(
             presentationData: ItemListPresentationData(presentationData),
-            entries: whiteGramChatSettingsEntries(settings: settings, appliedSettings: appliedSettings, initialSettings: initialSettings),
+            entries: extraChatSettingsEntries(settings: settings, appliedSettings: appliedSettings, initialSettings: initialSettings),
             style: .blocks,
-            footerItem: showRestartWarning && (settings.compactChatList != appliedSettings.compactChatList || settings.compactChatList != initialSettings.compactChatList) ? WhiteGramRestartFooterItem(presentationData: ItemListPresentationData(presentationData), action: arguments.restart) : nil,
+            footerItem: showRestartWarning && (settings.compactChatList != appliedSettings.compactChatList || settings.compactChatList != initialSettings.compactChatList) ? ExtraRestartFooterItem(presentationData: ItemListPresentationData(presentationData), action: arguments.restart) : nil,
             animateChanges: true
         )
 
@@ -1426,7 +1426,7 @@ private func whiteGramChatSettingsController(context: AccountContext) -> ViewCon
     return controller
 }
 
-private final class WhiteGramStickerSizeSliderItem: ListViewItem, ItemListItem {
+private final class ExtraStickerSizeSliderItem: ListViewItem, ItemListItem {
     let presentationData: ItemListPresentationData
     let value: Int32
     let showTime: Bool
@@ -1452,7 +1452,7 @@ private final class WhiteGramStickerSizeSliderItem: ListViewItem, ItemListItem {
 
     func nodeConfiguredForParams(async: @escaping (@escaping () -> Void) -> Void, params: ListViewItemLayoutParams, synchronousLoads: Bool, previousItem: ListViewItem?, nextItem: ListViewItem?, completion: @escaping (ListViewItemNode, @escaping () -> (Signal<Void, NoError>?, (ListViewItemApply) -> Void)) -> Void) {
         async {
-            let node = WhiteGramStickerSizeSliderItemNode()
+            let node = ExtraStickerSizeSliderItemNode()
             let (layout, apply) = node.asyncLayout()(self, params)
             node.contentSize = layout.contentSize
             node.insets = layout.insets
@@ -1468,7 +1468,7 @@ private final class WhiteGramStickerSizeSliderItem: ListViewItem, ItemListItem {
 
     func updateNode(async: @escaping (@escaping () -> Void) -> Void, node: @escaping () -> ListViewItemNode, params: ListViewItemLayoutParams, previousItem: ListViewItem?, nextItem: ListViewItem?, animation: ListViewItemUpdateAnimation, completion: @escaping (ListViewItemNodeLayout, @escaping (ListViewItemApply) -> Void) -> Void) {
         Queue.mainQueue().async {
-            if let nodeValue = node() as? WhiteGramStickerSizeSliderItemNode {
+            if let nodeValue = node() as? ExtraStickerSizeSliderItemNode {
                 let makeLayout = nodeValue.asyncLayout()
                 async {
                     let (layout, apply) = makeLayout(self, params)
@@ -1483,7 +1483,7 @@ private final class WhiteGramStickerSizeSliderItem: ListViewItem, ItemListItem {
     }
 }
 
-private final class WhiteGramStickerSizeSliderItemNode: ListViewItemNode {
+private final class ExtraStickerSizeSliderItemNode: ListViewItemNode {
     private let backgroundView = UIView()
     private let minLabel = UILabel()
     private let valueLabel = UILabel()
@@ -1548,7 +1548,7 @@ private final class WhiteGramStickerSizeSliderItemNode: ListViewItemNode {
         }
     }
 
-    func asyncLayout() -> (_ item: WhiteGramStickerSizeSliderItem, _ params: ListViewItemLayoutParams) -> (ListViewItemNodeLayout, (Bool) -> Void) {
+    func asyncLayout() -> (_ item: ExtraStickerSizeSliderItem, _ params: ListViewItemLayoutParams) -> (ListViewItemNodeLayout, (Bool) -> Void) {
         return { item, params in
             let contentSize = CGSize(width: params.width, height: 150.0)
             let insets = UIEdgeInsets(top: 0.0, left: 0.0, bottom: 0.0, right: 0.0)
@@ -1567,7 +1567,7 @@ private final class WhiteGramStickerSizeSliderItemNode: ListViewItemNode {
                 self.slider.minimumTrackTintColor = theme.list.itemAccentColor
                 self.slider.maximumTrackTintColor = theme.list.itemSecondaryTextColor.withAlphaComponent(0.24)
                 self.separatorView.backgroundColor = theme.list.itemBlocksSeparatorColor
-                self.showTimeLabel.text = whiteGramString(item.presentationData, ru: "Показывать время", en: "Show Time")
+                self.showTimeLabel.text = extraString(item.presentationData, ru: "Показывать время", en: "Show Time")
                 self.showTimeLabel.textColor = theme.list.itemPrimaryTextColor
                 self.updatedSize = item.updatedSize
                 self.updatedShowTime = item.updatedShowTime
@@ -1592,8 +1592,8 @@ private final class WhiteGramStickerSizeSliderItemNode: ListViewItemNode {
     }
 }
 
-private enum WhiteGramVideoMessageCameraSettingsEntry: ItemListNodeEntry {
-    case option(WhiteGramChatSettings.VideoMessageCamera, WhiteGramChatSettings.VideoMessageCamera)
+private enum ExtraVideoMessageCameraSettingsEntry: ItemListNodeEntry {
+    case option(ExtraChatSettings.VideoMessageCamera, ExtraChatSettings.VideoMessageCamera)
 
     var section: ItemListSectionId {
         return 0
@@ -1606,7 +1606,7 @@ private enum WhiteGramVideoMessageCameraSettingsEntry: ItemListNodeEntry {
         }
     }
 
-    static func ==(lhs: WhiteGramVideoMessageCameraSettingsEntry, rhs: WhiteGramVideoMessageCameraSettingsEntry) -> Bool {
+    static func ==(lhs: ExtraVideoMessageCameraSettingsEntry, rhs: ExtraVideoMessageCameraSettingsEntry) -> Bool {
         switch lhs {
         case let .option(lhsOption, lhsSelected):
             if case let .option(rhsOption, rhsSelected) = rhs {
@@ -1616,12 +1616,12 @@ private enum WhiteGramVideoMessageCameraSettingsEntry: ItemListNodeEntry {
         }
     }
 
-    static func <(lhs: WhiteGramVideoMessageCameraSettingsEntry, rhs: WhiteGramVideoMessageCameraSettingsEntry) -> Bool {
+    static func <(lhs: ExtraVideoMessageCameraSettingsEntry, rhs: ExtraVideoMessageCameraSettingsEntry) -> Bool {
         return lhs.stableId < rhs.stableId
     }
 
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
-        let arguments = arguments as! WhiteGramChatSettingsArguments
+        let arguments = arguments as! ExtraChatSettingsArguments
 
         switch self {
         case let .option(option, selectedOption):
@@ -1645,7 +1645,7 @@ private enum WhiteGramVideoMessageCameraSettingsEntry: ItemListNodeEntry {
     }
 }
 
-private extension WhiteGramChatSettings.VideoMessageCamera {
+private extension ExtraChatSettings.VideoMessageCamera {
     var stableId: Int32 {
         switch self {
         case .front:
@@ -1658,12 +1658,12 @@ private extension WhiteGramChatSettings.VideoMessageCamera {
     }
 }
 
-private func whiteGramVideoMessageCameraSettingsEntries(settings: WhiteGramChatSettings) -> [WhiteGramVideoMessageCameraSettingsEntry] {
-    return WhiteGramChatSettings.VideoMessageCamera.allCases.map { .option($0, settings.videoMessageCamera) }
+private func extraVideoMessageCameraSettingsEntries(settings: ExtraChatSettings) -> [ExtraVideoMessageCameraSettingsEntry] {
+    return ExtraChatSettings.VideoMessageCamera.allCases.map { .option($0, settings.videoMessageCamera) }
 }
 
-private func whiteGramVideoMessageCameraSettingsController(context: AccountContext, statePromise: ValuePromise<WhiteGramChatSettings>, updateSettings: @escaping (((WhiteGramChatSettings) -> WhiteGramChatSettings), Bool) -> Void) -> ViewController {
-    let arguments = WhiteGramChatSettingsArguments(
+private func extraVideoMessageCameraSettingsController(context: AccountContext, statePromise: ValuePromise<ExtraChatSettings>, updateSettings: @escaping (((ExtraChatSettings) -> ExtraChatSettings), Bool) -> Void) -> ViewController {
+    let arguments = ExtraChatSettingsArguments(
         update: updateSettings,
         openVideoMessageCamera: {},
         openPersonalChatDoubleTapAction: {},
@@ -1676,7 +1676,7 @@ private func whiteGramVideoMessageCameraSettingsController(context: AccountConte
     |> map { presentationData, settings -> (ItemListControllerState, (ItemListNodeState, Any)) in
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text(whiteGramString(presentationData.strings, ru: "Камера видеосообщения", en: "Video Message Camera")),
+            title: .text(extraString(presentationData.strings, ru: "Камера видеосообщения", en: "Video Message Camera")),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back),
@@ -1684,7 +1684,7 @@ private func whiteGramVideoMessageCameraSettingsController(context: AccountConte
         )
         let listState = ItemListNodeState(
             presentationData: ItemListPresentationData(presentationData),
-            entries: whiteGramVideoMessageCameraSettingsEntries(settings: settings),
+            entries: extraVideoMessageCameraSettingsEntries(settings: settings),
             style: .blocks,
             animateChanges: true
         )
@@ -1695,8 +1695,8 @@ private func whiteGramVideoMessageCameraSettingsController(context: AccountConte
     return ItemListController(context: context, state: signal)
 }
 
-private enum WhiteGramPersonalChatDoubleTapSettingsEntry: ItemListNodeEntry {
-    case option(WhiteGramChatSettings.PersonalChatDoubleTapAction, WhiteGramChatSettings.PersonalChatDoubleTapAction)
+private enum ExtraPersonalChatDoubleTapSettingsEntry: ItemListNodeEntry {
+    case option(ExtraChatSettings.PersonalChatDoubleTapAction, ExtraChatSettings.PersonalChatDoubleTapAction)
 
     var section: ItemListSectionId {
         return 0
@@ -1709,7 +1709,7 @@ private enum WhiteGramPersonalChatDoubleTapSettingsEntry: ItemListNodeEntry {
         }
     }
 
-    static func ==(lhs: WhiteGramPersonalChatDoubleTapSettingsEntry, rhs: WhiteGramPersonalChatDoubleTapSettingsEntry) -> Bool {
+    static func ==(lhs: ExtraPersonalChatDoubleTapSettingsEntry, rhs: ExtraPersonalChatDoubleTapSettingsEntry) -> Bool {
         switch lhs {
         case let .option(lhsOption, lhsSelected):
             if case let .option(rhsOption, rhsSelected) = rhs {
@@ -1719,12 +1719,12 @@ private enum WhiteGramPersonalChatDoubleTapSettingsEntry: ItemListNodeEntry {
         }
     }
 
-    static func <(lhs: WhiteGramPersonalChatDoubleTapSettingsEntry, rhs: WhiteGramPersonalChatDoubleTapSettingsEntry) -> Bool {
+    static func <(lhs: ExtraPersonalChatDoubleTapSettingsEntry, rhs: ExtraPersonalChatDoubleTapSettingsEntry) -> Bool {
         return lhs.stableId < rhs.stableId
     }
 
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
-        let arguments = arguments as! WhiteGramChatSettingsArguments
+        let arguments = arguments as! ExtraChatSettingsArguments
 
         switch self {
         case let .option(option, selectedOption):
@@ -1748,7 +1748,7 @@ private enum WhiteGramPersonalChatDoubleTapSettingsEntry: ItemListNodeEntry {
     }
 }
 
-private extension WhiteGramChatSettings.PersonalChatDoubleTapAction {
+private extension ExtraChatSettings.PersonalChatDoubleTapAction {
     var stableId: Int32 {
         switch self {
         case .savedMessages:
@@ -1773,12 +1773,12 @@ private extension WhiteGramChatSettings.PersonalChatDoubleTapAction {
     }
 }
 
-private func whiteGramPersonalChatDoubleTapSettingsEntries(settings: WhiteGramChatSettings) -> [WhiteGramPersonalChatDoubleTapSettingsEntry] {
-    return WhiteGramChatSettings.PersonalChatDoubleTapAction.allCases.map { .option($0, settings.personalChatDoubleTapAction) }
+private func extraPersonalChatDoubleTapSettingsEntries(settings: ExtraChatSettings) -> [ExtraPersonalChatDoubleTapSettingsEntry] {
+    return ExtraChatSettings.PersonalChatDoubleTapAction.allCases.map { .option($0, settings.personalChatDoubleTapAction) }
 }
 
-private func whiteGramPersonalChatDoubleTapSettingsController(context: AccountContext, statePromise: ValuePromise<WhiteGramChatSettings>, updateSettings: @escaping (((WhiteGramChatSettings) -> WhiteGramChatSettings), Bool) -> Void) -> ViewController {
-    let arguments = WhiteGramChatSettingsArguments(
+private func extraPersonalChatDoubleTapSettingsController(context: AccountContext, statePromise: ValuePromise<ExtraChatSettings>, updateSettings: @escaping (((ExtraChatSettings) -> ExtraChatSettings), Bool) -> Void) -> ViewController {
+    let arguments = ExtraChatSettingsArguments(
         update: updateSettings,
         openVideoMessageCamera: {},
         openPersonalChatDoubleTapAction: {},
@@ -1791,7 +1791,7 @@ private func whiteGramPersonalChatDoubleTapSettingsController(context: AccountCo
     |> map { presentationData, settings -> (ItemListControllerState, (ItemListNodeState, Any)) in
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text(whiteGramString(presentationData.strings, ru: "Двойной тап", en: "Double Tap")),
+            title: .text(extraString(presentationData.strings, ru: "Двойной тап", en: "Double Tap")),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back),
@@ -1799,7 +1799,7 @@ private func whiteGramPersonalChatDoubleTapSettingsController(context: AccountCo
         )
         let listState = ItemListNodeState(
             presentationData: ItemListPresentationData(presentationData),
-            entries: whiteGramPersonalChatDoubleTapSettingsEntries(settings: settings),
+            entries: extraPersonalChatDoubleTapSettingsEntries(settings: settings),
             style: .blocks,
             animateChanges: true
         )
@@ -1810,8 +1810,8 @@ private func whiteGramPersonalChatDoubleTapSettingsController(context: AccountCo
     return ItemListController(context: context, state: signal)
 }
 
-private enum WhiteGramChannelPostDoubleTapSettingsEntry: ItemListNodeEntry {
-    case option(WhiteGramChatSettings.ChannelPostDoubleTapAction, WhiteGramChatSettings.ChannelPostDoubleTapAction)
+private enum ExtraChannelPostDoubleTapSettingsEntry: ItemListNodeEntry {
+    case option(ExtraChatSettings.ChannelPostDoubleTapAction, ExtraChatSettings.ChannelPostDoubleTapAction)
 
     var section: ItemListSectionId {
         return 0
@@ -1824,7 +1824,7 @@ private enum WhiteGramChannelPostDoubleTapSettingsEntry: ItemListNodeEntry {
         }
     }
 
-    static func ==(lhs: WhiteGramChannelPostDoubleTapSettingsEntry, rhs: WhiteGramChannelPostDoubleTapSettingsEntry) -> Bool {
+    static func ==(lhs: ExtraChannelPostDoubleTapSettingsEntry, rhs: ExtraChannelPostDoubleTapSettingsEntry) -> Bool {
         switch lhs {
         case let .option(lhsOption, lhsSelected):
             if case let .option(rhsOption, rhsSelected) = rhs {
@@ -1834,12 +1834,12 @@ private enum WhiteGramChannelPostDoubleTapSettingsEntry: ItemListNodeEntry {
         }
     }
 
-    static func <(lhs: WhiteGramChannelPostDoubleTapSettingsEntry, rhs: WhiteGramChannelPostDoubleTapSettingsEntry) -> Bool {
+    static func <(lhs: ExtraChannelPostDoubleTapSettingsEntry, rhs: ExtraChannelPostDoubleTapSettingsEntry) -> Bool {
         return lhs.stableId < rhs.stableId
     }
 
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
-        let arguments = arguments as! WhiteGramChatSettingsArguments
+        let arguments = arguments as! ExtraChatSettingsArguments
 
         switch self {
         case let .option(option, selectedOption):
@@ -1863,7 +1863,7 @@ private enum WhiteGramChannelPostDoubleTapSettingsEntry: ItemListNodeEntry {
     }
 }
 
-private extension WhiteGramChatSettings.ChannelPostDoubleTapAction {
+private extension ExtraChatSettings.ChannelPostDoubleTapAction {
     var stableId: Int32 {
         switch self {
         case .savedMessages:
@@ -1884,12 +1884,12 @@ private extension WhiteGramChatSettings.ChannelPostDoubleTapAction {
     }
 }
 
-private func whiteGramChannelPostDoubleTapSettingsEntries(settings: WhiteGramChatSettings) -> [WhiteGramChannelPostDoubleTapSettingsEntry] {
-    return WhiteGramChatSettings.ChannelPostDoubleTapAction.allCases.map { .option($0, settings.channelPostDoubleTapAction) }
+private func extraChannelPostDoubleTapSettingsEntries(settings: ExtraChatSettings) -> [ExtraChannelPostDoubleTapSettingsEntry] {
+    return ExtraChatSettings.ChannelPostDoubleTapAction.allCases.map { .option($0, settings.channelPostDoubleTapAction) }
 }
 
-private func whiteGramChannelPostDoubleTapSettingsController(context: AccountContext, statePromise: ValuePromise<WhiteGramChatSettings>, updateSettings: @escaping (((WhiteGramChatSettings) -> WhiteGramChatSettings), Bool) -> Void) -> ViewController {
-    let arguments = WhiteGramChatSettingsArguments(
+private func extraChannelPostDoubleTapSettingsController(context: AccountContext, statePromise: ValuePromise<ExtraChatSettings>, updateSettings: @escaping (((ExtraChatSettings) -> ExtraChatSettings), Bool) -> Void) -> ViewController {
+    let arguments = ExtraChatSettingsArguments(
         update: updateSettings,
         openVideoMessageCamera: {},
         openPersonalChatDoubleTapAction: {},
@@ -1902,7 +1902,7 @@ private func whiteGramChannelPostDoubleTapSettingsController(context: AccountCon
     |> map { presentationData, settings -> (ItemListControllerState, (ItemListNodeState, Any)) in
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text(whiteGramString(presentationData.strings, ru: "Двойной тап", en: "Double Tap")),
+            title: .text(extraString(presentationData.strings, ru: "Двойной тап", en: "Double Tap")),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back),
@@ -1910,7 +1910,7 @@ private func whiteGramChannelPostDoubleTapSettingsController(context: AccountCon
         )
         let listState = ItemListNodeState(
             presentationData: ItemListPresentationData(presentationData),
-            entries: whiteGramChannelPostDoubleTapSettingsEntries(settings: settings),
+            entries: extraChannelPostDoubleTapSettingsEntries(settings: settings),
             style: .blocks,
             animateChanges: true
         )
@@ -1921,26 +1921,26 @@ private func whiteGramChannelPostDoubleTapSettingsController(context: AccountCon
     return ItemListController(context: context, state: signal)
 }
 
-private final class WhiteGramChatFoldersSettingsArguments {
-    let update: ((WhiteGramChatFolderSettings) -> WhiteGramChatFolderSettings) -> Void
+private final class ExtraChatFoldersSettingsArguments {
+    let update: ((ExtraChatFolderSettings) -> ExtraChatFolderSettings) -> Void
 
-    init(update: @escaping ((WhiteGramChatFolderSettings) -> WhiteGramChatFolderSettings) -> Void) {
+    init(update: @escaping ((ExtraChatFolderSettings) -> ExtraChatFolderSettings) -> Void) {
         self.update = update
     }
 }
 
-private enum WhiteGramChatFoldersSettingsSection: Int32 {
+private enum ExtraChatFoldersSettingsSection: Int32 {
     case options
 }
 
-private enum WhiteGramChatFoldersSettingsEntry: ItemListNodeEntry {
-    case disableFolders(WhiteGramChatFolderSettings)
-    case compactPanel(WhiteGramChatFolderSettings)
-    case foldersAtBottom(WhiteGramChatFolderSettings)
-    case openLastFolder(WhiteGramChatFolderSettings)
+private enum ExtraChatFoldersSettingsEntry: ItemListNodeEntry {
+    case disableFolders(ExtraChatFolderSettings)
+    case compactPanel(ExtraChatFolderSettings)
+    case foldersAtBottom(ExtraChatFolderSettings)
+    case openLastFolder(ExtraChatFolderSettings)
 
     var section: ItemListSectionId {
-        return WhiteGramChatFoldersSettingsSection.options.rawValue
+        return ExtraChatFoldersSettingsSection.options.rawValue
     }
 
     var stableId: Int32 {
@@ -1956,7 +1956,7 @@ private enum WhiteGramChatFoldersSettingsEntry: ItemListNodeEntry {
         }
     }
 
-    static func ==(lhs: WhiteGramChatFoldersSettingsEntry, rhs: WhiteGramChatFoldersSettingsEntry) -> Bool {
+    static func ==(lhs: ExtraChatFoldersSettingsEntry, rhs: ExtraChatFoldersSettingsEntry) -> Bool {
         switch lhs {
         case let .disableFolders(lhsSettings):
             if case let .disableFolders(rhsSettings) = rhs {
@@ -1981,12 +1981,12 @@ private enum WhiteGramChatFoldersSettingsEntry: ItemListNodeEntry {
         }
     }
 
-    static func <(lhs: WhiteGramChatFoldersSettingsEntry, rhs: WhiteGramChatFoldersSettingsEntry) -> Bool {
+    static func <(lhs: ExtraChatFoldersSettingsEntry, rhs: ExtraChatFoldersSettingsEntry) -> Bool {
         return lhs.stableId < rhs.stableId
     }
 
     func item(presentationData: ItemListPresentationData, arguments: Any) -> ListViewItem {
-        let arguments = arguments as! WhiteGramChatFoldersSettingsArguments
+        let arguments = arguments as! ExtraChatFoldersSettingsArguments
 
         func switchItem(title: String, text: String, value: Bool, enabled: Bool, update: @escaping (Bool) -> Void) -> ListViewItem {
             return ItemListSwitchItem(
@@ -2005,7 +2005,7 @@ private enum WhiteGramChatFoldersSettingsEntry: ItemListNodeEntry {
 
         switch self {
         case let .disableFolders(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Отключить папки", en: "Disable Folders"), text: whiteGramString(presentationData, ru: "Полностью скрывает панель папок, даже если папки существуют.", en: "Completely hides the folder bar, even if folders exist."), value: settings.disableFolders, enabled: true, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Отключить папки", en: "Disable Folders"), text: extraString(presentationData, ru: "Полностью скрывает панель папок, даже если папки существуют.", en: "Completely hides the folder bar, even if folders exist."), value: settings.disableFolders, enabled: true, update: { value in
                 arguments.update { current in
                     var current = current
                     current.disableFolders = value
@@ -2013,7 +2013,7 @@ private enum WhiteGramChatFoldersSettingsEntry: ItemListNodeEntry {
                 }
             })
         case let .compactPanel(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Компактная панель папок", en: "Compact Folder Bar"), text: whiteGramString(presentationData, ru: "Скрывает панель папок и переносит выбор папки в кнопку сверху.", en: "Hides the folder bar and moves folder selection into a button at the top."), value: settings.compactPanel, enabled: !settings.disableFolders && !settings.foldersAtBottom, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Компактная панель папок", en: "Compact Folder Bar"), text: extraString(presentationData, ru: "Скрывает панель папок и переносит выбор папки в кнопку сверху.", en: "Hides the folder bar and moves folder selection into a button at the top."), value: settings.compactPanel, enabled: !settings.disableFolders && !settings.foldersAtBottom, update: { value in
                 arguments.update { current in
                     var current = current
                     current.compactPanel = value
@@ -2024,7 +2024,7 @@ private enum WhiteGramChatFoldersSettingsEntry: ItemListNodeEntry {
                 }
             })
         case let .foldersAtBottom(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Папки снизу", en: "Folders at Bottom"), text: whiteGramString(presentationData, ru: "Переносит панель папок в нижнюю часть экрана.", en: "Moves the folder bar to the bottom of the screen."), value: settings.foldersAtBottom, enabled: !settings.disableFolders && !settings.compactPanel, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Папки снизу", en: "Folders at Bottom"), text: extraString(presentationData, ru: "Переносит панель папок в нижнюю часть экрана.", en: "Moves the folder bar to the bottom of the screen."), value: settings.foldersAtBottom, enabled: !settings.disableFolders && !settings.compactPanel, update: { value in
                 arguments.update { current in
                     var current = current
                     current.foldersAtBottom = value
@@ -2035,7 +2035,7 @@ private enum WhiteGramChatFoldersSettingsEntry: ItemListNodeEntry {
                 }
             })
         case let .openLastFolder(settings):
-            return switchItem(title: whiteGramString(presentationData, ru: "Открывать последнюю папку", en: "Open Last Folder"), text: whiteGramString(presentationData, ru: "После перезапуска открывает папку, которая была активна при закрытии приложения.", en: "After relaunching, opens the folder that was active when the app closed."), value: settings.openLastFolder, enabled: !settings.disableFolders, update: { value in
+            return switchItem(title: extraString(presentationData, ru: "Открывать последнюю папку", en: "Open Last Folder"), text: extraString(presentationData, ru: "После перезапуска открывает папку, которая была активна при закрытии приложения.", en: "After relaunching, opens the folder that was active when the app closed."), value: settings.openLastFolder, enabled: !settings.disableFolders, update: { value in
                 arguments.update { current in
                     var current = current
                     current.openLastFolder = value
@@ -2046,7 +2046,7 @@ private enum WhiteGramChatFoldersSettingsEntry: ItemListNodeEntry {
     }
 }
 
-private func whiteGramChatFoldersSettingsEntries(settings: WhiteGramChatFolderSettings) -> [WhiteGramChatFoldersSettingsEntry] {
+private func extraChatFoldersSettingsEntries(settings: ExtraChatFolderSettings) -> [ExtraChatFoldersSettingsEntry] {
     return [
         .disableFolders(settings),
         .compactPanel(settings),
@@ -2055,12 +2055,12 @@ private func whiteGramChatFoldersSettingsEntries(settings: WhiteGramChatFolderSe
     ]
 }
 
-private func whiteGramChatFoldersSettingsController(context: AccountContext) -> ViewController {
-    let initialSettings = WhiteGramChatFolderSettings.current
+private func extraChatFoldersSettingsController(context: AccountContext) -> ViewController {
+    let initialSettings = ExtraChatFolderSettings.current
     let statePromise = ValuePromise(initialSettings, ignoreRepeated: true)
     let stateValue = Atomic(value: initialSettings)
 
-    let arguments = WhiteGramChatFoldersSettingsArguments(update: { f in
+    let arguments = ExtraChatFoldersSettingsArguments(update: { f in
         let updated = stateValue.modify { current in
             let updated = f(current)
             updated.save()
@@ -2074,7 +2074,7 @@ private func whiteGramChatFoldersSettingsController(context: AccountContext) -> 
     |> map { presentationData, settings -> (ItemListControllerState, (ItemListNodeState, Any)) in
         let controllerState = ItemListControllerState(
             presentationData: ItemListPresentationData(presentationData),
-            title: .text(whiteGramString(presentationData.strings, ru: "Папки с чатами", en: "Chat Folders")),
+            title: .text(extraString(presentationData.strings, ru: "Папки с чатами", en: "Chat Folders")),
             leftNavigationButton: nil,
             rightNavigationButton: nil,
             backNavigationButton: ItemListBackButton(title: presentationData.strings.Common_Back),
@@ -2082,7 +2082,7 @@ private func whiteGramChatFoldersSettingsController(context: AccountContext) -> 
         )
         let listState = ItemListNodeState(
             presentationData: ItemListPresentationData(presentationData),
-            entries: whiteGramChatFoldersSettingsEntries(settings: settings),
+            entries: extraChatFoldersSettingsEntries(settings: settings),
             style: .blocks,
             animateChanges: true
         )

@@ -52,7 +52,7 @@ final class InstantPageWebEmbedNode: ASDisplayNode, InstantPageNode {
                 strongSelf.handleScriptMessage(message)
             }
         }, name: "performAction")
-        whiteGramInstallWebTrackerBlocker(into: userController)
+        extraInstallWebTrackerBlocker(into: userController)
         
         configuration.userContentController = userController
         

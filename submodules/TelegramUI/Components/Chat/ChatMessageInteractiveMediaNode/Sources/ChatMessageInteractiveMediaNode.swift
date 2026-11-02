@@ -1088,7 +1088,7 @@ public final class ChatMessageInteractiveMediaNode: ASDisplayNode, GalleryItemTr
                 }
             }
             
-            let useWideChannelPostLayout = whiteGramShouldUseWideChannelPostLayout(message: message)
+            let useWideChannelPostLayout = extraShouldUseWideChannelPostLayout(message: message)
 
             switch sizeCalculation {
                 case let .constrained(constrainedSize):

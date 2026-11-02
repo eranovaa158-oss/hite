@@ -1,6 +1,6 @@
 import Foundation
 
-public struct WhiteGramChatSettings: Codable, Equatable {
+public struct ExtraChatSettings: Codable, Equatable {
     public enum VideoMessageCamera: String, Codable, Equatable, CaseIterable {
         case front
         case back
@@ -94,10 +94,10 @@ public struct WhiteGramChatSettings: Codable, Equatable {
         }
     }
 
-    private static let storageKey = "WhiteGramChatSettings.v1"
+    private static let storageKey = "ExtraChatSettings.v1"
 
-    public static let updatedNotification = Notification.Name("WhiteGramChatSettingsUpdated")
-    public static let effectiveCompactSettings = WhiteGramChatSettings.load()
+    public static let updatedNotification = Notification.Name("ExtraChatSettingsUpdated")
+    public static let effectiveCompactSettings = ExtraChatSettings.load()
 
     public var compactPinnedMessagesPanel: Bool
     public var stickerSizePercent: Int32
@@ -120,7 +120,7 @@ public struct WhiteGramChatSettings: Codable, Equatable {
     public var chatSwipeOptions: Bool
     public var chatSwipeDelete: Bool
 
-    public static let defaultSettings = WhiteGramChatSettings(
+    public static let defaultSettings = ExtraChatSettings(
         compactPinnedMessagesPanel: false,
         stickerSizePercent: 100,
         showStickerTime: true,
@@ -234,18 +234,18 @@ public struct WhiteGramChatSettings: Codable, Equatable {
         self.chatSwipeDelete = try container.decodeIfPresent(Bool.self, forKey: .chatSwipeDelete) ?? Self.defaultSettings.chatSwipeDelete
     }
 
-    public static var current: WhiteGramChatSettings {
+    public static var current: ExtraChatSettings {
         return self.load()
     }
 
-    public static var effectiveChatListSettings: WhiteGramChatSettings {
+    public static var effectiveChatListSettings: ExtraChatSettings {
         var settings = self.current
         settings.compactChatList = self.effectiveCompactSettings.compactChatList
         return settings
     }
 
-    private static func load() -> WhiteGramChatSettings {
-        if let data = UserDefaults.standard.data(forKey: self.storageKey), let value = try? JSONDecoder().decode(WhiteGramChatSettings.self, from: data) {
+    private static func load() -> ExtraChatSettings {
+        if let data = UserDefaults.standard.data(forKey: self.storageKey), let value = try? JSONDecoder().decode(ExtraChatSettings.self, from: data) {
             return value
         }
         return .defaultSettings

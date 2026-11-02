@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import UIKit
 import Postbox
 import SwiftSignalKit
@@ -171,9 +171,9 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
     private var processedFeaturedFilters = false
 
     private let isReorderingTabsValue = ValuePromise<Bool>(false)
-    private var whiteGramChatFolderSettingsObserver: NSObjectProtocol?
-    private var whiteGramChatSettingsObserver: NSObjectProtocol?
-    private var whiteGramStorySettingsObserver: NSObjectProtocol?
+    private var extraChatFolderSettingsObserver: NSObjectProtocol?
+    private var extraChatSettingsObserver: NSObjectProtocol?
+    private var extraStorySettingsObserver: NSObjectProtocol?
     private var suppressChatListPeerSelectionUntil: Double = 0.0
     private var isProcessingChatListPeerSelection = false
 
@@ -306,19 +306,19 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
 
         self.tabBarItemContextActionType = .always
         self.automaticallyControlPresentationContextLayout = false
-        self.whiteGramChatFolderSettingsObserver = NotificationCenter.default.addObserver(forName: WhiteGramChatFolderSettings.updatedNotification, object: nil, queue: .main) { [weak self] _ in
+        self.extraChatFolderSettingsObserver = NotificationCenter.default.addObserver(forName: ExtraChatFolderSettings.updatedNotification, object: nil, queue: .main) { [weak self] _ in
             guard let self else {
                 return
             }
             self.requestLayout(transition: .animated(duration: 0.35, curve: .spring))
         }
-        self.whiteGramChatSettingsObserver = NotificationCenter.default.addObserver(forName: WhiteGramChatSettings.updatedNotification, object: nil, queue: .main) { [weak self] _ in
+        self.extraChatSettingsObserver = NotificationCenter.default.addObserver(forName: ExtraChatSettings.updatedNotification, object: nil, queue: .main) { [weak self] _ in
             guard let self else {
                 return
             }
             self.requestLayout(transition: .animated(duration: 0.35, curve: .spring))
         }
-        self.whiteGramStorySettingsObserver = NotificationCenter.default.addObserver(forName: WhiteGramStorySettings.updatedNotification, object: nil, queue: .main) { [weak self] _ in
+        self.extraStorySettingsObserver = NotificationCenter.default.addObserver(forName: ExtraStorySettings.updatedNotification, object: nil, queue: .main) { [weak self] _ in
             guard let self else {
                 return
             }
@@ -853,14 +853,14 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
             disposable.dispose()
         }
         self.globalControlPanelsContextStateDisposable?.dispose()
-        if let whiteGramChatFolderSettingsObserver = self.whiteGramChatFolderSettingsObserver {
-            NotificationCenter.default.removeObserver(whiteGramChatFolderSettingsObserver)
+        if let extraChatFolderSettingsObserver = self.extraChatFolderSettingsObserver {
+            NotificationCenter.default.removeObserver(extraChatFolderSettingsObserver)
         }
-        if let whiteGramChatSettingsObserver = self.whiteGramChatSettingsObserver {
-            NotificationCenter.default.removeObserver(whiteGramChatSettingsObserver)
+        if let extraChatSettingsObserver = self.extraChatSettingsObserver {
+            NotificationCenter.default.removeObserver(extraChatSettingsObserver)
         }
-        if let whiteGramStorySettingsObserver = self.whiteGramStorySettingsObserver {
-            NotificationCenter.default.removeObserver(whiteGramStorySettingsObserver)
+        if let extraStorySettingsObserver = self.extraStorySettingsObserver {
+            NotificationCenter.default.removeObserver(extraStorySettingsObserver)
         }
     }
 
@@ -3230,7 +3230,7 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
                 guard let self else {
                     return
                 }
-                if WhiteGramStorySettings.current.disableStoryRecordingSwipe {
+                if ExtraStorySettings.current.disableStoryRecordingSwipe {
                     return
                 }
                 self.openStoryCamera(fromList: true, gesturePullOffset: offset)
@@ -3240,8 +3240,8 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
                 guard let self else {
                     return
                 }
-                let whiteGramStorySettings = WhiteGramStorySettings.current
-                if whiteGramStorySettings.disableStories {
+                let extraStorySettings = ExtraStorySettings.current
+                if extraStorySettings.disableStories {
                     return
                 }
 
@@ -3260,7 +3260,7 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
                         }
 
                         if openCamera {
-                            if whiteGramStorySettings.disableStoryRecording {
+                            if extraStorySettings.disableStoryRecording {
                                 return
                             }
                             self.openStoryCamera(fromList: true)
@@ -3293,11 +3293,11 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
 
                     var items: [ContextMenuItem] = []
 
-                    let whiteGramStorySettings = WhiteGramStorySettings.current
-                    let canRecordWhiteGramStory = !whiteGramStorySettings.disableStories && !whiteGramStorySettings.disableStoryRecording
+                    let extraStorySettings = ExtraStorySettings.current
+                    let canRecordExtraStory = !extraStorySettings.disableStories && !extraStorySettings.disableStoryRecording
 
                     if peer.id == self.context.account.peerId {
-                        if canRecordWhiteGramStory {
+                        if canRecordExtraStory {
                             items.append(.action(ContextMenuActionItem(text: self.presentationData.strings.StoryFeed_ContextAddStory, icon: { theme in
                                 return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Add"), color: theme.contextMenu.primaryColor)
                             }, action: { [weak self] c, _ in
@@ -3335,7 +3335,7 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
                             })
                         })))
                     } else if case let .channel(channel) = peer {
-                        if canRecordWhiteGramStory && channel.hasPermission(.postStories) {
+                        if canRecordExtraStory && channel.hasPermission(.postStories) {
                             items.append(.action(ContextMenuActionItem(text: self.presentationData.strings.StoryFeed_ContextAddStory, icon: { theme in
                                 return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Add"), color: theme.contextMenu.primaryColor)
                             }, action: { [weak self] c, _ in
@@ -4142,8 +4142,8 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
             }
 
             var selectedEntryId = !strongSelf.initializedFilters ? firstItemEntryId : strongSelf.chatListDisplayNode.mainContainerNode.currentItemFilter
-            let whiteGramFolderSettings = WhiteGramChatFolderSettings.current
-            if !strongSelf.initializedFilters, whiteGramFolderSettings.openLastFolder, let lastFolderId = whiteGramFolderSettings.lastFolderId {
+            let extraFolderSettings = ExtraChatFolderSettings.current
+            if !strongSelf.initializedFilters, extraFolderSettings.openLastFolder, let lastFolderId = extraFolderSettings.lastFolderId {
                 selectedEntryId = .filter(lastFolderId)
             }
             var resetCurrentEntry = false
@@ -4225,15 +4225,15 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
     }
 
     func selectTab(id: ChatListFilterTabEntryId, switchToChatsIfNeeded: Bool = true) {
-        var whiteGramFolderSettings = WhiteGramChatFolderSettings.current
-        if whiteGramFolderSettings.openLastFolder {
+        var extraFolderSettings = ExtraChatFolderSettings.current
+        if extraFolderSettings.openLastFolder {
             switch id {
             case .all:
-                whiteGramFolderSettings.lastFolderId = nil
+                extraFolderSettings.lastFolderId = nil
             case let .filter(id):
-                whiteGramFolderSettings.lastFolderId = id
+                extraFolderSettings.lastFolderId = id
             }
-            whiteGramFolderSettings.save(notify: false)
+            extraFolderSettings.save(notify: false)
         }
 
         if self.parent == nil, switchToChatsIfNeeded {
@@ -4453,9 +4453,9 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
         self.openStories(peerId: peerId, completion: { _ in })
     }
 
-    public func openStories(peerId: EnginePeer.Id, completion: @escaping (StoryContainerScreen) -> Void = { _ in }, skipWhiteGramConfirmation: Bool = false) {
-        let whiteGramStorySettings = WhiteGramStorySettings.current
-        if whiteGramStorySettings.disableStories {
+    public func openStories(peerId: EnginePeer.Id, completion: @escaping (StoryContainerScreen) -> Void = { _ in }, skipExtraConfirmation: Bool = false) {
+        let extraStorySettings = ExtraStorySettings.current
+        if extraStorySettings.disableStories {
             return
         }
 
@@ -4571,7 +4571,7 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
             }
         }
 
-        if !skipWhiteGramConfirmation && whiteGramStorySettings.askBeforeViewingStories && peerId != self.context.account.peerId {
+        if !skipExtraConfirmation && extraStorySettings.askBeforeViewingStories && peerId != self.context.account.peerId {
             self.present(textAlertController(context: self.context, title: "Просмотр истории", text: "Владелец истории увидит, что вы просмотрели историю.", actions: [
                 TextAlertAction(type: .genericAction, title: self.presentationData.strings.Common_Cancel, action: {
                 }),
@@ -4579,7 +4579,7 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
                     guard let self else {
                         return
                     }
-                    self.openStories(peerId: peerId, completion: completion, skipWhiteGramConfirmation: true)
+                    self.openStories(peerId: peerId, completion: completion, skipExtraConfirmation: true)
                 })
             ]), in: .window(.root))
             return
@@ -6405,7 +6405,7 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
         self.donePressed()
     }
 
-    fileprivate func openWhiteGramFolderMenu(sourceView: UIView) {
+    fileprivate func openExtraFolderMenu(sourceView: UIView) {
         guard let tabContainerData = self.tabContainerData else {
             return
         }

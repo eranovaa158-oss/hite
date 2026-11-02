@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import UIKit
 import AsyncDisplayKit
 import SwiftSignalKit
@@ -106,10 +106,10 @@ open class TabBarControllerImpl: ViewController, TabBarController {
     private var strings: PresentationStrings
     private var presentationData: PresentationData
 
-    public var whiteGramTabSettings: WhiteGramTabSettings = .current {
+    public var extraTabSettings: ExtraTabSettings = .current {
         didSet {
-            if self.whiteGramTabSettings != oldValue, self.isNodeLoaded {
-                self.tabBarControllerNode.whiteGramTabSettings = self.whiteGramTabSettings
+            if self.extraTabSettings != oldValue, self.isNodeLoaded {
+                self.tabBarControllerNode.extraTabSettings = self.extraTabSettings
                 self.updateLayout(transition: .immediate)
             }
         }
@@ -190,7 +190,7 @@ open class TabBarControllerImpl: ViewController, TabBarController {
     }
 
     override open func loadDisplayNode() {
-        self.displayNode = TabBarControllerNode(presentationData: self.presentationData, whiteGramTabSettings: self.whiteGramTabSettings, itemSelected: { [weak self] index, longTap, itemNodes in
+        self.displayNode = TabBarControllerNode(presentationData: self.presentationData, extraTabSettings: self.extraTabSettings, itemSelected: { [weak self] index, longTap, itemNodes in
             if let strongSelf = self {
                 guard index >= 0 && index < strongSelf.controllers.count else {
                     return

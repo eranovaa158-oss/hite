@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import UIKit
 import SwiftSignalKit
 import ContextUI
@@ -136,7 +136,7 @@ func chatContextMenuItems(context: AccountContext, peerId: EnginePeer.Id, promoI
                     }
 
                     var items: [ContextMenuItem] = []
-                    let whiteGramContextMenuSettings = WhiteGramContextMenuSettings.current
+                    let extraContextMenuSettings = ExtraContextMenuSettings.current
 
                     if case let .search(search) = source {
                         switch search {
@@ -224,7 +224,7 @@ func chatContextMenuItems(context: AccountContext, peerId: EnginePeer.Id, promoI
                         var hasRemoveFromFolder = false
                         if canEditFolderMembership, case let .chatList(currentFilter) = source {
                             if let currentFilter = currentFilter, case let .filter(id, title, emoticon, data) = currentFilter {
-                                if whiteGramContextMenuSettings.isEnabled(.chatListFolder) {
+                                if extraContextMenuSettings.isEnabled(.chatListFolder) {
                                     items.append(.action(ContextMenuActionItem(text: strings.ChatList_Context_RemoveFromFolder, icon: { theme in generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/RemoveFromFolder"), color: theme.contextMenu.primaryColor) }, action: { c, _ in
                                     let _ = (context.engine.peers.updateChatListFiltersInteractively { filters in
                                         var filters = filters
@@ -391,7 +391,7 @@ func chatContextMenuItems(context: AccountContext, peerId: EnginePeer.Id, promoI
                         
                         let archiveEnabled = !isSavedMessages && peerId != EnginePeer.Id(namespace: Namespaces.Peer.CloudUser, id: EnginePeer.Id.Id._internalFromInt64Value(777000)) && peerId == context.account.peerId
                         if let group = peerGroup {
-                            if archiveEnabled && whiteGramContextMenuSettings.isEnabled(.chatListArchive) {
+                            if archiveEnabled && extraContextMenuSettings.isEnabled(.chatListArchive) {
                                 let isArchived = group == .archive
                                 items.append(.action(ContextMenuActionItem(text: isArchived ? strings.ChatList_Context_Unarchive : strings.ChatList_Context_Archive, icon: { theme in generateTintedImage(image: UIImage(bundleImageName: isArchived ? "Chat/Context Menu/Unarchive" : "Chat/Context Menu/Archive"), color: theme.contextMenu.primaryColor) }, action: { _, f in
                                     if isArchived {
@@ -587,7 +587,7 @@ func chatContextMenuItems(context: AccountContext, peerId: EnginePeer.Id, promoI
                                     }
                                 }
                                 
-                                if peerGroup != nil && whiteGramContextMenuSettings.isEnabled(.chatListDelete) {
+                                if peerGroup != nil && extraContextMenuSettings.isEnabled(.chatListDelete) {
                                     if !items.isEmpty {
                                         if !addedSeparator {
                                             items.append(.separator)

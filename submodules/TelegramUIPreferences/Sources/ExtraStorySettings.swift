@@ -1,9 +1,9 @@
 import Foundation
 
-public struct WhiteGramStorySettings: Codable, Equatable {
-    private static let storageKey = "WhiteGramStorySettings.v1"
+public struct ExtraStorySettings: Codable, Equatable {
+    private static let storageKey = "ExtraStorySettings.v1"
 
-    public static let updatedNotification = Notification.Name("WhiteGramStorySettingsUpdated")
+    public static let updatedNotification = Notification.Name("ExtraStorySettingsUpdated")
 
     public var disableStories: Bool
     public var hideStories: Bool
@@ -11,7 +11,7 @@ public struct WhiteGramStorySettings: Codable, Equatable {
     public var disableStoryRecordingSwipe: Bool
     public var askBeforeViewingStories: Bool
 
-    public static let defaultSettings = WhiteGramStorySettings(
+    public static let defaultSettings = ExtraStorySettings(
         disableStories: false,
         hideStories: false,
         disableStoryRecording: false,
@@ -19,8 +19,8 @@ public struct WhiteGramStorySettings: Codable, Equatable {
         askBeforeViewingStories: false
     )
 
-    public static var current: WhiteGramStorySettings {
-        if let data = UserDefaults.standard.data(forKey: self.storageKey), let value = try? JSONDecoder().decode(WhiteGramStorySettings.self, from: data) {
+    public static var current: ExtraStorySettings {
+        if let data = UserDefaults.standard.data(forKey: self.storageKey), let value = try? JSONDecoder().decode(ExtraStorySettings.self, from: data) {
             return value
         }
         return .defaultSettings

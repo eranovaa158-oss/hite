@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import LottieSettings
 import UniformTypeIdentifiers
 import UIKit
@@ -773,7 +773,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
         
         super.init()
         
-        self.whiteGramChatSettingsObserver = NotificationCenter.default.addObserver(forName: WhiteGramChatSettings.updatedNotification, object: nil, queue: .main) { [weak self] _ in
+        self.extraChatSettingsObserver = NotificationCenter.default.addObserver(forName: ExtraChatSettings.updatedNotification, object: nil, queue: .main) { [weak self] _ in
             guard let self, let presentationInterfaceState = self.presentationInterfaceState, let (width, leftInset, rightInset, bottomInset, additionalSideInsets, maxHeight, maxOverlayHeight, metrics, isSecondary, isMediaInputExpanded) = self.validLayout else {
                 return
             }
@@ -922,7 +922,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
         
         self.mediaActionButtons.micButton.beginRecording = { [weak self] in
             if let strongSelf = self, let presentationInterfaceState = strongSelf.presentationInterfaceState, let interfaceInteraction = strongSelf.interfaceInteraction {
-                guard WhiteGramChatSettings.current.voiceMessageButton else {
+                guard ExtraChatSettings.current.voiceMessageButton else {
                     return
                 }
                 let isVideo: Bool
@@ -1107,8 +1107,8 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
         self.statusDisposable.dispose()
         self.tooltipController?.dismiss()
         self.currentEmojiSuggestion?.disposable.dispose()
-        if let whiteGramChatSettingsObserver = self.whiteGramChatSettingsObserver {
-            NotificationCenter.default.removeObserver(whiteGramChatSettingsObserver)
+        if let extraChatSettingsObserver = self.extraChatSettingsObserver {
+            NotificationCenter.default.removeObserver(extraChatSettingsObserver)
         }
     }
     
@@ -2558,7 +2558,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
             sendActionButtonsSize = self.sendActionButtons.updateLayout(size: CGSize(width: 40.0, height: minimalHeight), isMediaInputExpanded: isMediaInputExpanded, showTitle: showTitle, currentMessageEffectId: presentationInterfaceState.interfaceState.sendMessageEffect, transition: transition, interfaceState: presentationInterfaceState)
             mediaActionButtonsSize = self.mediaActionButtons.updateLayout(size: CGSize(width: 40.0, height: 40.0), isMediaInputExpanded: isMediaInputExpanded, showTitle: false, currentMessageEffectId: presentationInterfaceState.interfaceState.sendMessageEffect, transition: transition, interfaceState: presentationInterfaceState)
         }
-        let voiceMessageButtonEnabled = WhiteGramChatSettings.current.voiceMessageButton
+        let voiceMessageButtonEnabled = ExtraChatSettings.current.voiceMessageButton
         
         var starReactionButtonSize: CGSize?
         if let customRightAction = self.customRightAction, case let .stars(count, isFilled, action, longPressAction) = customRightAction {
@@ -3722,7 +3722,7 @@ public class ChatTextInputPanelNode: ChatInputPanelNode, ASEditableTextNodeDeleg
         }
                 
         let mediaInputDisabled: Bool
-        if !WhiteGramChatSettings.current.voiceMessageButton {
+        if !ExtraChatSettings.current.voiceMessageButton {
             mediaInputDisabled = true
         } else if !interfaceState.voiceMessagesAvailable {
             mediaInputDisabled = true

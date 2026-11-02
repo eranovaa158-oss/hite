@@ -286,7 +286,7 @@ final class BrowserWebContent: UIView, BrowserContent, WKNavigationDelegate, WKU
             configuration.userContentController = contentController
             configuration.applicationNameForUserAgent = computedUserAgent()
         }
-        whiteGramInstallWebTrackerBlocker(into: configuration.userContentController)
+        extraInstallWebTrackerBlocker(into: configuration.userContentController)
         
         if context.sharedContext.immediateExperimentalUISettings.enablePWA {
             if #available(iOS 17.0, *) {

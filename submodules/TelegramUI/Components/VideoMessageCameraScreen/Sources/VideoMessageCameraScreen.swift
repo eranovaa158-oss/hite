@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import LottieSettings
 import UIKit
 import AVFoundation
@@ -120,8 +120,8 @@ struct CameraState: Equatable {
     }
 }
 
-private func whiteGramSetBuiltInMicrophoneIfNeeded() {
-    guard WhiteGramOtherSettings.current.forceDeviceMicrophone else {
+private func extraSetBuiltInMicrophoneIfNeeded() {
+    guard ExtraOtherSettings.current.forceDeviceMicrophone else {
         return
     }
     guard let input = AVAudioSession.sharedInstance().availableInputs?.first(where: { $0.portType == .builtInMic }) else {
@@ -2230,7 +2230,7 @@ public class VideoMessageCameraScreen: ViewController {
       
         self.audioSessionDisposable = self.context.sharedContext.mediaManager.audioSession.push(audioSessionType: audioSessionType, activate: { [weak self] _ in
             if let self {
-                whiteGramSetBuiltInMicrophoneIfNeeded()
+                extraSetBuiltInMicrophoneIfNeeded()
                 Queue.mainQueue().after(0.05) {
                     self.node.setupCamera()
                 }

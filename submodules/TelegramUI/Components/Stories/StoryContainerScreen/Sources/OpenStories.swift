@@ -11,7 +11,7 @@ import PresentationDataUtils
 
 public extension StoryContainerScreen {
     static func openArchivedStories(context: AccountContext, parentController: ViewController, avatarNode: AvatarNode, sharedProgressDisposable: MetaDisposable?) {
-        if WhiteGramStorySettings.current.disableStories {
+        if ExtraStorySettings.current.disableStories {
             return
         }
         let storyContent = StoryContentContextImpl(context: context, isHidden: true, focusedPeerId: nil, singlePeer: false)
@@ -94,7 +94,7 @@ public extension StoryContainerScreen {
     }
     
     static func openPeerStories(context: AccountContext, peerId: EnginePeer.Id, parentController: ViewController, avatarNode: AvatarNode?, sharedProgressDisposable: MetaDisposable? = nil) {
-        if WhiteGramStorySettings.current.disableStories {
+        if ExtraStorySettings.current.disableStories {
             return
         }
         return openPeerStoriesCustom(
@@ -181,13 +181,13 @@ public extension StoryContainerScreen {
         setFocusedItem: @escaping (Signal<EngineStoryId?, NoError>) -> Void,
         setProgress: @escaping (Signal<Never, NoError>) -> Void,
         completion: @escaping (StoryContainerScreen) -> Void = { _ in },
-        skipWhiteGramConfirmation: Bool = false
+        skipExtraConfirmation: Bool = false
     ) {
-        let whiteGramStorySettings = WhiteGramStorySettings.current
-        if whiteGramStorySettings.disableStories {
+        let extraStorySettings = ExtraStorySettings.current
+        if extraStorySettings.disableStories {
             return
         }
-        if !skipWhiteGramConfirmation && whiteGramStorySettings.askBeforeViewingStories && peerId != context.account.peerId {
+        if !skipExtraConfirmation && extraStorySettings.askBeforeViewingStories && peerId != context.account.peerId {
             let presentationData = context.sharedContext.currentPresentationData.with { $0 }
             parentController.present(textAlertController(context: context, title: "Просмотр истории", text: "Владелец истории увидит, что вы просмотрели историю.", actions: [
                 TextAlertAction(type: .genericAction, title: presentationData.strings.Common_Cancel, action: {
@@ -206,7 +206,7 @@ public extension StoryContainerScreen {
                         setFocusedItem: setFocusedItem,
                         setProgress: setProgress,
                         completion: completion,
-                        skipWhiteGramConfirmation: true
+                        skipExtraConfirmation: true
                     )
                 })
             ]), in: .window(.root))

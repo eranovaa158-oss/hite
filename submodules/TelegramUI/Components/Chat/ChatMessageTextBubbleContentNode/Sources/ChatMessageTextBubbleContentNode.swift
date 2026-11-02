@@ -30,7 +30,7 @@ import ShimmeringMask
 import StreamingTextReveal
 import WalletContext
 
-private func whiteGramNormalizedInterfaceLanguageCode(_ code: String) -> String {
+private func extraNormalizedInterfaceLanguageCode(_ code: String) -> String {
     var code = code
     let rawSuffix = "-raw"
     if code.hasSuffix(rawSuffix) {
@@ -300,7 +300,7 @@ public class ChatMessageTextBubbleContentNode: ChatMessageBubbleContentNode {
                 var dateReplies = 0
                 var starsCount: Int64?
                 var dateReactionsAndPeers = mergedMessageReactionsAndPeers(accountPeerId: item.context.account.peerId, accountPeer: item.associatedData.accountPeer, message: item.topMessage)
-                if item.message.isRestricted(platform: "ios", contentSettings: item.context.currentContentSettings.with { $0 }) || whiteGramShouldHideChannelPostReactions(message: item.topMessage) {
+                if item.message.isRestricted(platform: "ios", contentSettings: item.context.currentContentSettings.with { $0 }) || extraShouldHideChannelPostReactions(message: item.topMessage) {
                     dateReactionsAndPeers = ([], [])
                 }
                 
@@ -427,7 +427,7 @@ public class ChatMessageTextBubbleContentNode: ChatMessageBubbleContentNode {
                         messageEntities = updatingMedia.entities?.entities ?? []
                     }
                     
-                    let translateToLanguage = item.associatedData.translateToLanguage ?? (item.controllerInteraction.expandedTranslationMessageStableIds.contains(item.message.stableId) ? whiteGramNormalizedInterfaceLanguageCode(item.presentationData.strings.baseLanguageCode) : nil)
+                    let translateToLanguage = item.associatedData.translateToLanguage ?? (item.controllerInteraction.expandedTranslationMessageStableIds.contains(item.message.stableId) ? extraNormalizedInterfaceLanguageCode(item.presentationData.strings.baseLanguageCode) : nil)
                     var isSummarized = false
                     if item.controllerInteraction.summarizedMessageIds.contains(item.message.id) {
                         isSummarized = true

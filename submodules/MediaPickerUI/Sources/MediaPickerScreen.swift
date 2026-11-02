@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import LottieSettings
 import UIKit
 import Display
@@ -774,14 +774,14 @@ public final class MediaPickerScreenImpl: ViewController, MediaPickerScreen, Att
                         strongSelf.dismissInput()
                         strongSelf.controller?.openCamera?(strongSelf.cameraView)
 
-                        if !enableAnimations && !WhiteGramOtherSettings.current.hideCameraPreviewInGallery {
+                        if !enableAnimations && !ExtraOtherSettings.current.hideCameraPreviewInGallery {
                             cameraView?.startPreview()
                         }
                     }
                 }
                 self.cameraView = cameraView
 
-                if enableAnimations && !whiteGramOtherSettings.hideCameraPreviewInGallery {
+                if enableAnimations && !extraOtherSettings.hideCameraPreviewInGallery {
                     cameraView.startPreview()
                 }
 
@@ -832,7 +832,7 @@ public final class MediaPickerScreenImpl: ViewController, MediaPickerScreen, Att
                         secondaryPreviewView: nil
                     )
                     self.modernCamera = camera
-                    if !WhiteGramOtherSettings.current.hideCameraPreviewInGallery {
+                    if !ExtraOtherSettings.current.hideCameraPreviewInGallery {
                         camera.startCapture()
                     }
                 }
@@ -955,7 +955,7 @@ public final class MediaPickerScreenImpl: ViewController, MediaPickerScreen, Att
 
         func updateIsCameraActive() {
             let isCameraActive = !self.isSuspended && !self.hasGallery && self.isCameraPreviewVisible
-            if WhiteGramOtherSettings.current.hideCameraPreviewInGallery {
+            if ExtraOtherSettings.current.hideCameraPreviewInGallery {
                 if let cameraView = self.cameraView {
                     cameraView.pausePreview()
                 } else if let camera = self.modernCamera, let cameraView = self.modernCameraView {
@@ -984,7 +984,7 @@ public final class MediaPickerScreenImpl: ViewController, MediaPickerScreen, Att
         }
 
         private func updateCameraPreviewCover(cameraRect: CGRect? = nil, transition: ContainedViewLayoutTransition = .immediate) {
-            let shouldCover = WhiteGramOtherSettings.current.hideCameraPreviewInGallery && (self.cameraView != nil || self.modernCameraView != nil)
+            let shouldCover = ExtraOtherSettings.current.hideCameraPreviewInGallery && (self.cameraView != nil || self.modernCameraView != nil)
             if !shouldCover {
                 if let cameraPreviewCoverView = self.cameraPreviewCoverView {
                     self.cameraPreviewCoverView = nil
@@ -2048,7 +2048,7 @@ public final class MediaPickerScreenImpl: ViewController, MediaPickerScreen, Att
             if case let .noAccess(cameraAccess) = self.state {
                 self.controller?.titleView.isEnabled = false
 
-                var hasCamera = cameraAccess == .authorized && !WhiteGramOtherSettings.current.hideCameraInGallery
+                var hasCamera = cameraAccess == .authorized && !ExtraOtherSettings.current.hideCameraInGallery
                 var story = false
                 if let subject = self.controller?.subject {
                     if case .assets(_, .story) = subject {

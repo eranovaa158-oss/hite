@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import UIKit
 import AsyncDisplayKit
 import Display
@@ -418,7 +418,7 @@ public class ChatMessageStickerItemNode: ChatMessageItemView {
             
             let layoutConstants = chatMessageItemLayoutConstants(layoutConstants, params: params, presentationData: item.presentationData)
             let incoming = item.content.effectivelyIncoming(item.context.account.peerId, associatedData: item.associatedData)
-            let stickerScale = CGFloat(WhiteGramChatSettings.current.stickerSizePercent) / 100.0
+            let stickerScale = CGFloat(ExtraChatSettings.current.stickerSizePercent) / 100.0
             let displaySize = baseDisplaySize
             var imageSize: CGSize = CGSize(width: 100.0, height: 100.0)
             if let telegramFile = telegramFile {
@@ -443,7 +443,7 @@ public class ChatMessageStickerItemNode: ChatMessageItemView {
             if isStandaloneStickerLikeContent {
                 imageSize = CGSize(width: max(1.0, floor(imageSize.width * stickerScale)), height: max(1.0, floor(imageSize.height * stickerScale)))
             }
-            let stickerIsDisabled = isStandaloneStickerLikeContent && WhiteGramChatSettings.current.stickerSizePercent == 0
+            let stickerIsDisabled = isStandaloneStickerLikeContent && ExtraChatSettings.current.stickerSizePercent == 0
 
             let avatarInset: CGFloat
             var hasAvatar = false
@@ -604,7 +604,7 @@ public class ChatMessageStickerItemNode: ChatMessageItemView {
             var dateReplies = 0
             var starsCount: Int64?
             var dateReactionsAndPeers = mergedMessageReactionsAndPeers(accountPeerId: item.context.account.peerId, accountPeer: item.associatedData.accountPeer, message: item.message)
-            if item.message.isRestricted(platform: "ios", contentSettings: item.context.currentContentSettings.with { $0 }) || whiteGramShouldHideChannelPostReactions(message: item.message) {
+            if item.message.isRestricted(platform: "ios", contentSettings: item.context.currentContentSettings.with { $0 }) || extraShouldHideChannelPostReactions(message: item.message) {
                 dateReactionsAndPeers = ([], [])
             }
             for attribute in item.message.attributes {
@@ -1477,11 +1477,11 @@ public class ChatMessageStickerItemNode: ChatMessageItemView {
         switch recognizer.state {
         case .ended:
             if let (gesture, location) = recognizer.lastRecognizedGestureAndLocation {
-                if case .doubleTap = gesture, let item = self.item, self.performWhiteGramChannelPostDoubleTapAction(item: item, subFrame: self.imageNode.frame) {
+                if case .doubleTap = gesture, let item = self.item, self.performExtraChannelPostDoubleTapAction(item: item, subFrame: self.imageNode.frame) {
                     self.containerNode.cancelGesture()
                     return
                 }
-                if case .doubleTap = gesture, let item = self.item, self.performWhiteGramPersonalDoubleTapAction(item: item, subFrame: self.imageNode.frame) {
+                if case .doubleTap = gesture, let item = self.item, self.performExtraPersonalDoubleTapAction(item: item, subFrame: self.imageNode.frame) {
                     self.containerNode.cancelGesture()
                     return
                 }
@@ -1513,11 +1513,11 @@ public class ChatMessageStickerItemNode: ChatMessageItemView {
         }
     }
 
-    private func performWhiteGramChannelPostDoubleTapAction(item: ChatMessageItem, subFrame: CGRect) -> Bool {
+    private func performExtraChannelPostDoubleTapAction(item: ChatMessageItem, subFrame: CGRect) -> Bool {
         guard let channel = item.message.peers[item.message.id.peerId] as? TelegramChannel, case .broadcast = channel.info else {
             return false
         }
-        let settings = WhiteGramChatSettings.current
+        let settings = ExtraChatSettings.current
         switch settings.channelPostDoubleTapAction {
         case .savedMessages:
             if !item.controllerInteraction.performPersonalChatDoubleTapAction(item.message, .savedMessages) {
@@ -1543,12 +1543,12 @@ public class ChatMessageStickerItemNode: ChatMessageItemView {
         return true
     }
     
-    private func performWhiteGramPersonalDoubleTapAction(item: ChatMessageItem, subFrame: CGRect) -> Bool {
+    private func performExtraPersonalDoubleTapAction(item: ChatMessageItem, subFrame: CGRect) -> Bool {
         let chatPeerId = item.chatLocation.peerId ?? item.message.id.peerId
         guard chatPeerId.namespace == Namespaces.Peer.CloudUser || chatPeerId.namespace == Namespaces.Peer.SecretChat else {
             return false
         }
-        let settings = WhiteGramChatSettings.current
+        let settings = ExtraChatSettings.current
         switch settings.personalChatDoubleTapAction {
         case .savedMessages, .edit, .pin:
             if !item.controllerInteraction.performPersonalChatDoubleTapAction(item.message, settings.personalChatDoubleTapAction) {
@@ -1707,7 +1707,7 @@ public class ChatMessageStickerItemNode: ChatMessageItemView {
     
     private var playedSwipeToReplyHaptic = false
     @objc private func swipeToReplyGesture(_ recognizer: ChatSwipeToReplyRecognizer) {
-        guard WhiteGramChatSettings.current.swipeToReply else {
+        guard ExtraChatSettings.current.swipeToReply else {
             return
         }
         var offset: CGFloat = 0.0

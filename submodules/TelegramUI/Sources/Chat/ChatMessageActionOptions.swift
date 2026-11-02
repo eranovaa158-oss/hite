@@ -249,8 +249,8 @@ private func chatForwardOptions(selfController: ChatControllerImpl, sourceView: 
         if hasPaid {
             canHideNames = false
         }
-        let whiteGramContextMenuSettings = WhiteGramContextMenuSettings.current
-        if !whiteGramContextMenuSettings.isEnabled(.privateHideName) && !whiteGramContextMenuSettings.isEnabled(.channelHideName) {
+        let extraContextMenuSettings = ExtraContextMenuSettings.current
+        if !extraContextMenuSettings.isEnabled(.privateHideName) && !extraContextMenuSettings.isEnabled(.channelHideName) {
             canHideNames = false
         }
         let hideNames = forwardOptions.hideNames

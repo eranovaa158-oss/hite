@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import UIKit
 import Display
 import ComponentFlow
@@ -603,8 +603,8 @@ public final class StoryPeerListComponent: Component {
             if !self.ignoreScrolling {
                 self.updateScrolling(transition: .immediate)
                 
-                let disableWhiteGramStoryRecordingSwipe = WhiteGramStorySettings.current.disableStories || WhiteGramStorySettings.current.disableStoryRecording || WhiteGramStorySettings.current.disableStoryRecordingSwipe
-                let willComposeOnRelease = !disableWhiteGramStoryRecordingSwipe && scrollView.contentOffset.x <= -70.0
+                let disableExtraStoryRecordingSwipe = ExtraStorySettings.current.disableStories || ExtraStorySettings.current.disableStoryRecording || ExtraStorySettings.current.disableStoryRecordingSwipe
+                let willComposeOnRelease = !disableExtraStoryRecordingSwipe && scrollView.contentOffset.x <= -70.0
                 if self.willComposeOnRelease != willComposeOnRelease {
                     self.willComposeOnRelease = willComposeOnRelease
                     
@@ -615,7 +615,7 @@ public final class StoryPeerListComponent: Component {
                     }
                 }
                 
-                if !disableWhiteGramStoryRecordingSwipe && scrollView.isScrollEnabled && scrollView.isTracking, scrollView.contentOffset.x <= -85.0 {
+                if !disableExtraStoryRecordingSwipe && scrollView.isScrollEnabled && scrollView.isTracking, scrollView.contentOffset.x <= -85.0 {
                     scrollView.isScrollEnabled = false
                     scrollView.panGestureRecognizer.isEnabled = false
                     scrollView.panGestureRecognizer.isEnabled = true
@@ -636,8 +636,8 @@ public final class StoryPeerListComponent: Component {
                 
         public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
             if !self.ignoreScrolling {
-                let disableWhiteGramStoryRecordingSwipe = WhiteGramStorySettings.current.disableStories || WhiteGramStorySettings.current.disableStoryRecording || WhiteGramStorySettings.current.disableStoryRecordingSwipe
-                if !disableWhiteGramStoryRecordingSwipe && scrollView.isScrollEnabled && scrollView.contentOffset.x <= -70.0 {
+                let disableExtraStoryRecordingSwipe = ExtraStorySettings.current.disableStories || ExtraStorySettings.current.disableStoryRecording || ExtraStorySettings.current.disableStoryRecordingSwipe
+                if !disableExtraStoryRecordingSwipe && scrollView.isScrollEnabled && scrollView.contentOffset.x <= -70.0 {
                     scrollView.isScrollEnabled = false
                     scrollView.panGestureRecognizer.isEnabled = false
                     scrollView.panGestureRecognizer.isEnabled = true
@@ -1209,8 +1209,8 @@ public final class StoryPeerListComponent: Component {
                 unseenCount = itemSet.unseenCount
                 
                 var composeContentOffset: CGFloat?
-                let disableWhiteGramStoryRecordingSwipe = WhiteGramStorySettings.current.disableStories || WhiteGramStorySettings.current.disableStoryRecording || WhiteGramStorySettings.current.disableStoryRecordingSwipe
-                if !disableWhiteGramStoryRecordingSwipe && peer.id == component.context.account.peerId && collapsedState.sideAlphaFraction == 1.0 && self.scrollView.contentOffset.x < 0.0 {
+                let disableExtraStoryRecordingSwipe = ExtraStorySettings.current.disableStories || ExtraStorySettings.current.disableStoryRecording || ExtraStorySettings.current.disableStoryRecordingSwipe
+                if !disableExtraStoryRecordingSwipe && peer.id == component.context.account.peerId && collapsedState.sideAlphaFraction == 1.0 && self.scrollView.contentOffset.x < 0.0 {
                     composeContentOffset = self.scrollView.contentOffset.x * -1.0
                 }
                 

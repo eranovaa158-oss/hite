@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import UIKit
 import Display
 import AsyncDisplayKit
@@ -120,7 +120,7 @@ final class ChatPinnedMessageTitlePanelNode: ChatTitleAccessoryPanelNode, UIGest
             }
         }
 
-        return WhiteGramChatSettings.current.compactPinnedMessagesPanel
+        return ExtraChatSettings.current.compactPinnedMessagesPanel
     }
     
     private var captureProtected: Bool = false {

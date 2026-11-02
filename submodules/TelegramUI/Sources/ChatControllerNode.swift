@@ -1708,7 +1708,7 @@ class ChatControllerNode: ASDisplayNode, ASScrollViewDelegate {
                     theme: self.chatPresentationInterfaceState.theme,
                     strings: self.chatPresentationInterfaceState.strings,
                     info: TranslateHeaderPanelComponent.Info(
-                        isPremium: self.chatPresentationInterfaceState.isPremium || WhiteGramOtherSettings.current.autoTranslate || WhiteGramOtherSettings.current.translationButton,
+                        isPremium: self.chatPresentationInterfaceState.isPremium || ExtraOtherSettings.current.autoTranslate || ExtraOtherSettings.current.translationButton,
                         isActive: translationState.isEnabled,
                         fromLang: translationState.fromLang,
                         toLang: translationState.toLang,

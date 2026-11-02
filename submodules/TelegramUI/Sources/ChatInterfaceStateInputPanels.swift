@@ -110,7 +110,7 @@ func inputPanelForChatPresentationIntefaceState(_ chatPresentationInterfaceState
         return (nil, nil)
     }
 
-    if let channel = chatPresentationInterfaceState.renderedPeer?.peer as? TelegramChannel, case .broadcast = channel.info, !WhiteGramChatSettings.current.channelBottomPanel, chatPresentationInterfaceState.interfaceState.editMessage == nil, !channel.hasPermission(.sendSomething) {
+    if let channel = chatPresentationInterfaceState.renderedPeer?.peer as? TelegramChannel, case .broadcast = channel.info, !ExtraChatSettings.current.channelBottomPanel, chatPresentationInterfaceState.interfaceState.editMessage == nil, !channel.hasPermission(.sendSomething) {
         return (nil, nil)
     }
     

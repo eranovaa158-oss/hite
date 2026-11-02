@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import UIKit
 import TelegramCore
 import AsyncDisplayKit
@@ -653,7 +653,7 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
 
             if chatPresentationInterfaceState.copyProtectionEnabled {
             } else {
-                if WhiteGramContextMenuSettings.current.isEnabled(.channelCopy) {
+                if ExtraContextMenuSettings.current.isEnabled(.channelCopy) {
                     actions.append(.action(ContextMenuActionItem(text: chatPresentationInterfaceState.strings.Conversation_ContextMenuCopy, icon: { theme in
                     return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Copy"), color: theme.actionSheet.primaryTextColor)
                     }, action: { _, f in
@@ -694,7 +694,7 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
                 }
             }
 
-            if let author = message.author, let addressName = author.addressName, WhiteGramContextMenuSettings.current.isEnabled(.channelCopyLink) {
+            if let author = message.author, let addressName = author.addressName, ExtraContextMenuSettings.current.isEnabled(.channelCopyLink) {
                 let link = "https://t.me/\(addressName)"
                 actions.append(.action(ContextMenuActionItem(text: chatPresentationInterfaceState.strings.Conversation_ContextMenuCopyLink, icon: { theme in
                     return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Link"), color: theme.actionSheet.primaryTextColor)
@@ -1007,7 +1007,7 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
                 }
             }
             if !isPremiumSticker || chatPresentationInterfaceState.isPremium {
-                appendWhiteGramMessageAction(fromPrivate: .privateAddToFavorites, channel: .channelSaveToFavorites, item: .action(ContextMenuActionItem(text: starStatus ? chatPresentationInterfaceState.strings.Stickers_RemoveFromFavorites : chatPresentationInterfaceState.strings.Stickers_AddToFavorites, icon: { theme in
+                appendExtraMessageAction(fromPrivate: .privateAddToFavorites, channel: .channelSaveToFavorites, item: .action(ContextMenuActionItem(text: starStatus ? chatPresentationInterfaceState.strings.Stickers_RemoveFromFavorites : chatPresentationInterfaceState.strings.Stickers_AddToFavorites, icon: { theme in
                     return generateTintedImage(image: starStatus ? UIImage(bundleImageName: "Chat/Context Menu/Unfave") : UIImage(bundleImageName: "Chat/Context Menu/Fave"), color: theme.actionSheet.primaryTextColor)
                 }, action: { _, f in
                     interfaceInteraction.toggleMessageStickerStarred(messages[0].id)
@@ -1353,7 +1353,7 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
         if !messageText.isEmpty || richMessageMarkdown != nil || (resourceAvailable && isImage) || diceEmoji != nil {
             if !isExpired {
                 if !isPoll {
-                    if !isCopyProtected && isWhiteGramMessageContextOptionEnabled(fromPrivate: .privateCopy, channel: .channelCopy) {
+                    if !isCopyProtected && isExtraMessageContextOptionEnabled(fromPrivate: .privateCopy, channel: .channelCopy) {
                         actions.append(.action(ContextMenuActionItem(text: chatPresentationInterfaceState.strings.Conversation_ContextMenuCopy, icon: { theme in
                             return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Copy"), color: theme.actionSheet.primaryTextColor)
                         }, action: { _, f in
@@ -1635,7 +1635,7 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
             }
         }
 
-        if data.canEdit && !isPinnedMessages && !isMigrated && isWhiteGramMessageContextOptionEnabled(fromPrivate: .privateEdit, channel: .channelEdit) {
+        if data.canEdit && !isPinnedMessages && !isMigrated && isExtraMessageContextOptionEnabled(fromPrivate: .privateEdit, channel: .channelEdit) {
             actions.append(.action(ContextMenuActionItem(text: chatPresentationInterfaceState.strings.Conversation_MessageDialogEdit, icon: { theme in
                 return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Edit"), color: theme.actionSheet.primaryTextColor)
             }, action: { c, f in
@@ -1808,7 +1808,7 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
             }
         }
 
-        if let message = messages.first, message.id.namespace == Namespaces.Message.Cloud, let channel = message.peers[message.id.peerId] as? TelegramChannel, !channel.isMonoForum, !(message.media.first is TelegramMediaAction), !isReplyThreadHead, !isMigrated, whiteGramContextMenuSettings.isEnabled(.channelCopyLink) {
+        if let message = messages.first, message.id.namespace == Namespaces.Message.Cloud, let channel = message.peers[message.id.peerId] as? TelegramChannel, !channel.isMonoForum, !(message.media.first is TelegramMediaAction), !isReplyThreadHead, !isMigrated, extraContextMenuSettings.isEnabled(.channelCopyLink) {
             actions.append(.action(ContextMenuActionItem(text: chatPresentationInterfaceState.strings.Conversation_ContextMenuCopyLink, icon: { theme in
                 return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Link"), color: theme.actionSheet.primaryTextColor)
             }, action: { _, f in
@@ -1947,7 +1947,7 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
             })))
         }
 
-        if data.messageActions.options.contains(.forward), isWhiteGramMessageContextOptionEnabled(fromPrivate: .privateForward, channel: .channelForward) {
+        if data.messageActions.options.contains(.forward), isExtraMessageContextOptionEnabled(fromPrivate: .privateForward, channel: .channelForward) {
             if !isCopyProtected {
                 actions.append(.action(ContextMenuActionItem(text: chatPresentationInterfaceState.strings.Conversation_ContextMenuForward, icon: { theme in
                     return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Forward"), color: theme.actionSheet.primaryTextColor)
@@ -1958,7 +1958,7 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
             }
         }
 
-        if data.messageActions.options.contains(.report), (!isChannelMessageContext || whiteGramContextMenuSettings.isEnabled(.channelReport)) {
+        if data.messageActions.options.contains(.report), (!isChannelMessageContext || extraContextMenuSettings.isEnabled(.channelReport)) {
             actions.append(.action(ContextMenuActionItem(text: chatPresentationInterfaceState.strings.Conversation_ContextMenuReport, icon: { theme in
                 return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Report"), color: theme.actionSheet.primaryTextColor)
             }, action: { controller, f in
@@ -2086,7 +2086,7 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
                 }
             }
 
-            let deleteOptionEnabled = isWhiteGramMessageContextOptionEnabled(fromPrivate: title == chatPresentationInterfaceState.strings.Chat_MessageContextMenu_Remove ? .privateRemove : .privateDelete, channel: title == chatPresentationInterfaceState.strings.Chat_MessageContextMenu_Remove ? .channelRemove : .channelDelete)
+            let deleteOptionEnabled = isExtraMessageContextOptionEnabled(fromPrivate: title == chatPresentationInterfaceState.strings.Chat_MessageContextMenu_Remove ? .privateRemove : .privateDelete, channel: title == chatPresentationInterfaceState.strings.Chat_MessageContextMenu_Remove ? .channelRemove : .channelDelete)
             if deleteOptionEnabled, let autoremoveDeadline = autoremoveDeadline, !isEditing, !isSending {
                 actions.append(.custom(ChatDeleteMessageContextItem(timestamp: Double(autoremoveDeadline), action: { controller, f in
                     if isEditing {

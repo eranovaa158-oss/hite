@@ -37,8 +37,8 @@ import StoryContainerScreen
 
 let videoRedColor = UIColor(rgb: 0xff3b30)
 
-private func whiteGramSetBuiltInMicrophoneIfNeeded() {
-    guard WhiteGramOtherSettings.current.forceDeviceMicrophone else {
+private func extraSetBuiltInMicrophoneIfNeeded() {
+    guard ExtraOtherSettings.current.forceDeviceMicrophone else {
         return
     }
     guard let input = AVAudioSession.sharedInstance().availableInputs?.first(where: { $0.portType == .builtInMic }) else {
@@ -4450,7 +4450,7 @@ public class CameraScreenImpl: ViewController, CameraScreen {
     
     private func requestAudioSession() {
         self.audioSessionDisposable = self.context.sharedContext.mediaManager.audioSession.push(audioSessionType: .record(speaker: false, video: true, withOthers: true), activate: { _ in
-            whiteGramSetBuiltInMicrophoneIfNeeded()
+            extraSetBuiltInMicrophoneIfNeeded()
             if #available(iOS 13.0, *) {
                 try? AVAudioSession.sharedInstance().setAllowHapticsAndSystemSoundsDuringRecording(true)
             }

@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import UIKit
 import AsyncDisplayKit
 import Display
@@ -59,9 +59,9 @@ final class TabBarControllerNode: ASDisplayNode {
     private var presentationData: PresentationData
     private var theme: PresentationTheme
     private var strings: PresentationStrings
-    var whiteGramTabSettings: WhiteGramTabSettings {
+    var extraTabSettings: ExtraTabSettings {
         didSet {
-            if self.whiteGramTabSettings != oldValue {
+            if self.extraTabSettings != oldValue {
                 self.requestUpdate()
             }
         }
@@ -124,11 +124,11 @@ final class TabBarControllerNode: ASDisplayNode {
         return nil
     }
 
-    init(presentationData: PresentationData, whiteGramTabSettings: WhiteGramTabSettings, itemSelected: @escaping (Int, Bool, [ASDisplayNode]) -> Void, itemHasDoubleTapAction: @escaping (Int) -> Bool, itemDoubleTapped: @escaping (Int) -> Void, contextAction: @escaping (Int, ContextExtractedContentContainingView, ContextGesture) -> Void, swipeAction: @escaping (Int, TabBarItemSwipeDirection) -> Void, toolbarActionSelected: @escaping (ToolbarActionOption) -> Void, disabledPressed: @escaping () -> Void, activateSearch: @escaping () -> Void, deactivateSearch: @escaping () -> Void, compactSearchAction: @escaping () -> Void) {
+    init(presentationData: PresentationData, extraTabSettings: ExtraTabSettings, itemSelected: @escaping (Int, Bool, [ASDisplayNode]) -> Void, itemHasDoubleTapAction: @escaping (Int) -> Bool, itemDoubleTapped: @escaping (Int) -> Void, contextAction: @escaping (Int, ContextExtractedContentContainingView, ContextGesture) -> Void, swipeAction: @escaping (Int, TabBarItemSwipeDirection) -> Void, toolbarActionSelected: @escaping (ToolbarActionOption) -> Void, disabledPressed: @escaping () -> Void, activateSearch: @escaping () -> Void, deactivateSearch: @escaping () -> Void, compactSearchAction: @escaping () -> Void) {
         self.presentationData = presentationData
         self.theme = presentationData.theme
         self.strings = presentationData.strings
-        self.whiteGramTabSettings = whiteGramTabSettings
+        self.extraTabSettings = extraTabSettings
         self.itemSelected = itemSelected
         self.itemHasDoubleTapAction = itemHasDoubleTapAction
         self.itemDoubleTapped = itemDoubleTapped
@@ -295,10 +295,10 @@ final class TabBarControllerNode: ASDisplayNode {
             }
         }
 
-        let whiteGramTabSettings = self.whiteGramTabSettings
-        let isCompactSearchActive = whiteGramTabSettings.compactPanel && params.currentControllerSearchState?.isActive == true
-        let whiteGramFolderSettings = WhiteGramChatFolderSettings.current
-        if whiteGramTabSettings.compactPanel && !whiteGramFolderSettings.disableFolders && whiteGramFolderSettings.foldersAtBottom && !whiteGramFolderSettings.compactPanel {
+        let extraTabSettings = self.extraTabSettings
+        let isCompactSearchActive = extraTabSettings.compactPanel && params.currentControllerSearchState?.isActive == true
+        let extraFolderSettings = ExtraChatFolderSettings.current
+        if extraTabSettings.compactPanel && !extraFolderSettings.disableFolders && extraFolderSettings.foldersAtBottom && !extraFolderSettings.compactPanel {
             tabBarBottomInset = max(70.0, panelsBottomInset + 40.0)
         }
         var sideInset: CGFloat = 12.0

@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import UIKit
 import Display
 import AccountContext
@@ -33,7 +33,7 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
     guard let data = data else {
         return []
     }
-    let whiteGramContextMenuSettings = WhiteGramContextMenuSettings.current
+    let extraContextMenuSettings = ExtraContextMenuSettings.current
     
     var items: [SettingsSection: [PeerInfoScreenItem]] = [:]
     for section in SettingsSection.allCases {
@@ -197,8 +197,8 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
         items[.proxy]!.append(PeerInfoScreenDisclosureItem(id: 0, label: .text(proxyType), text: connectionTitle, icon: PresentationResourcesSettings.proxy, action: {
             interaction.openSettings(.proxy)
         }))
-        items[.proxy]!.append(PeerInfoScreenDisclosureItem(id: 1, text: "WhiteGram", icon: PresentationResourcesSettings.whiteGram, action: {
-            interaction.openSettings(.whiteGram)
+        items[.proxy]!.append(PeerInfoScreenDisclosureItem(id: 1, text: "Extra", icon: PresentationResourcesSettings.extra, action: {
+            interaction.openSettings(.extra)
         }))
     }
     
@@ -232,12 +232,12 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
         }
     }
     
-    if whiteGramContextMenuSettings.isEnabled(.settingsSavedMessages) {
+    if extraContextMenuSettings.isEnabled(.settingsSavedMessages) {
         items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 1, text: presentationData.strings.Settings_SavedMessages, icon: PresentationResourcesSettings.savedMessages, action: {
             interaction.openSettings(.savedMessages)
         }))
     }
-    if whiteGramContextMenuSettings.isEnabled(.settingsRecentCalls) {
+    if extraContextMenuSettings.isEnabled(.settingsRecentCalls) {
         items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 2, text: presentationData.strings.CallSettings_RecentCalls, icon: PresentationResourcesSettings.recentCalls, action: {
             interaction.openSettings(.recentCalls)
         }))
@@ -254,12 +254,12 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
         devicesLabel = ""
     }
     
-    if whiteGramContextMenuSettings.isEnabled(.settingsDevices) {
+    if extraContextMenuSettings.isEnabled(.settingsDevices) {
         items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 3, label: .text(devicesLabel), text: presentationData.strings.Settings_Devices, icon: PresentationResourcesSettings.devices, action: {
             interaction.openSettings(.devices)
         }))
     }
-    if whiteGramContextMenuSettings.isEnabled(.settingsChatFolders) {
+    if extraContextMenuSettings.isEnabled(.settingsChatFolders) {
         items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 4, text: presentationData.strings.Settings_ChatFolders, icon: PresentationResourcesSettings.chatFolders, action: {
             interaction.openSettings(.chatFolders)
         }))
@@ -295,13 +295,13 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
     
     let premiumConfiguration = PremiumConfiguration.with(appConfiguration: context.currentAppConfiguration.with { $0 })
     let isPremiumDisabled = premiumConfiguration.isPremiumDisabled
-    if whiteGramContextMenuSettings.isEnabled(.settingsPremium) && (!isPremiumDisabled || context.isPremium) {
+    if extraContextMenuSettings.isEnabled(.settingsPremium) && (!isPremiumDisabled || context.isPremium) {
         items[.payment]!.append(PeerInfoScreenDisclosureItem(id: 100, label: .text(""), text: presentationData.strings.Settings_Premium, icon: PresentationResourcesSettings.premium, action: {
             interaction.openSettings(.premium)
         }))
     }
     if let starsState = data.starsState {
-        if whiteGramContextMenuSettings.isEnabled(.settingsStars) && (!isPremiumDisabled || abs(starsState.balance.value) > 0) {
+        if extraContextMenuSettings.isEnabled(.settingsStars) && (!isPremiumDisabled || abs(starsState.balance.value) > 0) {
             let balanceText: NSAttributedString
             if abs(starsState.balance.value) > 0 {
                 let formattedLabel = formatStarsAmountText(starsState.balance, dateTimeFormat: presentationData.dateTimeFormat)
@@ -340,7 +340,7 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
         }))
     }
     if let starsState = data.starsState {
-        if whiteGramContextMenuSettings.isEnabled(.settingsGifts) && (!isPremiumDisabled || starsState.balance > StarsAmount.zero) {
+        if extraContextMenuSettings.isEnabled(.settingsGifts) && (!isPremiumDisabled || starsState.balance > StarsAmount.zero) {
             items[.payment]!.append(PeerInfoScreenDisclosureItem(id: 105, label: .text(""), text: presentationData.strings.Settings_SendGift, icon: PresentationResourcesSettings.premiumGift, action: {
                 interaction.openSettings(.premiumGift)
             }))
@@ -360,17 +360,17 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
         }
     }
     
-    if whiteGramContextMenuSettings.isEnabled(.settingsHelp) {
+    if extraContextMenuSettings.isEnabled(.settingsHelp) {
         items[.support]!.append(PeerInfoScreenDisclosureItem(id: 0, text: presentationData.strings.Settings_Support, icon: PresentationResourcesSettings.support, action: {
             interaction.openSettings(.support)
         }))
     }
-    if whiteGramContextMenuSettings.isEnabled(.settingsFAQ) {
+    if extraContextMenuSettings.isEnabled(.settingsFAQ) {
         items[.support]!.append(PeerInfoScreenDisclosureItem(id: 1, text: presentationData.strings.Settings_FAQ, icon: PresentationResourcesSettings.faq, action: {
             interaction.openSettings(.faq)
         }))
     }
-    if whiteGramContextMenuSettings.isEnabled(.settingsFeatures) {
+    if extraContextMenuSettings.isEnabled(.settingsFeatures) {
         items[.support]!.append(PeerInfoScreenDisclosureItem(id: 2, text: presentationData.strings.Settings_Tips, icon: PresentationResourcesSettings.tips, action: {
             interaction.openSettings(.tips)
         }))

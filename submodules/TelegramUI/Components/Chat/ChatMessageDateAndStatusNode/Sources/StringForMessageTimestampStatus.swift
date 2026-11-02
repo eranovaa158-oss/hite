@@ -1,4 +1,4 @@
-﻿import Foundation
+import Foundation
 import TelegramCore
 import TelegramPresentationData
 import TelegramUIPreferences
@@ -107,9 +107,9 @@ public func stringForMessageTimestampStatus(
         timestamp = orignalDate
     }
     
-    let whiteGramSettings = WhiteGramChatSettings.current
-    var dateText = whiteGramSettings.hideMessageTimestamp ? "" : stringForMessageTimestamp(timestamp: timestamp, dateTimeFormat: dateTimeFormat, withSeconds: whiteGramSettings.showSecondsInMessageTimestamp)
-    if !whiteGramSettings.hideMessageTimestamp && timestamp == scheduleWhenOnlineTimestamp {
+    let extraSettings = ExtraChatSettings.current
+    var dateText = extraSettings.hideMessageTimestamp ? "" : stringForMessageTimestamp(timestamp: timestamp, dateTimeFormat: dateTimeFormat, withSeconds: extraSettings.showSecondsInMessageTimestamp)
+    if !extraSettings.hideMessageTimestamp && timestamp == scheduleWhenOnlineTimestamp {
         dateText = "         "
     }
     
@@ -180,8 +180,8 @@ public func stringForMessageTimestampStatus(
             dateText = strings.Message_FullDateFormat(dayText, stringForMessageTimestamp(timestamp: timestamp, dateTimeFormat: dateTimeFormat)).string
         }
     } else if let forwardInfo = message.forwardInfo, forwardInfo.flags.contains(.isImported) {
-        if !whiteGramSettings.hideMessageTimestamp {
-            dateText = strings.Message_ImportedDateFormat(dateStringForDay(strings: strings, dateTimeFormat: dateTimeFormat, timestamp: forwardInfo.date), stringForMessageTimestamp(timestamp: forwardInfo.date, dateTimeFormat: dateTimeFormat, withSeconds: whiteGramSettings.showSecondsInMessageTimestamp), dateText).string
+        if !extraSettings.hideMessageTimestamp {
+            dateText = strings.Message_ImportedDateFormat(dateStringForDay(strings: strings, dateTimeFormat: dateTimeFormat, timestamp: forwardInfo.date), stringForMessageTimestamp(timestamp: forwardInfo.date, dateTimeFormat: dateTimeFormat, withSeconds: extraSettings.showSecondsInMessageTimestamp), dateText).string
         }
     }
     

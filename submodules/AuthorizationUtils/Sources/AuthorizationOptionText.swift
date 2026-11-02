@@ -6,23 +6,23 @@ import TelegramPresentationData
 import TextFormat
 import Markdown
 
-public func whiteGramAuthorizationString(_ string: String) -> String {
+public func extraAuthorizationString(_ string: String) -> String {
     var result = string
     let replacements: [(String, String)] = [
-        ("Telegram app", "WhiteGram app"),
-        ("Telegram App", "WhiteGram App"),
-        ("Telegram Premium", "WhiteGram Premium"),
-        ("Telegram", "WhiteGram"),
-        ("Телеграме", "WhiteGram"),
-        ("Телеграма", "WhiteGram"),
-        ("Телеграму", "WhiteGram"),
-        ("Телеграмом", "WhiteGram"),
-        ("Телеграм", "WhiteGram"),
-        ("телеграме", "WhiteGram"),
-        ("телеграма", "WhiteGram"),
-        ("телеграму", "WhiteGram"),
-        ("телеграмом", "WhiteGram"),
-        ("телеграм", "WhiteGram")
+        ("Telegram app", "hitegram app"),
+        ("Telegram App", "hitegram App"),
+        ("Telegram Premium", "hitegram Premium"),
+        ("Telegram", "hitegram"),
+        ("Телеграме", "hitegram"),
+        ("Телеграма", "hitegram"),
+        ("Телеграму", "hitegram"),
+        ("Телеграмом", "hitegram"),
+        ("Телеграм", "hitegram"),
+        ("телеграме", "hitegram"),
+        ("телеграма", "hitegram"),
+        ("телеграму", "hitegram"),
+        ("телеграмом", "hitegram"),
+        ("телеграм", "hitegram")
     ]
     for (source, target) in replacements {
         result = result.replacingOccurrences(of: source, with: target)
@@ -40,7 +40,7 @@ public func authorizationCurrentOptionText(_ type: SentAuthorizationCodeType, ph
     case .sms:
         return parseMarkdownIntoAttributedString(strings.Login_EnterCodeSMSText(phoneNumber).string, attributes: attributes, textAlignment: .center)
     case .otherSession:
-        return parseMarkdownIntoAttributedString(whiteGramAuthorizationString(strings.Login_EnterCodeTelegramText(phoneNumber).string), attributes: attributes, textAlignment: .center)
+        return parseMarkdownIntoAttributedString(extraAuthorizationString(strings.Login_EnterCodeTelegramText(phoneNumber).string), attributes: attributes, textAlignment: .center)
     case .missedCall:
         let body = MarkdownAttributeSet(font: Font.regular(fontSize), textColor: primaryColor)
         let bold = MarkdownAttributeSet(font: Font.semibold(fontSize), textColor: primaryColor)
@@ -109,13 +109,13 @@ public func authorizationNextOptionText(currentType: SentAuthorizationCodeType, 
             if timeout <= 0 {
                 return (NSAttributedString(string: strings.Login_CodeSentCall, font: font, textColor: primaryColor, paragraphAlignment: .center), false)
             } else {
-                return (NSAttributedString(string: whiteGramAuthorizationString(String(format: strings.ChangePhoneNumberCode_CallTimer(String(format: "%d:%.2d", minutes, seconds)).string, minutes, seconds)), font: font, textColor: primaryColor, paragraphAlignment: .center), false)
+                return (NSAttributedString(string: extraAuthorizationString(String(format: strings.ChangePhoneNumberCode_CallTimer(String(format: "%d:%.2d", minutes, seconds)).string, minutes, seconds)), font: font, textColor: primaryColor, paragraphAlignment: .center), false)
             }
         case .flashCall, .missedCall:
             if timeout <= 0 {
                 return (NSAttributedString(string: strings.ChangePhoneNumberCode_Called, font: font, textColor: primaryColor, paragraphAlignment: .center), false)
             } else {
-                return (NSAttributedString(string: whiteGramAuthorizationString(String(format: strings.ChangePhoneNumberCode_CallTimer(String(format: "%d:%.2d", minutes, seconds)).string, minutes, seconds)), font: font, textColor: primaryColor, paragraphAlignment: .center), false)
+                return (NSAttributedString(string: extraAuthorizationString(String(format: strings.ChangePhoneNumberCode_CallTimer(String(format: "%d:%.2d", minutes, seconds)).string, minutes, seconds)), font: font, textColor: primaryColor, paragraphAlignment: .center), false)
             }
         case .fragment:
             if timeout <= 0 {

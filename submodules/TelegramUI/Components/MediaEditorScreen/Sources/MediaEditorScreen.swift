@@ -93,8 +93,8 @@ func mediaEditorStickerPreviewFrame(screenSize: CGSize, safeInsets: UIEdgeInsets
     return CGRect(origin: CGPoint(x: bandMinX + floorToScreenPixels((bandWidth - previewWidth) / 2.0), y: previewMinY), size: CGSize(width: previewWidth, height: previewHeight))
 }
 
-private func whiteGramSetBuiltInMicrophoneIfNeeded() {
-    guard WhiteGramOtherSettings.current.forceDeviceMicrophone else {
+private func extraSetBuiltInMicrophoneIfNeeded() {
+    guard ExtraOtherSettings.current.forceDeviceMicrophone else {
         return
     }
     guard let input = AVAudioSession.sharedInstance().availableInputs?.first(where: { $0.portType == .builtInMic }) else {
@@ -7240,7 +7240,7 @@ public final class MediaEditorScreenImpl: ViewController, MediaEditorScreen, UID
         }
         if needsAudioSession {
             self.audioSessionDisposable = self.context.sharedContext.mediaManager.audioSession.push(audioSessionType: .record(speaker: false, video: true, withOthers: true), activate: { _ in
-                whiteGramSetBuiltInMicrophoneIfNeeded()
+                extraSetBuiltInMicrophoneIfNeeded()
                 if #available(iOS 13.0, *) {
                     try? AVAudioSession.sharedInstance().setAllowHapticsAndSystemSoundsDuringRecording(true)
                 }
