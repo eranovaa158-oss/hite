@@ -653,6 +653,9 @@ def build(bazel, arguments):
 
     bazel_command_line.set_split_swiftmodules(arguments.enableParallelSwiftmoduleGeneration)
 
+    if arguments.disableProvisioningProfiles:
+        bazel_command_line.set_disable_provisioning_profiles()
+
     bazel_command_line.invoke_build()
 
     if arguments.outputBuildArtifactsPath is not None:
