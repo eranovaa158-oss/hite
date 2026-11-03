@@ -38,12 +38,6 @@ jobs:
           # Submodules were checked out into $GITHUB_WORKSPACE; make sure they came along.
           ls third-party/mtproto-engine | head -3
 
-      - name: Refresh provisioning profile expiration
-        run: |
-          set -x
-          cd /Users/Shared/hitegram-build
-          python3 build-system/Make/RefreshProfiles.py --profiles-dir build-system/fake-codesigning/profiles --cert-p12 build-system/fake-codesigning/certs/SelfSigned.p12
-
       - name: Build the App
         run: |
           set -x
