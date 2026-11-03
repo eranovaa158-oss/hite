@@ -260,11 +260,6 @@ public class UnauthorizedAccount {
         self.networkEngineStateDisposable.dispose()
     }
 
-    deinit {
-        self.proxySettingsDisposable.dispose()
-        self.automaticProxyBootstrapDisposable.dispose()
-    }
-
     public func changedMasterDatacenterId(accountManager: AccountManager<TelegramAccountManagerTypes>, masterDatacenterId: Int32) -> Signal<UnauthorizedAccount, NoError> {
         if masterDatacenterId == Int32(self.network.datacenterId) {
             return .single(self)

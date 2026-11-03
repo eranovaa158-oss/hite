@@ -879,7 +879,6 @@ public class GlassBackgroundView: UIView {
                         }
                     }
                 }
-                #endif
             }
         }
         

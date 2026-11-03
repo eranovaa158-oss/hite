@@ -66,15 +66,13 @@ jobs:
             --codesigningInformationPath=build-system/fake-codesigning \
             --configuration=release_arm64 \
             --buildNumber="$BUILD_NUMBER" \
+            --outputBuildArtifactsPath="$SOURCE_DIR/build/artifacts" \
             --continueOnError
 
-          OUTPUT_PATH="build/artifacts"
-          rm -rf "$OUTPUT_PATH"
-          mkdir -p "$OUTPUT_PATH"
-          for f in bazel-out/applebin_ios-ios_arm*-opt-ST-*/bin/Telegram/Telegram.ipa; do
-            cp "$f" "$OUTPUT_PATH/hitegram-$APP_VERSION-$BUILD_NUMBER.ipa"
-          done
-          ls -la "$OUTPUT_PATH"
+          ls -la build/artifacts
+          mv build/artifacts/Telegram.ipa "build/artifacts/hitegram-$APP_VERSION-$BUILD_NUMBER.ipa"
+          rm -f build/artifacts/*.zip
+          ls -la build/artifacts
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
