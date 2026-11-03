@@ -3,6 +3,7 @@ import UIKit
 import SwiftSignalKit
 import AsyncDisplayKit
 import TelegramCore
+import Postbox
 import Display
 import TelegramUIPreferences
 import AccountContext
@@ -239,6 +240,7 @@ public final class ChatControllerInteraction: ChatControllerInteractionProtocol 
     public let updateInputMode: ((ChatInputMode) -> ChatInputMode) -> Void
     public let updatePresentationState: ((ChatPresentationInterfaceState) -> ChatPresentationInterfaceState) -> Void
     public let openMessageShareMenu: (EngineMessage.Id) -> Void
+    public let performPersonalChatDoubleTapAction: (Message, ExtraChatSettings.PersonalChatDoubleTapAction) -> Bool
     public let presentController: (ViewController, Any?) -> Void
     public let presentControllerInCurrent: (ViewController, Any?) -> Void
     public let navigationController: () -> NavigationController?
@@ -432,6 +434,7 @@ public final class ChatControllerInteraction: ChatControllerInteractionProtocol 
         updateInputMode: @escaping ((ChatInputMode) -> ChatInputMode) -> Void,
         updatePresentationState: @escaping ((ChatPresentationInterfaceState) -> ChatPresentationInterfaceState) -> Void,
         openMessageShareMenu: @escaping (EngineMessage.Id) -> Void,
+        performPersonalChatDoubleTapAction: @escaping (Message, ExtraChatSettings.PersonalChatDoubleTapAction) -> Bool,
         presentController: @escaping (ViewController, Any?) -> Void,
         presentControllerInCurrent: @escaping (ViewController, Any?) -> Void,
         navigationController: @escaping () -> NavigationController?,

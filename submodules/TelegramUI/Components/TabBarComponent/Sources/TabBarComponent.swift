@@ -438,6 +438,14 @@ public final class TabBarComponent: Component {
     public let axis: Axis
     /// Icons without labels, on either axis.
     public let isCompact: Bool
+    /// WhiteGram: force full width for the tab bar.
+    public let forceFullWidth: Bool
+    /// WhiteGram: hide item titles.
+    public let hideItemTitles: Bool
+    /// WhiteGram: use compact panel mode.
+    public let compactPanel: Bool
+    /// WhiteGram: action for compact menu.
+    public let compactAction: ((UIView) -> Void)?
     
     public init(
         theme: PresentationTheme,
@@ -449,7 +457,11 @@ public final class TabBarComponent: Component {
         selectedId: AnyHashable?,
         outerInsets: UIEdgeInsets,
         axis: Axis,
-        isCompact: Bool
+        isCompact: Bool,
+        forceFullWidth: Bool = false,
+        hideItemTitles: Bool = false,
+        compactPanel: Bool = false,
+        compactAction: ((UIView) -> Void)? = nil
     ) {
         self.theme = theme
         self.tintSelectedItem = tintSelectedItem
@@ -461,6 +473,10 @@ public final class TabBarComponent: Component {
         self.outerInsets = outerInsets
         self.axis = axis
         self.isCompact = isCompact
+        self.forceFullWidth = forceFullWidth
+        self.hideItemTitles = hideItemTitles
+        self.compactPanel = compactPanel
+        self.compactAction = compactAction
     }
 
     public static func ==(lhs: TabBarComponent, rhs: TabBarComponent) -> Bool {
@@ -1088,8 +1104,9 @@ private final class ItemComponent: Component {
     let isSelected: Bool
     let tintSelectedItem: Bool
     let isUnconstrained: Bool
+    let isCompact: Bool
     
-    init(item: TabBarComponent.Item, theme: PresentationTheme, isSearchActive: Bool, showsTitle: Bool, isSelected: Bool, tintSelectedItem: Bool, isUnconstrained: Bool) {
+    init(item: TabBarComponent.Item, theme: PresentationTheme, isSearchActive: Bool, showsTitle: Bool, isSelected: Bool, tintSelectedItem: Bool, isUnconstrained: Bool, isCompact: Bool = false) {
         self.item = item
         self.theme = theme
         self.isSearchActive = isSearchActive
@@ -1097,6 +1114,7 @@ private final class ItemComponent: Component {
         self.isSelected = isSelected
         self.tintSelectedItem = tintSelectedItem
         self.isUnconstrained = isUnconstrained
+        self.isCompact = isCompact
     }
 
     static func ==(lhs: ItemComponent, rhs: ItemComponent) -> Bool {
@@ -1480,9 +1498,6 @@ private final class ItemComponent: Component {
             self.contextContainerView.contentRect = CGRect(origin: CGPoint(), size: availableSize)
 
             if component.isUnconstrained {
-                if component.isCompact {
-                    return CGSize(width: 44.0, height: availableSize.height)
-                }
                 return CGSize(width: titleSize.width + 10.0 * 2.0, height: availableSize.height)
             } else {
                 return availableSize
