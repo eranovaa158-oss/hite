@@ -44,14 +44,14 @@ jobs:
           cd /Users/Shared/hitegram-build
           openssl pkcs12 -in build-system/fake-codesigning/certs/SelfSigned.p12 -out /tmp/fake_cert.pem -nodes -passin pass: 2>/dev/null || openssl pkcs12 -in build-system/fake-codesigning/certs/SelfSigned.p12 -out /tmp/fake_cert.pem -nodes -passin pass:secret
           for p in build-system/fake-codesigning/profiles/*.mobileprovision; do
-            openssl smime -inform der -verify -noverify -in "\" -out /tmp/profile.plist 2>/dev/null
+            openssl smime -inform der -verify -noverify -in "$p" -out /tmp/profile.plist 2>/dev/null
             python3 -c '
 p="/tmp/profile.plist"
 s=open(p).read()
 s=s.replace("2026-10-30T17:06:30Z","2030-12-31T23:59:59Z")
 open(p,"w").write(s)
 '
-            openssl smime -sign -in /tmp/profile.plist -out "\" -signer /tmp/fake_cert.pem -inkey /tmp/fake_cert.pem -outform DER -nodetach
+            openssl smime -sign -in /tmp/profile.plist -out "$p" -signer /tmp/fake_cert.pem -inkey /tmp/fake_cert.pem -outform DER -nodetach
           done
           openssl smime -inform der -verify -noverify -in build-system/fake-codesigning/profiles/Telegram.mobileprovision -out /dev/null && echo "PROFILE VERIFY OK"
       - name: Build the App
