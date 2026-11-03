@@ -970,12 +970,7 @@ public final class GlassBackgroundContainerView: UIView {
             self.nativeParamsView = nil
             self.legacyView = ContentView()
         }
-        #else
-        self.nativeView = nil
-        self.nativeParamsView = nil
-        self.legacyView = ContentView()
-        #endif
-        
+
         super.init(frame: CGRect())
         
         if let nativeParamsView = self.nativeParamsView {
