@@ -1,0 +1,61 @@
+name: Auto-retry build
+
+# macOS runners on the free pool are frequently unavailable: a queued job is
+# dropped without ever starting (no steps, no logs). Instead of babysitting the
+# queue by hand, re-dispatch the build whenever the newest run died before it
+# ever reached a runner.
+
+on:
+  schedule:
+    - cron: '*/20 * * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: auto-retry
+  cancel-in-progress: false
+
+jobs:
+  retry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Re-dispatch build when the runner never picked it up
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -uo pipefail
+
+          active=$(gh run list --repo "$REPO" --workflow "Build IPA" --limit 10 \
+            --json status -q '[.[] | select(.status == "queued" or .status == "in_progress" or .status == "waiting")] | length')
+          echo "active build runs: $active"
+          if [ "$active" -gt 0 ]; then
+            echo "A build is already queued or running - leaving the queue alone."
+            exit 0
+          fi
+
+          last_id=$(gh run list --repo "$REPO" --workflow "Build IPA" --limit 1 --json databaseId -q '.[0].databaseId')
+          last=$(gh run list --repo "$REPO" --workflow "Build IPA" --limit 1 --json conclusion,headSha -q '.[0]')
+          echo "last run: $last_id => $last"
+
+          conclusion=$(echo "$last" | jq -r '.conclusion')
+          if [ "$conclusion" = "success" ]; then
+            echo "Newest build is green - nothing to retry."
+            exit 0
+          fi
+
+          # Steps are empty when the job never reached a runner: a pure
+          # infrastructure drop. A run that actually compiled has steps.
+          steps=$(gh api "repos/$REPO/actions/runs/$last_id/jobs" -q '[(.jobs // [])[] | (.steps // []) | length] | add // 0')
+          echo "steps in last run: $steps"
+          if [ "$steps" -gt 0 ]; then
+            echo "Last run actually executed - it needs a code fix, not a retry."
+            exit 0
+          fi
+
+          echo "Last run never started on a runner; dispatching a fresh build."
+          gh workflow run "Build IPA" --repo "$REPO" --ref master

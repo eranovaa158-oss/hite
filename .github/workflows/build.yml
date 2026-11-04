@@ -5,6 +5,12 @@ on:
     branches: [ master ]
   workflow_dispatch:
 
+# Only one build may wait for a macOS runner at a time: extra queued runs
+# only fight each other for the scarce runner pool and get dropped.
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: macos-26
@@ -38,12 +44,20 @@ jobs:
           # Submodules were checked out into $GITHUB_WORKSPACE; make sure they came along.
           ls third-party/mtproto-engine | head -3
 
+      - name: Restore Bazel cache
+        uses: actions/cache/restore@v4
+        with:
+          path: /Users/Shared/bazel-root
+          key: bazel-root-${{ github.run_id }}
+          restore-keys: |
+            bazel-root-
+
       - name: Build the App
         run: |
           set -x
 
           SOURCE_DIR=/Users/Shared/hitegram-build
-          BAZEL_USER_ROOT="/private/var/tmp/_bazel_hitegram"
+          BAZEL_USER_ROOT="/Users/Shared/bazel-root"
 
           cd $SOURCE_DIR
 
@@ -73,6 +87,13 @@ jobs:
           mv build/artifacts/Telegram.ipa "build/artifacts/hitegram-$APP_VERSION-$BUILD_NUMBER.ipa"
           rm -f build/artifacts/*.zip
           ls -la build/artifacts
+
+      - name: Save Bazel cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: /Users/Shared/bazel-root
+          key: bazel-root-${{ github.run_id }}
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
