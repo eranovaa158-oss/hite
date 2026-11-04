@@ -781,7 +781,7 @@ public final class MediaPickerScreenImpl: ViewController, MediaPickerScreen, Att
                 }
                 self.cameraView = cameraView
 
-                if enableAnimations && !extraOtherSettings.hideCameraPreviewInGallery {
+                if enableAnimations && !ExtraOtherSettings.current.hideCameraPreviewInGallery {
                     cameraView.startPreview()
                 }
 

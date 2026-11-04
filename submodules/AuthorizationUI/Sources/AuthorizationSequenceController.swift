@@ -35,6 +35,21 @@ private enum InnerState: Equatable {
     case authorized
 }
 
+private func authorizationProxyButtonIcon(color: UIColor) -> UIImage? {
+    return generateImage(CGSize(width: 30.0, height: 30.0), rotatedContext: { size, context in
+        context.clear(CGRect(origin: CGPoint(), size: size))
+        context.translateBy(x: size.width / 2.0, y: size.height / 2.0)
+        context.scaleBy(x: 1.0, y: -1.0)
+        context.translateBy(x: -size.width / 2.0, y: -size.height / 2.0)
+        if let image = generateTintedImage(image: UIImage(bundleImageName: "Chat List/ProxyShieldIcon"), color: color) {
+            context.draw(image.cgImage!, in: CGRect(origin: CGPoint(), size: image.size))
+        }
+        if let image = generateTintedImage(image: UIImage(bundleImageName: "Chat List/ProxyOnIcon"), color: color) {
+            context.draw(image.cgImage!, in: CGRect(origin: CGPoint(), size: image.size))
+        }
+    })
+}
+
 public final class AuthorizationSequenceController: NavigationController, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
     static func navigationBarTheme(_ theme: PresentationTheme) -> NavigationBarTheme {
         return NavigationBarTheme(overallDarkAppearance: theme.overallDarkAppearance, buttonColor: theme.chat.inputPanel.panelControlColor, disabledButtonColor: theme.intro.disabledTextColor, primaryTextColor: theme.intro.primaryTextColor, badgeBackgroundColor: theme.rootController.navigationBar.badgeBackgroundColor, badgeTextColor: theme.rootController.navigationBar.badgeTextColor, edgeEffectColor: .clear, accentButtonColor: theme.list.itemCheckColors.fillColor, accentDisabledButtonColor: theme.chat.inputPanel.panelControlDisabledColor, accentForegroundColor: theme.list.itemCheckColors.foregroundColor)
@@ -136,13 +151,17 @@ public final class AuthorizationSequenceController: NavigationController, ASAuth
     override public func containerLayoutUpdated(_ layout: ContainerViewLayout, transition: ContainedViewLayoutTransition) {
         super.containerLayoutUpdated(layout, transition: transition)
 
+        let proxyTheme = self.presentationData.theme
         let buttonSize = self.proxyButton.update(
             transition: ComponentTransition(transition),
             component: AnyComponent(NavigationButtonComponent(
-                content: .proxy(status: .available),
+                content: .image(authorizationProxyButtonIcon(color: proxyTheme.chat.inputPanel.panelControlColor)),
+                color: proxyTheme.chat.inputPanel.panelControlColor,
+                isEnabled: true,
                 pressed: { [weak self] _ in
                     self?.proxyButtonPressed()
-                }
+                },
+                contextAction: nil
             )),
             environment: {
                 NavigationButtonEnvironment(theme: Self.navigationBarTheme(self.presentationData.theme))
