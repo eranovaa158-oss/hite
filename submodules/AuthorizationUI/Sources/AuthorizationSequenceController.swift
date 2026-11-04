@@ -25,7 +25,6 @@ import AuthorizationUtils
 import ObjectiveC
 import AVFoundation
 import ComponentFlow
-import ChatListHeaderComponent
 import ChatListTitleView
 import GlassBackgroundComponent
 

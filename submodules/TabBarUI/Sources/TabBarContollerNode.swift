@@ -296,7 +296,6 @@ final class TabBarControllerNode: ASDisplayNode {
         }
 
         let extraTabSettings = self.extraTabSettings
-        let isCompactSearchActive = extraTabSettings.compactPanel && params.currentControllerSearchState?.isActive == true
         let extraFolderSettings = ExtraChatFolderSettings.current
         if extraTabSettings.compactPanel && !extraFolderSettings.disableFolders && extraFolderSettings.foldersAtBottom && !extraFolderSettings.compactPanel {
             tabBarBottomInset = max(70.0, panelsBottomInset + 40.0)

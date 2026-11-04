@@ -361,7 +361,6 @@ public final class ChatMessageInteractiveFileNode: ASDisplayNode {
         }
         
         let extraOtherSettings = ExtraOtherSettings.current
-        let extraAppleTranscription = extraOtherSettings.voiceTranscription && extraOtherSettings.transcriptionService == .apple
         let extraTelegramTranscription = extraOtherSettings.voiceTranscription && extraOtherSettings.transcriptionService == .telegram
         let presentationData = context.sharedContext.currentPresentationData.with { $0 }
         let premiumConfiguration = PremiumConfiguration.with(appConfiguration: arguments.context.currentAppConfiguration.with { $0 })
