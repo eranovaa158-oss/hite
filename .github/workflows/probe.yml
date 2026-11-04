@@ -1,0 +1,33 @@
+name: Runner Probe
+
+on:
+  workflow_dispatch:
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Echo
+        run: echo "linux ok"
+
+  mac15:
+    runs-on: macos-15
+    timeout-minutes: 15
+    steps:
+      - name: Info
+        run: |
+          sw_vers
+          xcodebuild -version
+          ls /Applications | grep -i xcode || true
+          df -h / | tail -1
+
+  mac26:
+    runs-on: macos-26
+    timeout-minutes: 15
+    steps:
+      - name: Info
+        run: |
+          sw_vers
+          xcodebuild -version
+          ls /Applications | grep -i xcode || true
