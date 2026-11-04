@@ -35,8 +35,8 @@ private enum InnerState: Equatable {
     case authorized
 }
 
-private func authorizationProxyButtonIcon(color: UIColor) -> UIImage? {
-    return generateImage(CGSize(width: 30.0, height: 30.0), rotatedContext: { size, context in
+private func authorizationProxyButtonIcon(color: UIColor) -> UIImage {
+    let icon = generateImage(CGSize(width: 30.0, height: 30.0), rotatedContext: { size, context in
         context.clear(CGRect(origin: CGPoint(), size: size))
         context.translateBy(x: size.width / 2.0, y: size.height / 2.0)
         context.scaleBy(x: 1.0, y: -1.0)
@@ -48,6 +48,7 @@ private func authorizationProxyButtonIcon(color: UIColor) -> UIImage? {
             context.draw(image.cgImage!, in: CGRect(origin: CGPoint(), size: image.size))
         }
     })
+    return icon ?? UIImage()
 }
 
 public final class AuthorizationSequenceController: NavigationController, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {

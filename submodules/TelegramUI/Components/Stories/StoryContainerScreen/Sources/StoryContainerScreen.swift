@@ -19,6 +19,7 @@ import TooltipUI
 import ChatEntityKeyboardInputNode
 import notify
 import TelegramNotices
+import TelegramUIPreferences
 
 func hasFirstResponder(_ view: UIView) -> Bool {
     if view.isFirstResponder {
