@@ -145,7 +145,7 @@ public final class AuthorizationSequenceController: NavigationController, ASAuth
                 }
             )),
             environment: {
-                NavigationButtonEnvironment(theme: self.presentationData.theme)
+                NavigationButtonEnvironment(theme: Self.navigationBarTheme(self.presentationData.theme))
             },
             containerSize: CGSize(width: 44.0, height: 44.0)
         )

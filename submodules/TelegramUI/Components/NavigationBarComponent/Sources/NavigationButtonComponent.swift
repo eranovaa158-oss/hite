@@ -8,18 +8,18 @@ import MoreHeaderButton
 
 /// Renders one `NavigationBarComponent.Button`: a 44pt-tall tap target whose content dims to 0.6 while
 /// highlighted. The caller resolves the content color (`navigationButtonContentColor`).
-final class NavigationButtonComponent: Component {
+public final class NavigationButtonComponent: Component {
     typealias EnvironmentType = NavigationButtonEnvironment
 
-    let content: NavigationBarComponent.Button.Content
-    let color: UIColor
-    let isEnabled: Bool
-    let pressed: (UIView) -> Void
-    let contextAction: ((UIView, ContextGesture?) -> Void)?
+    public let content: NavigationBarComponent.Button.Content
+    public let color: UIColor
+    public let isEnabled: Bool
+    public let pressed: (UIView) -> Void
+    public let contextAction: ((UIView, ContextGesture?) -> Void)?
     /// A node in the content is borrowed (`NavigationBarNodeLoan`): hosted only while lent, never its home.
-    let borrowsNode: Bool
+    public let borrowsNode: Bool
 
-    init(
+    public init(
         content: NavigationBarComponent.Button.Content,
         color: UIColor,
         isEnabled: Bool,
