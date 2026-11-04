@@ -2298,6 +2298,9 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             let dateFont = Font.regular(floor(item.presentationData.fontSize.itemListBaseFontSize * 14.0 / 17.0))
             let badgeFont = Font.with(size: floor(item.presentationData.fontSize.itemListBaseFontSize * 12.0 / 17.0), design: .regular, weight: .semibold, traits: [.monospacedNumbers])
             let avatarBadgeFont = Font.with(size: floor(item.presentationData.fontSize.itemListBaseFontSize * 16.0 / 17.0), design: .regular, weight: .regular, traits: [.monospacedNumbers])
+            let extraChatSettings = ExtraChatSettings.effectiveChatListSettings
+            let compactChatLayout = extraChatSettings.compactChatList
+            let isSearching = item.interaction.searchTextHighightState != nil
             
             let account = item.context.account
             var messages: [EngineMessage]
@@ -3819,6 +3822,8 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             }
             
             let textLineSpacing: CGFloat = min(0.2, item.presentationData.fontSize.itemListBaseFontSize * 0.2 / 17.0)
+            let canUseTwoLinePreview = authorAttributedString == nil && itemTags.isEmpty && forumThread == nil && topForumTopicItems.isEmpty
+            let forceSingleLinePreview = extraChatSettings.compactChatList
             let (textLayout, textApply) = textLayout(TextNodeLayoutArguments(
                 attributedString: textAttributedString,
                 backgroundColor: nil,

@@ -4788,8 +4788,12 @@ public class ChatListControllerImpl: TelegramBaseController, ChatListController 
     public private(set) var isSearchActive: Bool = false
 
     public func activateSearch(filter: ChatListSearchFilter, query: String? = nil) {
+        self.activateSearchInternal(isFromTabBar: false, filter: filter, query: query)
+    }
+
+    public func activateSearchInternal(isFromTabBar: Bool, filter: ChatListSearchFilter, query: String? = nil) {
         var searchContentNode: NavigationBarSearchContentNode?
-        if let navigationBarView = self.chatListDisplayNode.navigationBarView.view as? ChatListNavigationBar.View {
+        if !isFromTabBar, let navigationBarView = self.chatListDisplayNode.navigationBarView.view as? ChatListNavigationBar.View {
             searchContentNode = navigationBarView.searchContentNode
         }
 
@@ -6953,6 +6957,36 @@ private func chatListHeaderOverflowInfo(strings: PresentationStrings) -> [AnyHas
     ]
 }
 
+private func generateChatListFolderButtonIcon() -> UIImage {
+    let icon = generateImage(CGSize(width: 23.0, height: 17.0), contextGenerator: { size, context in
+        context.clear(CGRect(origin: CGPoint(), size: size))
+        let path = UIBezierPath()
+        path.move(to: CGPoint(x: 2.0, y: 6.0))
+        path.addQuadCurve(to: CGPoint(x: 4.0, y: 4.6), controlPoint: CGPoint(x: 2.0, y: 4.8))
+        path.addLine(to: CGPoint(x: 8.0, y: 4.6))
+        path.addLine(to: CGPoint(x: 10.2, y: 2.8))
+        path.addQuadCurve(to: CGPoint(x: 12.0, y: 2.2), controlPoint: CGPoint(x: 10.8, y: 2.2))
+        path.addLine(to: CGPoint(x: 15.6, y: 2.2))
+        path.addQuadCurve(to: CGPoint(x: 17.4, y: 2.9), controlPoint: CGPoint(x: 16.8, y: 2.2))
+        path.addLine(to: CGPoint(x: 19.2, y: 4.6))
+        path.addLine(to: CGPoint(x: 20.0, y: 4.6))
+        path.addQuadCurve(to: CGPoint(x: 21.5, y: 6.2), controlPoint: CGPoint(x: 21.5, y: 4.8))
+        path.addLine(to: CGPoint(x: 21.5, y: 14.0))
+        path.addQuadCurve(to: CGPoint(x: 19.0, y: 16.2), controlPoint: CGPoint(x: 21.5, y: 16.2))
+        path.addLine(to: CGPoint(x: 4.0, y: 16.2))
+        path.addQuadCurve(to: CGPoint(x: 1.5, y: 14.0), controlPoint: CGPoint(x: 1.5, y: 16.2))
+        path.addLine(to: CGPoint(x: 1.5, y: 6.2))
+        path.close()
+        context.addPath(path.cgPath)
+        context.setStrokeColor(UIColor.black.cgColor)
+        context.setLineWidth(1.65)
+        context.setLineJoin(.round)
+        context.setLineCap(.round)
+        context.strokePath()
+    })
+    return (icon ?? UIImage()).withRenderingMode(.alwaysTemplate)
+}
+
 private final class ChatListLocationContext {
     let context: AccountContext
     let location: ChatListControllerLocation
@@ -6971,6 +7005,25 @@ private final class ChatListLocationContext {
     var rightButton: NavigationBarComponent.Button?
     var proxyButton: NavigationBarComponent.Button?
     var storyButton: NavigationBarComponent.Button?
+    var allowFolderButton: Bool = false
+    
+    private var folderButton: NavigationBarComponent.Button? {
+        guard self.allowFolderButton, case .chatList(.root) = self.location, let parentController = self.parentController else {
+            return nil
+        }
+        let settings = ExtraChatFolderSettings.current
+        let hasFolders = (parentController.tabContainerData?.0.count ?? 0) > 1
+        guard !settings.disableFolders && settings.compactPanel && hasFolders else {
+            return nil
+        }
+        return NavigationBarComponent.Button(
+            id: "folders",
+            content: .image(generateChatListFolderButtonIcon()),
+            action: { [weak parentController] sourceView in
+                parentController?.openExtraFolderMenu(sourceView: sourceView)
+            }
+        )
+    }
     
     var rightButtons: [NavigationBarComponent.Button] {
         var result: [NavigationBarComponent.Button] = []
@@ -7371,6 +7424,7 @@ private final class ChatListLocationContext {
                 self.rightButton = nil
                 self.storyButton = nil
                 self.proxyButton = nil
+                self.allowFolderButton = false
             }
             let title = !stateAndFilterId.state.selectedPeerIds.isEmpty ? presentationData.strings.ChatList_SelectedChats(Int32(stateAndFilterId.state.selectedPeerIds.count)) : defaultTitle
 
@@ -7387,6 +7441,7 @@ private final class ChatListLocationContext {
                 self.rightButton = nil
                 self.storyButton = nil
                 self.proxyButton = nil
+                self.allowFolderButton = false
             }
             self.leftButton = NavigationBarComponent.Button(id: "done",
                 content: .text(title: presentationData.strings.Common_Done, isBold: true),
