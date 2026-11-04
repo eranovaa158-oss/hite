@@ -1446,7 +1446,7 @@ public final class StoryPeerListComponent: Component {
             let titleMinContentOffset: CGFloat = collapsedTitleOffset.interpolate(to: collapsedTitleOffset + 12.0, amount: collapsedState.minFraction * (1.0 - collapsedState.activityFraction))
             let titleSafeMinX = component.minTitleX
             let titleSafeMaxX = max(titleSafeMinX, component.maxTitleX)
-            let expandedTitleContentOffset: CGFloat = titleSafeMinX + max(0.0, titleSafeMaxX - titleSafeMinX - collapsedState.titleWidth) * 0.5
+            let _ = titleSafeMinX + max(0.0, titleSafeMaxX - titleSafeMinX - collapsedState.titleWidth) * 0.5
             
             var titleContentOffset: CGFloat
             if self.sortedItems.isEmpty {

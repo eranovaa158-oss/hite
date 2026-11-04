@@ -159,6 +159,9 @@ public final class AlertWebpagePreviewComponent: Component {
                     updateInputMode: { _ in },
                     updatePresentationState: { _ in },
                     openMessageShareMenu: { _ in },
+                    performPersonalChatDoubleTapAction: { _, _ in
+                        return false
+                    },
                     presentController: { _, _ in },
                     presentControllerInCurrent: { _, _ in },
                     navigationController: {
