@@ -9,7 +9,7 @@ import MoreHeaderButton
 /// Renders one `NavigationBarComponent.Button`: a 44pt-tall tap target whose content dims to 0.6 while
 /// highlighted. The caller resolves the content color (`navigationButtonContentColor`).
 public final class NavigationButtonComponent: Component {
-    typealias EnvironmentType = NavigationButtonEnvironment
+    public typealias EnvironmentType = NavigationButtonEnvironment
 
     public let content: NavigationBarComponent.Button.Content
     public let color: UIColor
@@ -35,7 +35,7 @@ public final class NavigationButtonComponent: Component {
         self.borrowsNode = borrowsNode
     }
 
-    static func ==(lhs: NavigationButtonComponent, rhs: NavigationButtonComponent) -> Bool {
+    public static func ==(lhs: NavigationButtonComponent, rhs: NavigationButtonComponent) -> Bool {
         if lhs.content != rhs.content {
             return false
         }
@@ -56,7 +56,7 @@ public final class NavigationButtonComponent: Component {
         case image(UIImage)
     }
 
-    final class View: HighlightTrackingButton {
+    public final class View: HighlightTrackingButton {
         private var textView: ImmediateTextView?
 
         private(set) var iconView: UIImageView?
@@ -406,11 +406,11 @@ public final class NavigationButtonComponent: Component {
         }
     }
 
-    func makeView() -> View {
+    public func makeView() -> View {
         return View(frame: CGRect())
     }
 
-    func update(view: View, availableSize: CGSize, state: EmptyComponentState, environment: Environment<NavigationButtonEnvironment>, transition: ComponentTransition) -> CGSize {
+    public func update(view: View, availableSize: CGSize, state: EmptyComponentState, environment: Environment<NavigationButtonEnvironment>, transition: ComponentTransition) -> CGSize {
         return view.update(component: self, availableSize: availableSize, state: state, environment: environment, transition: transition)
     }
 }
