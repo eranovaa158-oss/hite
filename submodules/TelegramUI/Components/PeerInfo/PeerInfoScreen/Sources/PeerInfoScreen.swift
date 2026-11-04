@@ -1167,6 +1167,8 @@ final class PeerInfoScreenNode: ViewControllerTracingNode, PeerInfoScreenNodePro
         }, updateInputMode: { _ in
         }, updatePresentationState: { _ in
         }, openMessageShareMenu: { _ in
+        }, performPersonalChatDoubleTapAction: { _, _ in
+            return false
         }, presentController: { [weak self] c, a in
             self?.controller?.present(c, in: .window(.root), with: a)
         }, presentControllerInCurrent: { [weak self] c, a in

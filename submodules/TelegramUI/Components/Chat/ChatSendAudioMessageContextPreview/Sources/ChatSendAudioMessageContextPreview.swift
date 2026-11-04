@@ -432,6 +432,8 @@ public final class ChatSendGroupMediaMessageContextPreview: UIView, ChatSendMess
         }, editGif: { _, _ in
         }, requestMessageActionCallback: { _, _, _, _, _ in }, requestMessageActionUrlAuth: { _, _ in }, activateSwitchInline: { _, _, _ in }, openUrl: { _ in }, openExternalInstantPage: { _ in
         }, shareCurrentLocation: { _ in }, shareAccountContact: { _ in }, sendBotCommand: { _, _ in }, openInstantPage: { _, _ in  }, openWallpaper: { _ in  }, openTheme: { _ in  }, openHashtag: { _, _ in }, updateInputState: { _ in }, updateInputMode: { _ in }, updatePresentationState: { _ in }, openMessageShareMenu: { _ in
+        }, performPersonalChatDoubleTapAction: { _, _ in
+            return false
         }, presentController: { _, _ in
         }, presentControllerInCurrent: { _, _ in
         }, navigationController: {

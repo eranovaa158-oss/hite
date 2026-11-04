@@ -2448,6 +2448,9 @@ public final class SharedAccountContextImpl: SharedAccountContext {
             updatePresentationState: { _ in },
             openMessageShareMenu: { _ in
             },
+            performPersonalChatDoubleTapAction: { _, _ in
+                return false
+            },
             presentController: { _, _ in
             },
             presentControllerInCurrent: { _, _ in

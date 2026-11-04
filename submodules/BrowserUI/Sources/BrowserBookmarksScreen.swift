@@ -97,6 +97,9 @@ public final class BrowserBookmarksScreen: ViewController {
             }, updateInputMode: { _ in
             }, updatePresentationState: { _ in
             }, openMessageShareMenu: { _ in
+                return false
+            }, performPersonalChatDoubleTapAction: { _, _ in
+                return false
             }, presentController: { _, _ in
             }, presentControllerInCurrent: { _, _ in
             }, navigationController: {
