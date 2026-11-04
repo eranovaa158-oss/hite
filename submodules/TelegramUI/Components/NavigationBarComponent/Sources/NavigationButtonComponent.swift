@@ -130,7 +130,7 @@ public final class NavigationButtonComponent: Component {
             node.frame = self.hostedNodeFrame
         }
 
-        override func didMoveToWindow() {
+        override public func didMoveToWindow() {
             super.didMoveToWindow()
             guard self.window != nil, let node = self.hostedNode, let component = self.component else {
                 return
@@ -159,7 +159,7 @@ public final class NavigationButtonComponent: Component {
             return touches.first?.view !== self
         }
 
-        override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        override public func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
             if self.isForwarded(touches) {
                 if self.forwardedTouchCount == 0 {
                     self.highligthedChanged(true)
@@ -170,14 +170,14 @@ public final class NavigationButtonComponent: Component {
             super.touchesBegan(touches, with: event)
         }
 
-        override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        override public func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
             if self.isForwarded(touches) {
                 return
             }
             super.touchesMoved(touches, with: event)
         }
 
-        override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        override public func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
             if self.isForwarded(touches) {
                 let previousCount = self.forwardedTouchCount
                 self.forwardedTouchCount = max(0, self.forwardedTouchCount - touches.count)
@@ -192,7 +192,7 @@ public final class NavigationButtonComponent: Component {
             super.touchesEnded(touches, with: event)
         }
 
-        override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        override public func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
             if self.isForwarded(touches) {
                 let previousCount = self.forwardedTouchCount
                 self.forwardedTouchCount = max(0, self.forwardedTouchCount - touches.count)

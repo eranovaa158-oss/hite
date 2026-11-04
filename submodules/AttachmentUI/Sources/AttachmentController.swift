@@ -794,7 +794,7 @@ public class AttachmentController: ViewController, MinimizableController {
                     guard let caption = await mediaPickerContext.caption.get() else {
                         return
                     }
-                    if caption.isEmpty {
+                    if caption.string.isEmpty {
                         return
                     }
 
