@@ -25,7 +25,6 @@ import AuthorizationUtils
 import ObjectiveC
 import AVFoundation
 import ComponentFlow
-import ChatListTitleView
 import GlassBackgroundComponent
 
 private var ObjCKey_Delegate: Int?
