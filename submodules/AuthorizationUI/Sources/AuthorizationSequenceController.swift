@@ -26,6 +26,7 @@ import ObjectiveC
 import AVFoundation
 import ComponentFlow
 import GlassBackgroundComponent
+import NavigationBarComponent
 
 private var ObjCKey_Delegate: Int?
 
@@ -53,7 +54,7 @@ public final class AuthorizationSequenceController: NavigationController, ASAuth
     private var applicationStateDisposable: Disposable?
     
     private var didPlayPresentationAnimation = false
-    private let proxyButton = ComponentView<NavigationButtonComponentEnvironment>()
+    private let proxyButton = ComponentView<NavigationButtonEnvironment>()
     private let proxyButtonBackground = GlassContextExtractableContainer()
     
     private let _ready = Promise<Bool>()
@@ -144,7 +145,7 @@ public final class AuthorizationSequenceController: NavigationController, ASAuth
                 }
             )),
             environment: {
-                NavigationButtonComponentEnvironment(theme: self.presentationData.theme)
+                NavigationButtonEnvironment(theme: self.presentationData.theme)
             },
             containerSize: CGSize(width: 44.0, height: 44.0)
         )
