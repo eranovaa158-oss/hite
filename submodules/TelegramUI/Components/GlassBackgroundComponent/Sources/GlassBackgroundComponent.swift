@@ -456,6 +456,7 @@ public class GlassBackgroundView: UIView {
                 transition.setCornerRadius(layer: self.view.layer, cornerRadius: cornerRadius)
             case let .customRoundedRect(cornerRadii):
                 transition.setCornerRadius(layer: self.view.layer, cornerRadius: 0.0)
+                #if compiler(>=6.2)
                 if #available(iOS 26.0, *) {
                     transition.animateView {
                         self.view.cornerConfiguration = .corners(
@@ -465,7 +466,9 @@ public class GlassBackgroundView: UIView {
                             bottomRightRadius: .fixed(cornerRadii.bottomRight)
                         )
                     }
-                } else {
+                } else
+                #endif
+                {
                     let maskLayer: CAShapeLayer
                     if let current = self.maskLayer {
                         maskLayer = current
@@ -834,6 +837,7 @@ public class GlassBackgroundView: UIView {
                 transition.setAlpha(view: foregroundView, alpha: isVisible ? 1.0 : 0.0)
             } else {
                 if let nativeView = self.nativeView {
+                    #if compiler(>=6.2)
                     if #available(iOS 26.0, *) {
                         var glassEffect: UIGlassEffect?
                         
@@ -878,6 +882,7 @@ public class GlassBackgroundView: UIView {
                             }
                         }
                     }
+                    #endif
                 }
             }
         }
@@ -954,6 +959,7 @@ public final class GlassBackgroundContainerView: UIView {
 
     public init(spacing: CGFloat = 7.0) {
         self.spacing = spacing
+        #if compiler(>=6.2)
         if #available(iOS 26.0, *), !GlassBackgroundView.useCustomGlassImpl {
             let effect = UIGlassContainerEffect()
             effect.spacing = spacing
@@ -965,7 +971,9 @@ public final class GlassBackgroundContainerView: UIView {
             nativeParamsView.addSubview(nativeView)
             
             self.legacyView = nil
-        } else {
+        } else
+        #endif
+        {
             self.nativeView = nil
             self.nativeParamsView = nil
             self.legacyView = ContentView()

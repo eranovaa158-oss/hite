@@ -783,13 +783,19 @@ final class InteractiveDiamondLayer: MetalEngineSubjectLayer, MetalEngineSubject
     private func updateDynamicRange(highDynamicRange: Bool) {
         guard self.isHighDynamicRange != highDynamicRange else { return }
         self.isHighDynamicRange = highDynamicRange
+        #if compiler(>=6.2)
         if #available(iOS 26.0, *) {
             // 1.4 in extended sRGB is approximately 2.2 in linear-light headroom.
             self.contentsHeadroom = highDynamicRange ? 2.2 : 1.0
             self.preferredDynamicRange = highDynamicRange ? .high : .standard
         } else if #available(iOS 17.0, *) {
             self.wantsExtendedDynamicRangeContent = highDynamicRange
+        } else {
+            self.wantsExtendedDynamicRangeContent = highDynamicRange
         }
+        #else
+        self.wantsExtendedDynamicRangeContent = highDynamicRange
+        #endif
     }
 
     func update(context: MetalEngineSubjectContext) {
