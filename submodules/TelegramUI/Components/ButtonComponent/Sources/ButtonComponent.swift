@@ -527,7 +527,10 @@ public final class ButtonComponent: Component {
                     return UIColor.black.withAlphaComponent(1 - t * t * (3 - 2 * t)).cgColor
                 }
                 mask.locations = (0...8).map { index in
-                    NSNumber(value: Double(max(0, 1 - 18 / r) + min(1, 18 / r) * CGFloat(index) / 8))
+                    let featherWidth = 18 / r
+                    let position = CGFloat(index) / 8
+                    let location = max(CGFloat(0), 1 - featherWidth) + min(CGFloat(1), featherWidth) * position
+                    return NSNumber(value: Double(location))
                 }
                 layer.mask = mask
             }
