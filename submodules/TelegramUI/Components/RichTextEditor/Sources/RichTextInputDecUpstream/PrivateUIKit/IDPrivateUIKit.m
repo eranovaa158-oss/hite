@@ -1644,8 +1644,6 @@ void IDPrivateSynchronizeTextInputTraits(
         traits,
         @selector(setAllowedWritingToolsResultOptions:),
         source.allowedWritingToolsResultOptions);
-    ID_SET_OBJECT_TRAIT("ConversationContext", source.conversationContext);
-    ID_SET_BOOL_TRAIT("AllowsNumberPadPopover", source.allowsNumberPadPopover);
 
 #undef ID_SET_INTEGER_TRAIT
 #undef ID_SET_BOOL_TRAIT
