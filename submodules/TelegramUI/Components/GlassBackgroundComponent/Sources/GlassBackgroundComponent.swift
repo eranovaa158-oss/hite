@@ -466,9 +466,7 @@ public class GlassBackgroundView: UIView {
                             bottomRightRadius: .fixed(cornerRadii.bottomRight)
                         )
                     }
-                } else
-                #endif
-                {
+                } else {
                     let maskLayer: CAShapeLayer
                     if let current = self.maskLayer {
                         maskLayer = current
@@ -481,6 +479,19 @@ public class GlassBackgroundView: UIView {
                     transition.setFrame(layer: maskLayer, frame: CGRect(origin: CGPoint(), size: size))
                     transition.setShapeLayerPath(layer: maskLayer, path: GlassBackgroundView.generateRoundedRectPath(size: size, cornerRadii: cornerRadii))
                 }
+                #else
+                let maskLayer: CAShapeLayer
+                if let current = self.maskLayer {
+                    maskLayer = current
+                } else {
+                    maskLayer = CAShapeLayer()
+                    maskLayer.fillColor = UIColor.black.cgColor
+                    self.maskLayer = maskLayer
+                    self.view.layer.mask = maskLayer
+                }
+                transition.setFrame(layer: maskLayer, frame: CGRect(origin: CGPoint(), size: size))
+                transition.setShapeLayerPath(layer: maskLayer, path: GlassBackgroundView.generateRoundedRectPath(size: size, cornerRadii: cornerRadii))
+                #endif
             }
         }
     }
@@ -971,13 +982,16 @@ public final class GlassBackgroundContainerView: UIView {
             nativeParamsView.addSubview(nativeView)
             
             self.legacyView = nil
-        } else
-        #endif
-        {
+        } else {
             self.nativeView = nil
             self.nativeParamsView = nil
             self.legacyView = ContentView()
         }
+        #else
+        self.nativeView = nil
+        self.nativeParamsView = nil
+        self.legacyView = ContentView()
+        #endif
 
         super.init(frame: CGRect())
         

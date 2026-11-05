@@ -10,6 +10,16 @@ import Camera
 private final class CameraBundleMarker: NSObject {
 }
 
+/// Keeps non-Sendable Metal/CoreVideo lifetime anchors alive across a @Sendable
+/// completion closure. The values are only held, never touched on another thread.
+private final class FrameLifetimeAnchor<Value>: @unchecked Sendable {
+    let value: Value
+
+    init(_ value: Value) {
+        self.value = value
+    }
+}
+
 private struct FrameUniforms {
     var primaryRow0: SIMD4<Float>
     var primaryRow1: SIMD4<Float>
@@ -505,6 +515,7 @@ final class RoundVideoFrameProcessor {
             statistics.decoratedFrames += 1
         }
         let mediaQueue = self.mediaQueue
+        let lifetimeAnchor = FrameLifetimeAnchor((retainedPixelBuffers, retainedTextures))
         commandBuffer.addCompletedHandler { [weak self] commandBuffer in
             let processedFrame: ProcessedVideoFrame?
             if commandBuffer.status == .completed {
@@ -521,10 +532,8 @@ final class RoundVideoFrameProcessor {
                     return
                 }
                 self.isRendering = false
-                withExtendedLifetime(retainedPixelBuffers) {
-                    withExtendedLifetime(retainedTextures) {
-                        completion(processedFrame)
-                    }
+                withExtendedLifetime(lifetimeAnchor) {
+                    completion(processedFrame)
                 }
             }
         }

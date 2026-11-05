@@ -794,7 +794,9 @@ final class InteractiveDiamondLayer: MetalEngineSubjectLayer, MetalEngineSubject
             self.wantsExtendedDynamicRangeContent = highDynamicRange
         }
         #else
-        self.wantsExtendedDynamicRangeContent = highDynamicRange
+        if #available(iOS 17.0, *) {
+            self.wantsExtendedDynamicRangeContent = highDynamicRange
+        }
         #endif
     }
 

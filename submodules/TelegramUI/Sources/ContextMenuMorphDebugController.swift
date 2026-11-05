@@ -157,11 +157,12 @@ final class ContextMenuMorphDebugController: ViewController {
             #if compiler(>=6.2)
             if #available(iOS 26.0, *) {
                 background = UIVisualEffectView(effect: UIGlassEffect(style: .regular))
-            } else
-            #endif
-            {
+            } else {
                 background = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
             }
+            #else
+            background = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
+            #endif
             background.frame = button.frame
             let maskContainer = UIView(frame: background.bounds)
             let mask = UIView(frame: index == 15 ? maskContainer.bounds.inset(by: UIEdgeInsets(top: 16, left: 0, bottom: 0, right: 0)) : maskContainer.bounds)
@@ -285,11 +286,12 @@ final class ContextMenuMorphDebugController: ViewController {
         #if compiler(>=6.2)
         if #available(iOS 26.0, *) {
             background = UIVisualEffectView(effect: UIGlassEffect(style: .regular))
-        } else
-        #endif
-        {
+        } else {
             background = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
         }
+        #else
+        background = UIVisualEffectView(effect: UIBlurEffect(style: .regular))
+        #endif
         background.frame = source.frame
         let mask = UIView(frame: background.bounds)
         mask.backgroundColor = .white
