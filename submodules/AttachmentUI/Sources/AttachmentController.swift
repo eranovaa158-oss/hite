@@ -791,10 +791,14 @@ public class AttachmentController: ViewController, MinimizableController {
                         return
                     }
 
-                    guard let caption = await mediaPickerContext.caption.get() else {
+                    // Cast to a Sendable String before awaiting: Signal.get()
+                    // resumes from a nonisolated context, and Swift 6 mode
+                    // forbids sending the non-Sendable NSAttributedString across
+                    // that boundary. Only the caption's string is needed here.
+                    guard let captionText = await (mediaPickerContext.caption |> map { $0?.string }).get() else {
                         return
                     }
-                    if caption.string.isEmpty {
+                    if captionText.isEmpty {
                         return
                     }
 
@@ -827,7 +831,7 @@ public class AttachmentController: ViewController, MinimizableController {
                             },
                             sendContextActions: nil
                         ),
-                        inputText: .plain(text: caption.string, entities: []),
+                        inputText: .plain(text: captionText, entities: []),
                         copyResult: nil,
                         translateChat: nil
                     )
