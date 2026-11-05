@@ -622,6 +622,7 @@ public class GlassBackgroundView: UIView {
         legacyHighlightContainerView.isUserInteractionEnabled = false
         legacyHighlightContainerView.clipsToBounds = true
         self.legacyHighlightContainerView = legacyHighlightContainerView
+        self.legacyHighlightClippingContext = ClippingShapeContext(view: legacyHighlightContainerView)
         self.nativeView = nil
         self.nativeViewClippingContext = nil
         self.nativeParamsView = nil
