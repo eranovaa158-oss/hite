@@ -10,10 +10,6 @@ swift_library(
     ]),
     copts = [
         "-warnings-as-errors",
-        "-Xfrontend",
-        "-solver-expression-time-threshold=20",
-        "-Xfrontend",
-        "-debug-time-limiting-constraint",
     ],
     deps = [
         "//submodules/SSignalKit/SwiftSignalKit:SwiftSignalKit",
