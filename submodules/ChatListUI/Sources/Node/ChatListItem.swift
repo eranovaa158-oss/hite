@@ -5,7 +5,6 @@ import Display
 import SwiftSignalKit
 import TelegramCore
 import TelegramPresentationData
-import TelegramUIPreferences
 import ItemListUI
 import PresentationDataUtils
 import AvatarNode
@@ -2025,12 +2024,7 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                 }
             }
             
-            let extraChatSettings = ExtraChatSettings.effectiveChatListSettings
             var avatarDiameter = min(60.0, floor(item.presentationData.fontSize.baseDisplaySize * 60.0 / 17.0))
-            let compactChatLayout = extraChatSettings.compactChatList
-            if compactChatLayout {
-                avatarDiameter = min(38.0, floor(item.presentationData.fontSize.baseDisplaySize * 38.0 / 17.0))
-            }
             
             if case let .peer(peerData) = item.content, let customMessageListData = peerData.customMessageListData, customMessageListData.commandPrefix != nil {
                 avatarDiameter = 40.0
@@ -2291,16 +2285,13 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
         let currentChatListQuoteSearchResult = self.cachedChatListQuoteSearchResult
         let currentCustomTextEntities = self.cachedCustomTextEntities
         
-        return { [weak self] (item: ChatListItem, params: ListViewItemLayoutParams, first: Bool, last: Bool, firstWithHeader: Bool, nextIsPinned: Bool, nextHasActiveRevealControls: Bool) -> (ListViewItemNodeLayout, (Bool, Bool) -> Void) in
+        return { [weak self] item, params, first, last, firstWithHeader, nextIsPinned, nextHasActiveRevealControls in
             let titleFont = Font.semibold(floor(item.presentationData.fontSize.itemListBaseFontSize * 16.0 / 17.0))
             let textFont = Font.regular(floor(item.presentationData.fontSize.itemListBaseFontSize * 15.0 / 17.0))
             let italicTextFont = Font.italic(floor(item.presentationData.fontSize.itemListBaseFontSize * 15.0 / 17.0))
             let dateFont = Font.regular(floor(item.presentationData.fontSize.itemListBaseFontSize * 14.0 / 17.0))
             let badgeFont = Font.with(size: floor(item.presentationData.fontSize.itemListBaseFontSize * 12.0 / 17.0), design: .regular, weight: .semibold, traits: [.monospacedNumbers])
             let avatarBadgeFont = Font.with(size: floor(item.presentationData.fontSize.itemListBaseFontSize * 16.0 / 17.0), design: .regular, weight: .regular, traits: [.monospacedNumbers])
-            let extraChatSettings = ExtraChatSettings.effectiveChatListSettings
-            let compactChatLayout = extraChatSettings.compactChatList
-            let isSearching = item.interaction.searchTextHighightState != nil
             
             let account = item.context.account
             var messages: [EngineMessage]
@@ -2647,20 +2638,6 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             if case .groupReference = item.content {
                 useInlineAuthorPrefix = true
             }
-            if compactChatLayout, case let .chat(itemPeer, _, _, _, _, _, _, _) = contentData {
-                if let messagePeer = itemPeer.chatMainPeer {
-                    switch messagePeer {
-                    case let .channel(channel):
-                        if case .group = channel.info {
-                            useInlineAuthorPrefix = true
-                        }
-                    case .legacyGroup:
-                        useInlineAuthorPrefix = true
-                    default:
-                        break
-                    }
-                }
-            }
             if !itemTags.isEmpty {
                 forumTopicData = nil
                 topForumTopicItems = []
@@ -2682,11 +2659,11 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             }
             
             if useInlineAuthorPrefix {
-                if let author = messages.last?.author {
+                if case let .user(author) = messages.last?.author {
                     if author.id == item.context.account.peerId {
                         inlineAuthorPrefix = item.presentationData.strings.DialogList_You
                     } else if messages.last?.id.peerId.namespace != Namespaces.Peer.CloudUser && messages.last?.id.peerId.namespace != Namespaces.Peer.SecretChat {
-                        inlineAuthorPrefix = author.compactDisplayTitle
+                        inlineAuthorPrefix = EnginePeer.user(author).compactDisplayTitle
                     }
                 }
             }
@@ -2855,7 +2832,7 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                     } else if let message = messages.last {
                         var composedString: NSMutableAttributedString
                         
-                        if let peerText = peerText, inlineAuthorPrefix == nil {
+                        if let peerText = peerText {
                             authorAttributedString = NSAttributedString(string: peerText, font: textFont, textColor: theme.authorNameColor)
                         }
                                        
@@ -3204,7 +3181,7 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                             }
                         }
                         
-                        if let peerText = peerText, inlineAuthorPrefix == nil {
+                        if let peerText = peerText {
                             authorAttributedString = NSAttributedString(string: peerText, font: textFont, textColor: theme.authorNameColor)
                         }
                     }
@@ -3742,6 +3719,8 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             
             var effectiveAuthorTitle = (hideAuthor && !hasDraft) ? nil : authorAttributedString
             
+            let isSearching = item.interaction.searchTextHighightState != nil
+            
             var isFirstForumThreadSelectable = false
             var forumThreads: [(id: Int64, threadPeer: EnginePeer?, title: NSAttributedString, iconId: Int64?, iconColor: Int32?)] = []
             var authorTopicArrowColor: UIColor?
@@ -3753,10 +3732,8 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                         forumThreads.append((id: forumThread.id, threadPeer: forumThread.threadPeer, title: NSAttributedString(string: forumThread.threadPeer?.compactDisplayTitle ?? " ", font: textFont, textColor: forumThread.isUnread || isSearching ? theme.authorNameColor : theme.messageTextColor), iconId: nil, iconColor: nil))
                     }
                     for topicItem in topForumTopicItems {
-                        if case let .peer(peer) = item.content, peer.peer.peerId.id._internalGetInt64Value() == topicItem.id {
-                            
-                        } else if forumThread?.id != topicItem.id {
-                            forumThreads.append((id: topicItem.id, threadPeer: topicItem.threadPeer, title: NSAttributedString(string: topicItem.title, font: textFont, textColor: topicItem.isUnread || isSearching ? theme.authorNameColor : theme.messageTextColor), iconId: topicItem.iconFileId, iconColor: topicItem.iconColor))
+                        if forumThread?.id != topicItem.id {
+                            forumThreads.append((id: topicItem.id, threadPeer: topicItem.threadPeer, title: NSAttributedString(string: topicItem.threadPeer?.compactDisplayTitle ?? " ", font: textFont, textColor: topicItem.isUnread || isSearching ? theme.authorNameColor : theme.messageTextColor), iconId: nil, iconColor: nil))
                         }
                     }
                     
@@ -3770,14 +3747,32 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                     
                     effectiveAuthorTitle = nil
                 }
-            }
-            
-            if compactChatLayout, let effectiveAuthorTitleValue = effectiveAuthorTitle, let textAttributedStringValue = textAttributedString {
-                let mutableTextAttributedString = NSMutableAttributedString()
-                mutableTextAttributedString.append(NSAttributedString(string: effectiveAuthorTitleValue.string + ": ", font: textFont, textColor: theme.authorNameColor))
-                mutableTextAttributedString.append(textAttributedStringValue)
+            } else if forumThread != nil || !topForumTopicItems.isEmpty {
+                if let forumThread = forumThread {
+                    if case let .peer(peer) = item.content, case .user = peer.peer.chatMainPeer {
+                        isFirstForumThreadSelectable = false
+                    } else {
+                        isFirstForumThreadSelectable = forumThread.isUnread
+                    }
+                    
+                    forumThreads.append((id: forumThread.id, threadPeer: forumThread.threadPeer, title: NSAttributedString(string: forumThread.title, font: textFont, textColor: forumThread.isUnread || isSearching ? theme.authorNameColor : theme.messageTextColor), iconId: forumThread.iconId, iconColor: forumThread.iconColor))
+                }
+                for topicItem in topForumTopicItems {
+                    if case let .peer(peer) = item.content, peer.peer.peerId.id._internalGetInt64Value() == topicItem.id {
+                        
+                    } else if forumThread?.id != topicItem.id {
+                        forumThreads.append((id: topicItem.id, threadPeer: topicItem.threadPeer, title: NSAttributedString(string: topicItem.title, font: textFont, textColor: topicItem.isUnread || isSearching ? theme.authorNameColor : theme.messageTextColor), iconId: topicItem.iconFileId, iconColor: topicItem.iconColor))
+                    }
+                }
                 
-                textAttributedString = mutableTextAttributedString
+                if let effectiveAuthorTitle, let textAttributedStringValue = textAttributedString {
+                    let mutableTextAttributedString = NSMutableAttributedString()
+                    mutableTextAttributedString.append(NSAttributedString(string: effectiveAuthorTitle.string + ": ", font: textFont, textColor: theme.authorNameColor))
+                    mutableTextAttributedString.append(textAttributedStringValue)
+                    
+                    textAttributedString = mutableTextAttributedString
+                }
+                
                 effectiveAuthorTitle = nil
             }
             
@@ -3822,8 +3817,6 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             }
             
             let textLineSpacing: CGFloat = min(0.2, item.presentationData.fontSize.itemListBaseFontSize * 0.2 / 17.0)
-            let canUseTwoLinePreview = authorAttributedString == nil && itemTags.isEmpty && forumThread == nil && topForumTopicItems.isEmpty
-            let forceSingleLinePreview = extraChatSettings.compactChatList
             let (textLayout, textApply) = textLayout(TextNodeLayoutArguments(
                 attributedString: textAttributedString,
                 backgroundColor: nil,
@@ -4035,13 +4028,6 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                 peerRevealOptions = []
                 peerLeftRevealOptions = []
             }
-            if !extraChatSettings.chatSwipeOptions {
-                peerRevealOptions = []
-                peerLeftRevealOptions = []
-            } else if !extraChatSettings.chatSwipeDelete {
-                peerRevealOptions.removeAll(where: { $0.key == RevealOptionKey.delete.rawValue })
-                peerLeftRevealOptions.removeAll(where: { $0.key == RevealOptionKey.delete.rawValue })
-            }
             
             let (onlineLayout, onlineApply) = onlineLayout(online, onlineIsVoiceChat)
             var animateContent = false
@@ -4053,7 +4039,6 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             
             let titleSpacing: CGFloat = -1.0
             let authorSpacing: CGFloat = -3.0
-            let rawContentTopInset = compactChatLayout ? floor(item.presentationData.fontSize.itemListBaseFontSize * 4.0 / 17.0) : floor(item.presentationData.fontSize.itemListBaseFontSize * 8.0 / 17.0)
             var itemHeight: CGFloat = 8.0 * 2.0 + 1.0
             itemHeight -= 21.0
             if case let .peer(peerData) = item.content, let customMessageListData = peerData.customMessageListData, customMessageListData.commandPrefix != nil {
@@ -4065,16 +4050,8 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                 itemHeight += titleSpacing
                 itemHeight += authorSpacing
             }
-            if forceSingleLinePreview && canUseTwoLinePreview {
-                itemHeight = max(58.0, itemHeight - measureLayout.size.height)
-            }
-            if extraChatSettings.compactChatList {
-                let compactTextBlockHeight = titleLayout.size.height + textLayout.size.height
-                let compactTextHeight = rawContentTopInset + compactTextBlockHeight + 5.0
-                itemHeight = max(42.0, compactTextHeight, 38.0 + 4.0)
-            }
                         
-            let rawContentRect = CGRect(origin: CGPoint(x: 2.0, y: layoutOffset + rawContentTopInset), size: CGSize(width: rawContentWidth, height: itemHeight - 12.0 - 9.0))
+            let rawContentRect = CGRect(origin: CGPoint(x: 2.0, y: layoutOffset + floor(item.presentationData.fontSize.itemListBaseFontSize * 8.0 / 17.0)), size: CGSize(width: rawContentWidth, height: itemHeight - 12.0 - 9.0))
             
             let insets = ChatListItemNode.insets(first: first, last: last, firstWithHeader: firstWithHeader)
             var heightOffset: CGFloat = 0.0
