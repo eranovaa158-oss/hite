@@ -568,11 +568,15 @@ private func extractAccountManagerState(records: AccountRecordsView<TelegramAcco
         
         let appVersion = (Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String) ?? "unknown"
         
-        let baseAppBundleId = Bundle.main.bundleIdentifier!
+        let baseAppBundleId = Bundle.main.bundleIdentifier ?? "org.telegram.Telegram"
         let appGroupName = "group.\(baseAppBundleId)"
-        try! PasscodeEnvironment.shared.configure(PasscodeConfiguration(appGroupIdentifier: appGroupName, processRole: .mainApp, biometricKeychainService: walletBiometricKeychainService), privateAccessGroup: {
-            BuildConfig.keychainAccessGroup(baseAppBundleId: baseAppBundleId)
-        })
+        do {
+            try PasscodeEnvironment.shared.configure(PasscodeConfiguration(appGroupIdentifier: appGroupName, processRole: .mainApp, biometricKeychainService: walletBiometricKeychainService), privateAccessGroup: {
+                BuildConfig.keychainAccessGroup(baseAppBundleId: baseAppBundleId)
+            })
+        } catch {
+            Logger.shared.log("App \(self.episodeId)", "PasscodeEnvironment configure failed: \(error)")
+        }
         let maybeAppGroupUrl = FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupName)
         
         let buildConfig = BuildConfig(baseAppBundleId: baseAppBundleId)
