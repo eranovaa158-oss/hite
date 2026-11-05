@@ -5,7 +5,6 @@ import AsyncDisplayKit
 import TelegramCore
 import SwiftSignalKit
 import TelegramPresentationData
-import TelegramUIPreferences
 import AccountContext
 import ContactListUI
 import CallListUI
@@ -86,8 +85,6 @@ public final class TelegramRootController: NavigationController, TelegramRootCon
     private var permissionsDisposable: Disposable?
     private var presentationDataDisposable: Disposable?
     private var presentationData: PresentationData
-    private var currentShowCallsTab: Bool = true
-    private var extraTabSettingsObserver: NSObjectProtocol?
     
     private var detailsPlaceholderNode: DetailsChatPlaceholderNode?
     
@@ -118,17 +115,13 @@ public final class TelegramRootController: NavigationController, TelegramRootCon
                 let previousTheme = strongSelf.presentationData.theme
                 strongSelf.presentationData = presentationData
                 if previousTheme !== presentationData.theme {
-                    (strongSelf.rootTabController as? TabBarControllerImpl)?.updatePresentationData(presentationData)
+                    (strongSelf.rootTabController as? TabBarControllerImpl)?.updateTheme(theme: presentationData.theme)
                     strongSelf.rootTabController?.statusBar.statusBarStyle = presentationData.theme.rootController.statusBarStyle.style
                 }
             }
         })
         
         if context.sharedContext.applicationBindings.isMainApp {
-            self.extraTabSettingsObserver = NotificationCenter.default.addObserver(forName: ExtraTabSettings.updatedNotification, object: nil, queue: .main, using: { [weak self] _ in
-                self?.applyExtraTabSettings(transition: .animated(duration: 0.35, curve: .spring))
-            })
-
             self.applicationInFocusDisposable = (context.sharedContext.applicationBindings.applicationIsActive
             |> distinctUntilChanged
             |> deliverOn(Queue.mainQueue())).startStrict(next: { value in
@@ -155,9 +148,6 @@ public final class TelegramRootController: NavigationController, TelegramRootCon
         self.presentationDataDisposable?.dispose()
         self.applicationInFocusDisposable?.dispose()
         self.storyUploadEventsDisposable?.dispose()
-        if let extraTabSettingsObserver = self.extraTabSettingsObserver {
-            NotificationCenter.default.removeObserver(extraTabSettingsObserver)
-        }
     }
     
     public func getContactsController() -> ViewController? {
@@ -223,11 +213,9 @@ public final class TelegramRootController: NavigationController, TelegramRootCon
         contactsController.switchToChatsController = {  [weak self] in
             self?.openChatsController(activateSearch: false)
         }
-        if extraTabSettings.compactPanel || !extraTabSettings.hideContactsTab {
-            controllers.append(contactsController)
-        }
+        controllers.append(contactsController)
         
-        if showCallsTab && (extraTabSettings.compactPanel || !extraTabSettings.hideCallsTab) {
+        if showCallsTab {
             controllers.append(callListController)
         }
         controllers.append(chatListController)
@@ -270,14 +258,9 @@ public final class TelegramRootController: NavigationController, TelegramRootCon
         guard let rootTabController = self.rootTabController as? TabBarControllerImpl else {
             return
         }
-        self.currentShowCallsTab = showCallsTab
-        let extraTabSettings = self.effectiveExtraTabSettings()
-        rootTabController.extraTabSettings = extraTabSettings
         var controllers: [ViewController] = []
-        if extraTabSettings.compactPanel || !extraTabSettings.hideContactsTab {
-            controllers.append(self.contactsController!)
-        }
-        if showCallsTab && (extraTabSettings.compactPanel || !extraTabSettings.hideCallsTab) {
+        controllers.append(self.contactsController!)
+        if showCallsTab {
             controllers.append(self.callListController!)
         }
         controllers.append(self.chatListController!)
@@ -294,19 +277,6 @@ public final class TelegramRootController: NavigationController, TelegramRootCon
         rootTabController.setControllers(controllers, selectedIndex: selectedIndex)
     }
     
-    private func effectiveExtraTabSettings() -> ExtraTabSettings {
-        return ExtraTabSettings.current
-    }
-
-    private func applyExtraTabSettings(transition: ContainedViewLayoutTransition) {
-        guard let rootTabController = self.rootTabController as? TabBarControllerImpl else {
-            return
-        }
-        rootTabController.extraTabSettings = self.effectiveExtraTabSettings()
-        self.updateRootControllers(showCallsTab: self.currentShowCallsTab)
-        rootTabController.updateLayout(transition: transition)
-    }
-
     public func openChatsController(activateSearch: Bool, filter: ChatListSearchFilter = .chats, query: String? = nil) {
         guard let rootTabController = self.rootTabController else {
             return
@@ -356,10 +326,6 @@ public final class TelegramRootController: NavigationController, TelegramRootCon
     
     @discardableResult
     public func openStoryCamera(mode: StoryCameraMode, customTarget: Stories.PendingTarget?, resumeLiveStream: Bool, transitionIn: StoryCameraTransitionIn?, transitionedIn: @escaping () -> Void, transitionOut: @escaping (Stories.PendingTarget?, Bool) -> StoryCameraTransitionOut?) -> StoryCameraTransitionInCoordinator? {
-        let extraStorySettings = ExtraStorySettings.current
-        if extraStorySettings.disableStories || extraStorySettings.disableStoryRecording {
-            return nil
-        }
         guard let controller = self.viewControllers.last as? ViewController else {
             return nil
         }

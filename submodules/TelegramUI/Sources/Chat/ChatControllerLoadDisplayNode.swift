@@ -271,22 +271,17 @@ extension ChatControllerImpl {
         self.chatDisplayNode.overlayTitle = contentData.overlayTitle
         self.chatDisplayNode.overlayTitleContent = contentData.state.chatTitleContent
         
-        if ExtraChatSettings.current.channelSwipeToNext {
-            self.chatDisplayNode.historyNode.nextChannelToRead = contentData.state.nextChannelToRead.flatMap { nextChannelToRead -> (peer: EnginePeer, threadData: (id: Int64, data: MessageHistoryThreadData)?, unreadCount: Int, location: TelegramEngine.NextUnreadChannelLocation)? in
-                return (
-                    nextChannelToRead.peer,
-                    nextChannelToRead.threadData.flatMap { threadData -> (id: Int64, data: MessageHistoryThreadData) in
-                        return (threadData.id, threadData.data)
-                    },
-                    nextChannelToRead.unreadCount,
-                    nextChannelToRead.location
-                )
-            }
-            self.chatDisplayNode.historyNode.nextChannelToReadDisplayName = contentData.state.nextChannelToReadDisplayName
-        } else {
-            self.chatDisplayNode.historyNode.nextChannelToRead = nil
-            self.chatDisplayNode.historyNode.nextChannelToReadDisplayName = false
+        self.chatDisplayNode.historyNode.nextChannelToRead = contentData.state.nextChannelToRead.flatMap { nextChannelToRead -> (peer: EnginePeer, threadData: (id: Int64, data: MessageHistoryThreadData)?, unreadCount: Int, location: TelegramEngine.NextUnreadChannelLocation)? in
+            return (
+                nextChannelToRead.peer,
+                nextChannelToRead.threadData.flatMap { threadData -> (id: Int64, data: MessageHistoryThreadData) in
+                    return (threadData.id, threadData.data)
+                },
+                nextChannelToRead.unreadCount,
+                nextChannelToRead.location
+            )
         }
+        self.chatDisplayNode.historyNode.nextChannelToReadDisplayName = contentData.state.nextChannelToReadDisplayName
         self.updateNextChannelToReadVisibility()
         
         var animated = false
@@ -697,11 +692,8 @@ extension ChatControllerImpl {
             }
         }
         
-        if ExtraOtherSettings.current.translationService == .gTranslate {
-            engineExperimentalInternalTranslationService = ExperimentalGoogleTranslationServiceImpl()
-        } else {
-            engineExperimentalInternalTranslationService = nil
-            if #available(iOS 18.0, *), let hostView = self.context.sharedContext.mainWindow?.hostView {
+        if #available(iOS 18.0, *) {
+            if engineExperimentalInternalTranslationService == nil, let hostView = self.context.sharedContext.mainWindow?.hostView {
                 let translationService = ExperimentalInternalTranslationServiceImpl(view: hostView.containerView)
                 engineExperimentalInternalTranslationService = translationService
             }
@@ -2681,26 +2673,7 @@ extension ChatControllerImpl {
                 return
             }
                         
-            if !isVideo && ExtraChatSettings.current.confirmVoiceRecording && !strongSelf.skipNextVoiceRecordingConfirmation {
-                strongSelf.present(textAlertController(context: strongSelf.context, updatedPresentationData: strongSelf.updatedPresentationData, title: "Записать голосовое?", text: "Подтвердите начало записи голосового сообщения.", actions: [
-                    TextAlertAction(type: .genericAction, title: strongSelf.presentationData.strings.Common_Cancel, action: {
-                    }),
-                    TextAlertAction(type: .defaultAction, title: "Записать", action: { [weak self] in
-                        guard let strongSelf = self else {
-                            return
-                        }
-                        strongSelf.skipNextVoiceRecordingConfirmation = true
-                        strongSelf.lockNextMediaRecordingOnStart = true
-                        strongSelf.interfaceInteraction?.beginMediaRecording(false)
-                    })
-                ]), in: .window(.root))
-                return
-            } else {
-                strongSelf.skipNextVoiceRecordingConfirmation = false
-            }
-
             let requestId = strongSelf.beginMediaRecordingRequestId
-            var requestedVideoFrontCamera: Bool?
             let begin: () -> Void = {
                 guard let strongSelf = self, strongSelf.beginMediaRecordingRequestId == requestId else {
                     return
@@ -2708,7 +2681,6 @@ extension ChatControllerImpl {
                 guard checkAvailableDiskSpace(context: strongSelf.context, push: { [weak self] c in
                     self?.present(c, in: .window(.root))
                 }) else {
-                    strongSelf.lockNextMediaRecordingOnStart = false
                     return
                 }
                 let hasOngoingCall: Signal<Bool, NoError> = strongSelf.context.sharedContext.hasOngoingCall.get()
@@ -2719,26 +2691,11 @@ extension ChatControllerImpl {
                         return
                     }
                     if hasOngoingCall {
-                        strongSelf.lockNextMediaRecordingOnStart = false
                         strongSelf.present(textAlertController(context: strongSelf.context, updatedPresentationData: strongSelf.updatedPresentationData, title: strongSelf.presentationData.strings.Call_CallInProgressTitle, text: strongSelf.presentationData.strings.Call_RecordingDisabledMessage, actions: [TextAlertAction(type: .defaultAction, title: strongSelf.presentationData.strings.Common_OK, action: {
                         })]), in: .window(.root))
                     } else {
-                        if strongSelf.lockNextMediaRecordingOnStart {
-                            strongSelf.lockMediaRecordingRequestId = strongSelf.beginMediaRecordingRequestId
-                            strongSelf.lockNextMediaRecordingOnStart = false
-                        }
                         if isVideo {
-                            let settings = ExtraChatSettings.current
-                            let startWithFrontCamera: Bool
-                            switch settings.videoMessageCamera {
-                            case .front:
-                                startWithFrontCamera = true
-                            case .back:
-                                startWithFrontCamera = false
-                            case .ask:
-                                startWithFrontCamera = requestedVideoFrontCamera ?? true
-                            }
-                            strongSelf.requestVideoRecorder(initialFrontCamera: startWithFrontCamera)
+                            strongSelf.requestVideoRecorder()
                         } else {
                             strongSelf.requestAudioRecorder(beginWithTone: false)
                         }
@@ -2752,41 +2709,18 @@ extension ChatControllerImpl {
                 self?.context.sharedContext.applicationBindings.openSettings()
             }, { granted in
                 guard let strongSelf = self, granted else {
-                    self?.lockNextMediaRecordingOnStart = false
                     return
                 }
                 if isVideo {
-                    let authorizeCamera: () -> Void = {
-                        DeviceAccess.authorizeAccess(to: .camera(.video), presentationData: strongSelf.presentationData, present: { c, a in
-                            self?.present(c, in: .window(.root), with: a)
-                        }, openSettings: {
-                            self?.context.sharedContext.applicationBindings.openSettings()
-                        }, { granted in
-                            if granted {
-                                begin()
-                            } else {
-                                self?.lockNextMediaRecordingOnStart = false
-                            }
-                        })
-                    }
-                    if ExtraChatSettings.current.videoMessageCamera == .ask {
-                        strongSelf.present(textAlertController(context: strongSelf.context, updatedPresentationData: strongSelf.updatedPresentationData, title: "Камера видеосообщения", text: "Выберите камеру для записи видеосообщения.", actions: [
-                            TextAlertAction(type: .defaultAction, title: "Фронтальная", action: {
-                                requestedVideoFrontCamera = true
-                                strongSelf.lockNextMediaRecordingOnStart = true
-                                authorizeCamera()
-                            }),
-                            TextAlertAction(type: .genericAction, title: "Задняя", action: {
-                                requestedVideoFrontCamera = false
-                                strongSelf.lockNextMediaRecordingOnStart = true
-                                authorizeCamera()
-                            }),
-                            TextAlertAction(type: .genericAction, title: strongSelf.presentationData.strings.Common_Cancel, action: {
-                            })
-                        ]), in: .window(.root))
-                    } else {
-                        authorizeCamera()
-                    }
+                    DeviceAccess.authorizeAccess(to: .camera(.video), presentationData: strongSelf.presentationData, present: { c, a in
+                        self?.present(c, in: .window(.root), with: a)
+                    }, openSettings: {
+                        self?.context.sharedContext.applicationBindings.openSettings()
+                    }, { granted in
+                        if granted {
+                            begin()
+                        }
+                    })
                 } else {
                     begin()
                 }
@@ -5572,9 +5506,6 @@ extension ChatControllerImpl {
         historyNode.openNextChannelToRead = { [weak self] peer, threadData, location -> Bool in
             guard let strongSelf = self else {
                 return false
-            }
-            guard ExtraChatSettings.current.channelSwipeToNext else {
-                return
             }
             if let navigationController = strongSelf.effectiveNavigationController {
                 let _ = ApplicationSpecificNotice.incrementNextChatSuggestionTip(accountManager: strongSelf.context.sharedContext.accountManager).startStandalone()

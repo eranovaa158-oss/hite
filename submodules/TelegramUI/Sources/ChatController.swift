@@ -533,9 +533,6 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
     
     var beginMediaRecordingRequestId: Int = 0
     var lockMediaRecordingRequestId: Int?
-    var skipNextVoiceRecordingConfirmation = false
-    var lockNextMediaRecordingOnStart = false
-    var extraChatSettingsObserver: NSObjectProtocol?
     
     var updateSlowmodeStatusDisposable = MetaDisposable()
     var updateSlowmodeStatusTimerValue: Int32?
@@ -3622,27 +3619,6 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
                 return
             }
             self.openMessageShareMenu(id: id)
-        }, performPersonalChatDoubleTapAction: { [weak self] message, action in
-            guard let self else {
-                return false
-            }
-            switch action {
-            case .savedMessages:
-                self.forwardMessagesToSavedMessages(messages: [message])
-                return true
-            case .edit:
-                self.interfaceInteraction?.setupEditMessage(message.id, { _ in })
-                return true
-            case .pin:
-                if message.tags.contains(.pinned) {
-                    self.interfaceInteraction?.unpinMessage(message.id, false, nil)
-                } else {
-                    self.interfaceInteraction?.pinMessage(message.id, nil)
-                }
-                return true
-            case .reaction, .forward, .reply, .select, .copy, .contextMenu:
-                return false
-            }
         }, presentController: { [weak self] controller, arguments in
             self?.present(controller, in: .window(.root), with: arguments)
         }, presentControllerInCurrent: { [weak self] controller, arguments in
@@ -7048,24 +7024,6 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
             }
         })
         
-        self.extraChatSettingsObserver = NotificationCenter.default.addObserver(forName: ExtraChatSettings.updatedNotification, object: nil, queue: .main) { [weak self] _ in
-            guard let strongSelf = self, strongSelf.isNodeLoaded else {
-                return
-            }
-            var messageIds: [MessageId] = []
-            strongSelf.chatDisplayNode.historyNode.forEachMessageInCurrentHistoryView { message in
-                messageIds.append(message.id)
-                return true
-            }
-            for messageId in messageIds {
-                strongSelf.chatDisplayNode.historyNode.requestMessageUpdate(messageId)
-            }
-            strongSelf.chatDisplayNode.updateStickerSettings(strongSelf.stickerSettings, forceStopAnimations: strongSelf.disableStickerAnimationsValue)
-            if let validLayout = strongSelf.validLayout {
-                strongSelf.containerLayoutUpdated(validLayout, transition: .immediate)
-            }
-        }
-
         if case let .messageOptions(_, messageIds, _) = self.subject, messageIds.count > 1 {
             self.updateChatPresentationInterfaceState(interactive: false, { state in
                 return state.updatedInterfaceState({ $0.withUpdatedSelectedMessages(messageIds) })
@@ -7219,9 +7177,6 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
         self.updateMessageTodoDisposables?.dispose()
         self.preloadNextChatPeerIdDisposable.dispose()
         self.globalControlPanelsContextStateDisposable?.dispose()
-        if let extraChatSettingsObserver = self.extraChatSettingsObserver {
-            NotificationCenter.default.removeObserver(extraChatSettingsObserver)
-        }
     }
     
     public func updatePresentationMode(_ mode: ChatControllerPresentationMode) {
@@ -11245,7 +11200,7 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
         guard let contentData = self.contentData else {
             return
         }
-        self.chatDisplayNode.historyNode.offerNextChannelToRead = ExtraChatSettings.current.channelSwipeToNext && contentData.state.offerNextChannelToRead && self.presentationInterfaceState.interfaceState.selectionState == nil
+        self.chatDisplayNode.historyNode.offerNextChannelToRead = contentData.state.offerNextChannelToRead && self.presentationInterfaceState.interfaceState.selectionState == nil
     }
     
     func displayGiveawayStatusInfo(messageId: EngineMessage.Id, giveawayInfo: PremiumGiveawayInfo) {
