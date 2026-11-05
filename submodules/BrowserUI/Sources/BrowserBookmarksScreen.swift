@@ -97,6 +97,8 @@ public final class BrowserBookmarksScreen: ViewController {
             }, updateInputMode: { _ in
             }, updatePresentationState: { _ in
             }, openMessageShareMenu: { _ in
+            }, performPersonalChatDoubleTapAction: { _, _ in
+                return false
             }, presentController: { _, _ in
             }, presentControllerInCurrent: { _, _ in
             }, navigationController: {
@@ -193,8 +195,6 @@ public final class BrowserBookmarksScreen: ViewController {
             }, openRankInfo: { _, _, _ in
             }, openSetPeerAvatar: {
             }, displayPollRestrictedToast: { _ in
-            }, performPersonalChatDoubleTapAction: { _, _ in
-                return false
             }, automaticMediaDownloadSettings: MediaAutoDownloadSettings.defaultSettings, pollActionState: ChatInterfacePollActionState(), stickerSettings: ChatInterfaceStickerSettings(), presentationContext: ChatPresentationContext(context: context, backgroundNode: nil))
             
             
