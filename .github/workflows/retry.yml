@@ -28,21 +28,20 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
         run: |
-          set -uo pipefail
+          set -euo pipefail
 
-          active=$(gh run list --repo "$REPO" --workflow "Build IPA" --limit 10 \
-            --json status -q '[.[] | select(.status == "queued" or .status == "in_progress" or .status == "waiting")] | length')
+          active=$(gh run list --repo "$REPO" --workflow "Build IPA" --limit 10 --json status \
+            -q '[.[] | select(.status == "queued" or .status == "in_progress" or .status == "waiting")] | length')
           echo "active build runs: $active"
           if [ "$active" -gt 0 ]; then
             echo "A build is already queued or running - leaving the queue alone."
             exit 0
           fi
 
-          last_id=$(gh run list --repo "$REPO" --workflow "Build IPA" --limit 1 --json databaseId -q '.[0].databaseId')
-          last=$(gh run list --repo "$REPO" --workflow "Build IPA" --limit 1 --json conclusion,headSha -q '.[0]')
-          echo "last run: $last_id => $last"
-
-          conclusion=$(echo "$last" | jq -r '.conclusion')
+          last_json=$(gh run list --repo "$REPO" --workflow "Build IPA" --limit 1 --json databaseId,conclusion -q '.[0]')
+          last_id=$(echo "$last_json" | jq -r '.databaseId')
+          conclusion=$(echo "$last_json" | jq -r '.conclusion')
+          echo "last build run: $last_id conclusion=$conclusion"
           if [ "$conclusion" = "success" ]; then
             echo "Newest build is green - nothing to retry."
             exit 0

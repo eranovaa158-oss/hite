@@ -438,13 +438,13 @@ public final class TabBarComponent: Component {
     public let axis: Axis
     /// Icons without labels, on either axis.
     public let isCompact: Bool
-    /// WhiteGram: force full width for the tab bar.
+    /// Force full width for the tab bar.
     public let forceFullWidth: Bool
-    /// WhiteGram: hide item titles.
+    /// Hide item titles.
     public let hideItemTitles: Bool
-    /// WhiteGram: use compact panel mode.
+    /// Use compact panel mode.
     public let compactPanel: Bool
-    /// WhiteGram: action for compact menu.
+    /// Action for compact menu.
     public let compactAction: ((UIView) -> Void)?
     
     public init(
