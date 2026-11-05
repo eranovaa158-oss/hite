@@ -419,7 +419,7 @@ private func proxySettingsDisplayStatus(strings: PresentationStrings, server: Pr
     switch server.connection {
         case .socks5:
             text = strings.ChatSettings_ConnectionType_UseSocks5
-        case .mtp:
+        case .mtp, .web:
             text = strings.SocksProxySetup_ProxyTelegram
     }
     switch status {
@@ -646,23 +646,22 @@ public func proxySettingsController(accountManager: AccountManager<TelegramAccou
         }
     })
     
-    let experimentalUISettings = Promise<ExperimentalUISettings>()
-    experimentalUISettings.set(accountManager.sharedData(keys: [ApplicationSpecificSharedDataKeys.experimentalUISettings])
+    let experimentalUISettingsSignal = accountManager.sharedData(keys: [ApplicationSpecificSharedDataKeys.experimentalUISettings])
     |> map { sharedData -> ExperimentalUISettings in
         if let value = sharedData.entries[ApplicationSpecificSharedDataKeys.experimentalUISettings]?.get(ExperimentalUISettings.self) {
             return value
         } else {
             return ExperimentalUISettings.defaultSettings
         }
-    })
+    }
     
     let statusesContext = ProxyServersStatuses(network: network, servers: proxySettings.get()
     |> map { proxySettings -> [ProxyServerSettings] in
         return proxySettings.servers
     })
     
-    let signal = combineLatest(updatedPresentationData, statePromise.get(), proxySettings.get(), statusesContext.statuses(), network.connectionStatus)
-    |> map { presentationData, state, proxySettings, statuses, connectionStatus -> (ItemListControllerState, (ItemListNodeState, Any)) in
+    let signal = combineLatest(updatedPresentationData, statePromise.get(), proxySettings.get(), statusesContext.statuses(), network.connectionStatus, experimentalUISettingsSignal)
+    |> map { presentationData, state, proxySettings, statuses, connectionStatus, experimentalUISettings -> (ItemListControllerState, (ItemListNodeState, Any)) in
         var presentationData = presentationData
         let updatedTheme = presentationData.theme.withModalBlocksBackground()
         presentationData = presentationData.withUpdated(theme: updatedTheme)

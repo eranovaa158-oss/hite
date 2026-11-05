@@ -193,6 +193,8 @@ public final class BrowserBookmarksScreen: ViewController {
             }, openRankInfo: { _, _, _ in
             }, openSetPeerAvatar: {
             }, displayPollRestrictedToast: { _ in
+            }, performPersonalChatDoubleTapAction: { _, _ in
+                return false
             }, automaticMediaDownloadSettings: MediaAutoDownloadSettings.defaultSettings, pollActionState: ChatInterfacePollActionState(), stickerSettings: ChatInterfaceStickerSettings(), presentationContext: ChatPresentationContext(context: context, backgroundNode: nil))
             
             
