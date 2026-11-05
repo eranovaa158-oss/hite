@@ -1653,7 +1653,7 @@ class ChatControllerNode: ASDisplayNode, ASScrollViewDelegate {
         if let titleAccessoryPanelNode {
             self.currentTitleAccessoryPanelNode = titleAccessoryPanelNode
             let panelKey = "\(type(of: titleAccessoryPanelNode))"
-            let hidesPanelBackground = titleAccessoryPanelNode is ChatPinnedMessageTitlePanelNode && ChatPinnedMessageTitlePanelNode.shouldUseCompactPinnedMessagesPanel(interfaceState: self.chatPresentationInterfaceState, context: self.context)
+            let hidesPanelBackground = titleAccessoryPanelNode is ChatPinnedMessageTitlePanelNode
             headerPanels.append(HeaderPanelContainerComponent.Panel(
                 key: panelKey,
                 orderIndex: 3,

@@ -3619,6 +3619,8 @@ public final class ChatControllerImpl: TelegramBaseController, ChatController, G
                 return
             }
             self.openMessageShareMenu(id: id)
+        }, performPersonalChatDoubleTapAction: { _, _ in
+            return false
         }, presentController: { [weak self] controller, arguments in
             self?.present(controller, in: .window(.root), with: arguments)
         }, presentControllerInCurrent: { [weak self] controller, arguments in
