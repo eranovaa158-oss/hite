@@ -2299,8 +2299,8 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             let badgeFont = Font.with(size: floor(item.presentationData.fontSize.itemListBaseFontSize * 12.0 / 17.0), design: .regular, weight: .semibold, traits: [.monospacedNumbers])
             let avatarBadgeFont = Font.with(size: floor(item.presentationData.fontSize.itemListBaseFontSize * 16.0 / 17.0), design: .regular, weight: .regular, traits: [.monospacedNumbers])
             let extraChatSettings = ExtraChatSettings.effectiveChatListSettings
-            let compactChatLayout = extraChatSettings.compactChatList
-            let isSearching = item.interaction.searchTextHighightState != nil
+            let compactChatLayout: Bool = extraChatSettings.compactChatList
+            let isSearching: Bool = item.interaction.searchTextHighightState != nil
             
             let account = item.context.account
             var messages: [EngineMessage]
@@ -2647,7 +2647,7 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             if case .groupReference = item.content {
                 useInlineAuthorPrefix = true
             }
-            if compactChatLayout, case let .chat(itemPeer, _, _, _, _, _, _, _) = contentData {
+            if compactChatLayout, case let .chat(itemPeer, _, _, _, _, _, _, _, _) = contentData {
                 if let messagePeer = itemPeer.chatMainPeer {
                     switch messagePeer {
                     case let .channel(channel):
@@ -3822,8 +3822,8 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             }
             
             let textLineSpacing: CGFloat = min(0.2, item.presentationData.fontSize.itemListBaseFontSize * 0.2 / 17.0)
-            let canUseTwoLinePreview = authorAttributedString == nil && itemTags.isEmpty && forumThread == nil && topForumTopicItems.isEmpty
-            let forceSingleLinePreview = extraChatSettings.compactChatList
+            let canUseTwoLinePreview: Bool = authorAttributedString == nil && itemTags.isEmpty && forumThread == nil && topForumTopicItems.isEmpty
+            let forceSingleLinePreview: Bool = extraChatSettings.compactChatList
             let (textLayout, textApply) = textLayout(TextNodeLayoutArguments(
                 attributedString: textAttributedString,
                 backgroundColor: nil,
@@ -4053,7 +4053,7 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             
             let titleSpacing: CGFloat = -1.0
             let authorSpacing: CGFloat = -3.0
-            let rawContentTopInset = compactChatLayout ? floor(item.presentationData.fontSize.itemListBaseFontSize * 4.0 / 17.0) : floor(item.presentationData.fontSize.itemListBaseFontSize * 8.0 / 17.0)
+            let rawContentTopInset: CGFloat = compactChatLayout ? floor(item.presentationData.fontSize.itemListBaseFontSize * 4.0 / 17.0) : floor(item.presentationData.fontSize.itemListBaseFontSize * 8.0 / 17.0)
             var itemHeight: CGFloat = 8.0 * 2.0 + 1.0
             itemHeight -= 21.0
             if case let .peer(peerData) = item.content, let customMessageListData = peerData.customMessageListData, customMessageListData.commandPrefix != nil {
@@ -4069,9 +4069,9 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
                 itemHeight = max(58.0, itemHeight - measureLayout.size.height)
             }
             if extraChatSettings.compactChatList {
-                let compactTextBlockHeight = titleLayout.size.height + textLayout.size.height
-                let compactTextHeight = rawContentTopInset + compactTextBlockHeight + 5.0
-                itemHeight = max(42.0, compactTextHeight, 38.0 + 4.0)
+                let compactTextBlockHeight: CGFloat = titleLayout.size.height + textLayout.size.height
+                let compactTextHeight: CGFloat = rawContentTopInset + compactTextBlockHeight + 5.0
+                itemHeight = CGFloat.maximum(42.0, compactTextHeight, 38.0 + 4.0)
             }
                         
             let rawContentRect = CGRect(origin: CGPoint(x: 2.0, y: layoutOffset + rawContentTopInset), size: CGSize(width: rawContentWidth, height: itemHeight - 12.0 - 9.0))
