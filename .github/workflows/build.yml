@@ -83,8 +83,7 @@ jobs:
             --codesigningInformationPath=build-system/fake-codesigning \
             --configuration=release_arm64 \
             --buildNumber="$BUILD_NUMBER" \
-            --outputBuildArtifactsPath="$SOURCE_DIR/build/artifacts" \
-            --continueOnError
+            --outputBuildArtifactsPath="$SOURCE_DIR/build/artifacts" 
 
           ls -la build/artifacts
           mv build/artifacts/Telegram.ipa "build/artifacts/hitegram-$APP_VERSION-$BUILD_NUMBER.ipa"
