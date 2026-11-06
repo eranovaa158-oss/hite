@@ -10,10 +10,6 @@ swift_library(
     ]),
     copts = [
         "-warnings-as-errors",
-        "-Xfrontend",
-        "-warn-long-expression-type-checking=100",
-        "-Xfrontend",
-        "-warn-long-function-bodies=200",
     ],
     deps = [
         "//submodules/SSignalKit/SwiftSignalKit:SwiftSignalKit",

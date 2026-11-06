@@ -4071,7 +4071,7 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
             if extraChatSettings.compactChatList {
                 let compactTextBlockHeight: CGFloat = titleLayout.size.height + textLayout.size.height
                 let compactTextHeight: CGFloat = rawContentTopInset + compactTextBlockHeight + 5.0
-                itemHeight = CGFloat.maximum(42.0, compactTextHeight, 38.0 + 4.0)
+                itemHeight = max(42.0, max(compactTextHeight, 38.0 + 4.0))
             }
                         
             let rawContentRect = CGRect(origin: CGPoint(x: 2.0, y: layoutOffset + rawContentTopInset), size: CGSize(width: rawContentWidth, height: itemHeight - 12.0 - 9.0))
