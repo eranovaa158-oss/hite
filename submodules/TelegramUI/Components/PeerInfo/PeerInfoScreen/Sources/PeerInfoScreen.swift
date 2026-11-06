@@ -164,6 +164,7 @@ enum PeerInfoSettingsSection {
     case avatar
     case edit
     case proxy
+    case extra
     case stories
     case savedMessages
     case recentCalls

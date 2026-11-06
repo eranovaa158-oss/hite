@@ -12,6 +12,7 @@ import ItemListPeerItem
 import DeviceAccess
 import TelegramStringFormatting
 import PeerNameColorItem
+import TelegramUIPreferences
 import WalletContext
 
 enum SettingsSection: Int, CaseIterable {
@@ -176,22 +177,16 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
             }))
         }
         
-        if !settings.proxySettings.servers.isEmpty {
-            let proxyType: String
-            if settings.proxySettings.enabled, let activeServer = settings.proxySettings.activeServer {
-                switch activeServer.connection {
-                case .mtp:
-                    proxyType = presentationData.strings.SocksProxySetup_ProxyTelegram
-                case .web:
-                    proxyType = presentationData.strings.SocksProxySetup_ProxyWeb
-                case .socks5:
-                    proxyType = presentationData.strings.SocksProxySetup_ProxySocks5
-                }
-            } else {
-                proxyType = presentationData.strings.Settings_ProxyDisabled
+        var proxyType: String = presentationData.strings.Settings_ProxyDisabled
+        if !settings.proxySettings.servers.isEmpty, settings.proxySettings.enabled, let activeServer = settings.proxySettings.activeServer {
+            switch activeServer.connection {
+            case .mtp:
+                proxyType = presentationData.strings.SocksProxySetup_ProxyTelegram
+            case .web:
+                proxyType = presentationData.strings.SocksProxySetup_ProxyWeb
+            case .socks5:
+                proxyType = presentationData.strings.SocksProxySetup_ProxySocks5
             }
-        } else {
-            proxyType = presentationData.strings.Settings_ProxyDisabled
         }
         let connectionTitle = presentationData.strings.baseLanguageCode.lowercased().hasPrefix("ru") ? "Соединение" : "Connection"
         items[.proxy]!.append(PeerInfoScreenDisclosureItem(id: 0, label: .text(proxyType), text: connectionTitle, icon: PresentationResourcesSettings.proxy, action: {
