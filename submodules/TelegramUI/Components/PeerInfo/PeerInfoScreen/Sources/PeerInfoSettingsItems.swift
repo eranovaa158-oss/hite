@@ -33,6 +33,7 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
     guard let data = data else {
         return []
     }
+    let extraContextMenuSettings = ExtraContextMenuSettings.current
     
     var items: [SettingsSection: [PeerInfoScreenItem]] = [:]
     for section in SettingsSection.allCases {
@@ -189,15 +190,24 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
             } else {
                 proxyType = presentationData.strings.Settings_ProxyDisabled
             }
-            items[.proxy]!.append(PeerInfoScreenDisclosureItem(id: 0, label: .text(proxyType), text: presentationData.strings.Settings_Proxy, icon: PresentationResourcesSettings.proxy, action: {
-                interaction.openSettings(.proxy)
-            }))
+        } else {
+            proxyType = presentationData.strings.Settings_ProxyDisabled
         }
+        let connectionTitle = presentationData.strings.baseLanguageCode.lowercased().hasPrefix("ru") ? "Соединение" : "Connection"
+        items[.proxy]!.append(PeerInfoScreenDisclosureItem(id: 0, label: .text(proxyType), text: connectionTitle, icon: PresentationResourcesSettings.proxy, action: {
+            interaction.openSettings(.proxy)
+        }))
+        items[.proxy]!.append(PeerInfoScreenDisclosureItem(id: 1, text: "Extra", icon: PresentationResourcesSettings.extra, action: {
+            interaction.openSettings(.extra)
+        }))
     }
     
     var appIndex = 1000
     if let settings = data.globalSettings {
         for bot in settings.bots {
+            if bot.shortName.lowercased() == "wallet" {
+                continue
+            }
             let iconSignal: Signal<UIImage?, NoError>
             if let peer = PeerReference(bot.peer), let icon = bot.icons[.iOSSettingsStatic] {
                 let fileReference: FileMediaReference = .attachBot(peer: peer, media: icon)
@@ -222,12 +232,16 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
         }
     }
     
-    items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 1, text: presentationData.strings.Settings_SavedMessages, icon: PresentationResourcesSettings.savedMessages, action: {
-        interaction.openSettings(.savedMessages)
-    }))
-    items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 2, text: presentationData.strings.CallSettings_RecentCalls, icon: PresentationResourcesSettings.recentCalls, action: {
-        interaction.openSettings(.recentCalls)
-    }))
+    if extraContextMenuSettings.isEnabled(.settingsSavedMessages) {
+        items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 1, text: presentationData.strings.Settings_SavedMessages, icon: PresentationResourcesSettings.savedMessages, action: {
+            interaction.openSettings(.savedMessages)
+        }))
+    }
+    if extraContextMenuSettings.isEnabled(.settingsRecentCalls) {
+        items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 2, text: presentationData.strings.CallSettings_RecentCalls, icon: PresentationResourcesSettings.recentCalls, action: {
+            interaction.openSettings(.recentCalls)
+        }))
+    }
     
     let devicesLabel: String
     if let settings = data.globalSettings, let otherSessionsCount = settings.otherSessionsCount {
@@ -240,12 +254,16 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
         devicesLabel = ""
     }
     
-    items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 3, label: .text(devicesLabel), text: presentationData.strings.Settings_Devices, icon: PresentationResourcesSettings.devices, action: {
-        interaction.openSettings(.devices)
-    }))
-    items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 4, text: presentationData.strings.Settings_ChatFolders, icon: PresentationResourcesSettings.chatFolders, action: {
-        interaction.openSettings(.chatFolders)
-    }))
+    if extraContextMenuSettings.isEnabled(.settingsDevices) {
+        items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 3, label: .text(devicesLabel), text: presentationData.strings.Settings_Devices, icon: PresentationResourcesSettings.devices, action: {
+            interaction.openSettings(.devices)
+        }))
+    }
+    if extraContextMenuSettings.isEnabled(.settingsChatFolders) {
+        items[.shortcuts]!.append(PeerInfoScreenDisclosureItem(id: 4, text: presentationData.strings.Settings_ChatFolders, icon: PresentationResourcesSettings.chatFolders, action: {
+            interaction.openSettings(.chatFolders)
+        }))
+    }
     
     let notificationsWarning: Bool
     if let settings = data.globalSettings {
@@ -277,13 +295,13 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
     
     let premiumConfiguration = PremiumConfiguration.with(appConfiguration: context.currentAppConfiguration.with { $0 })
     let isPremiumDisabled = premiumConfiguration.isPremiumDisabled
-    if !isPremiumDisabled || context.isPremium {
+    if extraContextMenuSettings.isEnabled(.settingsPremium) && (!isPremiumDisabled || context.isPremium) {
         items[.payment]!.append(PeerInfoScreenDisclosureItem(id: 100, label: .text(""), text: presentationData.strings.Settings_Premium, icon: PresentationResourcesSettings.premium, action: {
             interaction.openSettings(.premium)
         }))
     }
     if let starsState = data.starsState {
-        if !isPremiumDisabled || abs(starsState.balance.value) > 0 {
+        if extraContextMenuSettings.isEnabled(.settingsStars) && (!isPremiumDisabled || abs(starsState.balance.value) > 0) {
             let balanceText: NSAttributedString
             if abs(starsState.balance.value) > 0 {
                 let formattedLabel = formatStarsAmountText(starsState.balance, dateTimeFormat: presentationData.dateTimeFormat)
@@ -322,7 +340,7 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
         }))
     }
     if let starsState = data.starsState {
-        if !isPremiumDisabled || starsState.balance > StarsAmount.zero {
+        if extraContextMenuSettings.isEnabled(.settingsGifts) && (!isPremiumDisabled || starsState.balance > StarsAmount.zero) {
             items[.payment]!.append(PeerInfoScreenDisclosureItem(id: 105, label: .text(""), text: presentationData.strings.Settings_SendGift, icon: PresentationResourcesSettings.premiumGift, action: {
                 interaction.openSettings(.premiumGift)
             }))
@@ -342,15 +360,21 @@ func settingsItems(data: PeerInfoScreenData?, context: AccountContext, presentat
         }
     }
     
-    items[.support]!.append(PeerInfoScreenDisclosureItem(id: 0, text: presentationData.strings.Settings_Support, icon: PresentationResourcesSettings.support, action: {
-        interaction.openSettings(.support)
-    }))
-    items[.support]!.append(PeerInfoScreenDisclosureItem(id: 1, text: presentationData.strings.Settings_FAQ, icon: PresentationResourcesSettings.faq, action: {
-        interaction.openSettings(.faq)
-    }))
-    items[.support]!.append(PeerInfoScreenDisclosureItem(id: 2, text: presentationData.strings.Settings_Tips, icon: PresentationResourcesSettings.tips, action: {
-        interaction.openSettings(.tips)
-    }))
+    if extraContextMenuSettings.isEnabled(.settingsHelp) {
+        items[.support]!.append(PeerInfoScreenDisclosureItem(id: 0, text: presentationData.strings.Settings_Support, icon: PresentationResourcesSettings.support, action: {
+            interaction.openSettings(.support)
+        }))
+    }
+    if extraContextMenuSettings.isEnabled(.settingsFAQ) {
+        items[.support]!.append(PeerInfoScreenDisclosureItem(id: 1, text: presentationData.strings.Settings_FAQ, icon: PresentationResourcesSettings.faq, action: {
+            interaction.openSettings(.faq)
+        }))
+    }
+    if extraContextMenuSettings.isEnabled(.settingsFeatures) {
+        items[.support]!.append(PeerInfoScreenDisclosureItem(id: 2, text: presentationData.strings.Settings_Tips, icon: PresentationResourcesSettings.tips, action: {
+            interaction.openSettings(.tips)
+        }))
+    }
     
     var result: [(AnyHashable, [PeerInfoScreenItem])] = []
     for section in SettingsSection.allCases {
