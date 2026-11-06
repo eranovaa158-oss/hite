@@ -84,26 +84,26 @@ typedef enum {
 
 @end
 
-static NSString *RMIntrohitegramString(NSString *string) {
+static NSString *RMIntroHidegramString(NSString *string) {
     if (string == nil) {
         return nil;
     }
 
     NSString *result = string;
-    result = [result stringByReplacingOccurrencesOfString:@"Telegram app" withString:@"hitegram app"];
-    result = [result stringByReplacingOccurrencesOfString:@"Telegram App" withString:@"hitegram App"];
-    result = [result stringByReplacingOccurrencesOfString:@"Telegram Premium" withString:@"hitegram Premium"];
-    result = [result stringByReplacingOccurrencesOfString:@"Telegram" withString:@"hitegram"];
-    result = [result stringByReplacingOccurrencesOfString:@"Телеграме" withString:@"hitegram"];
-    result = [result stringByReplacingOccurrencesOfString:@"Телеграма" withString:@"hitegram"];
-    result = [result stringByReplacingOccurrencesOfString:@"Телеграму" withString:@"hitegram"];
-    result = [result stringByReplacingOccurrencesOfString:@"Телеграмом" withString:@"hitegram"];
-    result = [result stringByReplacingOccurrencesOfString:@"Телеграм" withString:@"hitegram"];
-    result = [result stringByReplacingOccurrencesOfString:@"телеграме" withString:@"hitegram"];
-    result = [result stringByReplacingOccurrencesOfString:@"телеграма" withString:@"hitegram"];
-    result = [result stringByReplacingOccurrencesOfString:@"телеграму" withString:@"hitegram"];
-    result = [result stringByReplacingOccurrencesOfString:@"телеграмом" withString:@"hitegram"];
-    result = [result stringByReplacingOccurrencesOfString:@"телеграм" withString:@"hitegram"];
+    result = [result stringByReplacingOccurrencesOfString:@"Telegram app" withString:@"Hidegram app"];
+    result = [result stringByReplacingOccurrencesOfString:@"Telegram App" withString:@"Hidegram App"];
+    result = [result stringByReplacingOccurrencesOfString:@"Telegram Premium" withString:@"Hidegram Premium"];
+    result = [result stringByReplacingOccurrencesOfString:@"Telegram" withString:@"Hidegram"];
+    result = [result stringByReplacingOccurrencesOfString:@"Телеграме" withString:@"Hidegram"];
+    result = [result stringByReplacingOccurrencesOfString:@"Телеграма" withString:@"Hidegram"];
+    result = [result stringByReplacingOccurrencesOfString:@"Телеграму" withString:@"Hidegram"];
+    result = [result stringByReplacingOccurrencesOfString:@"Телеграмом" withString:@"Hidegram"];
+    result = [result stringByReplacingOccurrencesOfString:@"Телеграм" withString:@"Hidegram"];
+    result = [result stringByReplacingOccurrencesOfString:@"телеграме" withString:@"Hidegram"];
+    result = [result stringByReplacingOccurrencesOfString:@"телеграма" withString:@"Hidegram"];
+    result = [result stringByReplacingOccurrencesOfString:@"телеграму" withString:@"Hidegram"];
+    result = [result stringByReplacingOccurrencesOfString:@"телеграмом" withString:@"Hidegram"];
+    result = [result stringByReplacingOccurrencesOfString:@"телеграм" withString:@"Hidegram"];
     return result;
 }
 
@@ -173,7 +173,7 @@ static NSString *RMIntrohitegramString(NSString *string) {
             if (bundle != nil) {
                 NSString *value = [bundle localizedStringForKey:key value:key table:nil];
                 if (value != nil) {
-                    englishStrings[key] = RMIntrohitegramString(value);
+                    englishStrings[key] = RMIntroHidegramString(value);
                 } else {
                     englishStrings[key] = key;
                 }

@@ -9,20 +9,20 @@ import Markdown
 public func extraAuthorizationString(_ string: String) -> String {
     var result = string
     let replacements: [(String, String)] = [
-        ("Telegram app", "hitegram app"),
-        ("Telegram App", "hitegram App"),
-        ("Telegram Premium", "hitegram Premium"),
-        ("Telegram", "hitegram"),
-        ("Телеграме", "hitegram"),
-        ("Телеграма", "hitegram"),
-        ("Телеграму", "hitegram"),
-        ("Телеграмом", "hitegram"),
-        ("Телеграм", "hitegram"),
-        ("телеграме", "hitegram"),
-        ("телеграма", "hitegram"),
-        ("телеграму", "hitegram"),
-        ("телеграмом", "hitegram"),
-        ("телеграм", "hitegram")
+        ("Telegram app", "Hidegram app"),
+        ("Telegram App", "Hidegram App"),
+        ("Telegram Premium", "Hidegram Premium"),
+        ("Telegram", "Hidegram"),
+        ("Телеграме", "Hidegram"),
+        ("Телеграма", "Hidegram"),
+        ("Телеграму", "Hidegram"),
+        ("Телеграмом", "Hidegram"),
+        ("Телеграм", "Hidegram"),
+        ("телеграме", "Hidegram"),
+        ("телеграма", "Hidegram"),
+        ("телеграму", "Hidegram"),
+        ("телеграмом", "Hidegram"),
+        ("телеграм", "Hidegram")
     ]
     for (source, target) in replacements {
         result = result.replacingOccurrences(of: source, with: target)

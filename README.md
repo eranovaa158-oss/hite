@@ -1,6 +1,6 @@
-# hitegram
+# Hidegram
 
-hitegram is an unofficial Telegram iOS client with a redesigned proxy system and the ability to customize the interface.
+Hidegram is an unofficial Telegram iOS client with a redesigned proxy system and the ability to customize the interface.
 
 Build on macOS via GitHub Actions (`.github/workflows/build.yml` in this repository): the workflow produces an unsigned IPA ready for Sideloadly / AltStore.
 

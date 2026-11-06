@@ -41,9 +41,9 @@ jobs:
         run: |
           set -x
           sudo mkdir -p /Users/Shared
-          sudo cp -R $GITHUB_WORKSPACE /Users/Shared/hitegram-build
-          sudo chown -R $(whoami):staff /Users/Shared/hitegram-build
-          cd /Users/Shared/hitegram-build
+          sudo cp -R $GITHUB_WORKSPACE /Users/Shared/Hidegram-build
+          sudo chown -R $(whoami):staff /Users/Shared/Hidegram-build
+          cd /Users/Shared/Hidegram-build
           # Submodules were checked out into $GITHUB_WORKSPACE; make sure they came along.
           ls third-party/mtproto-engine | head -3
 
@@ -59,7 +59,7 @@ jobs:
         run: |
           set -x
 
-          SOURCE_DIR=/Users/Shared/hitegram-build
+          SOURCE_DIR=/Users/Shared/Hidegram-build
           BAZEL_USER_ROOT="/Users/Shared/bazel-root"
 
           cd $SOURCE_DIR
@@ -86,7 +86,7 @@ jobs:
             --outputBuildArtifactsPath="$SOURCE_DIR/build/artifacts" 
 
           ls -la build/artifacts
-          mv build/artifacts/Telegram.ipa "build/artifacts/hitegram-$APP_VERSION-$BUILD_NUMBER.ipa"
+          mv build/artifacts/Telegram.ipa "build/artifacts/Hidegram-$APP_VERSION-$BUILD_NUMBER.ipa"
           rm -f build/artifacts/*.zip
           ls -la build/artifacts
 
@@ -100,8 +100,8 @@ jobs:
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v4
         with:
-          name: hitegram-${{ env.APP_VERSION }}-${{ env.BUILD_NUMBER }}
-          path: /Users/Shared/hitegram-build/build/artifacts/*.ipa
+          name: Hidegram-${{ env.APP_VERSION }}-${{ env.BUILD_NUMBER }}
+          path: /Users/Shared/Hidegram-build/build/artifacts/*.ipa
           if-no-files-found: error
           compression-level: 0
 
@@ -112,10 +112,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: build-${{ env.BUILD_NUMBER }}
-          name: hitegram ${{ env.APP_VERSION }} (${{ env.BUILD_NUMBER }})
+          name: Hidegram ${{ env.APP_VERSION }} (${{ env.BUILD_NUMBER }})
           body: |
-            Unsigned build of hitegram (Telegram iOS ${{ env.APP_VERSION }}).
+            Unsigned build of Hidegram (Telegram iOS ${{ env.APP_VERSION }}).
             Install via Sideloadly / AltStore.
-          files: /Users/Shared/hitegram-build/build/artifacts/*.ipa
+          files: /Users/Shared/Hidegram-build/build/artifacts/*.ipa
           draft: false
           prerelease: false
