@@ -43,9 +43,7 @@ filegroup(
 #    ], exclude = ["Telegram-iOS/Icons.xcassets/**/.*"]),
 #)
 
-internal_bundle_ids = [
-    "org.telegram.Telegram-iOS",
-]
+internal_bundle_ids = []
 
 available_appcenter_targets = [
     "@appcenter_sdk//:AppCenter",
